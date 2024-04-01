@@ -8,24 +8,21 @@ namespace market_manager.Models
 
         [Key]
         public int NotificacaoId { get; set; }
-        public string Tipo { get; set; }
 
-        [ForeignKey("Destinatario")]
-        public int DestinatarioId { get; set; }
-        public Utilizadores Destinatario { get; set; }
+        [ForeignKey(nameof(Utilizador))]
+        public string? DestinatarioId { get; set; }
+        public Utilizadores? Utilizador { get; set; }
 
-        [ForeignKey("Registo")]
-        public int RegistoId { get; set; }
-        public Utilizadores Registo { get; set; }
+        public EstadoNotificacao? EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
+        public DateTime? DataCriacao { get; set; } = DateTime.Now;
 
-        public string DestinatarioTipo { get; set; }
-
-        [ForeignKey("Reserva")]
-        public int? ReservaId { get; set; }
-        public Reservas Reserva { get; set; }
-
-        public string Estado { get; set; }
-        public DateTime DataCriacao { get; set; }
-
+        public enum EstadoNotificacao
+        {
+            /// <summary>
+            /// Enumerações permitidas para o estado de uma notificação
+            /// </summary>
+            Vista,
+            Enviada
+        }
     }
 }

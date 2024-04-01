@@ -4,42 +4,54 @@ using Microsoft.EntityFrameworkCore;
 
 namespace market_manager.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<Utilizadores>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Utilizadores> Utilizadores { get; set; }
-        public DbSet<Reservas> Reservas { get; set; }
         public DbSet<Bancas> Bancas { get; set; }
+        public DbSet<Reservas> Reservas { get; set; }
         public DbSet<Notificacoes> Notificacoes { get; set; }
+        public DbSet<Gestores> Gestores { get; set; }
+        public DbSet<Vendedores> Vendedores { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            modelBuilder.Entity<Notificacoes>()
-                .HasOne(n => n.Destinatario)
-                .WithMany()
-                .HasForeignKey(n => n.DestinatarioId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Reservas>()
+                .HasOne(r => r.Utilizador)
+                .WithMany(u => u.ListaReservas)
+                .HasForeignKey(r => r.UtilizadorId);
 
-            modelBuilder.Entity<Notificacoes>()
-                .HasOne(n => n.Registo)
-                .WithMany()
-                .HasForeignKey(n => n.RegistoId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Notificacoes>()
+                .HasOne(n => n.Utilizador)
+                .WithMany(u => u.ListaNotificacoes)
+                .HasForeignKey(n => n.DestinatarioId);
 
-            modelBuilder.Entity<Notificacoes>()
-                .HasOne(n => n.Reserva)
-                .WithMany(r => r.Notificacoes)
-                .HasForeignKey(n => n.ReservaId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            builder.Entity<Reservas>()
+                .HasMany(r => r.ListaBancas)
+                .WithMany(b => b.Reservas)
+                .UsingEntity<ReservaBanca>(
+                    j => j.HasOne(rb => rb.Banca).WithMany().HasForeignKey(rb => rb.BancaId),
+                    j => j.HasOne(rb => rb.Reserva).WithMany().HasForeignKey(rb => rb.ReservaId),
+                    j =>
+                    {
+                        j.Property(rb => rb.BancaId).HasColumnName("BancaId");
+                        j.Property(rb => rb.ReservaId).HasColumnName("ReservaId");
+                    });
         }
+    }
 
+    public class ReservaBanca
+    {
+        public int BancaId { get; set; }
+        public Bancas Banca { get; set; }
+
+        public int ReservaId { get; set; }
+        public Reservas Reserva { get; set; }
 
     }
 }
