@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static market_manager.Models.Reservas;
 
 namespace market_manager.Models
 {
@@ -11,6 +12,7 @@ namespace market_manager.Models
         public string? NISS { get; set; }
 
         [Display(Name = "Estado de Registo")]
+        [EnumDataType(typeof(EstadoRegisto))]
         public EstadoRegisto? EstadoActualRegisto{ get; set; } = EstadoRegisto.Pendente;
 
         [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de comerciante.")]

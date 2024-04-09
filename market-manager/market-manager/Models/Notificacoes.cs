@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using static market_manager.Models.Bancas;
 
 namespace market_manager.Models
 {
@@ -13,6 +14,7 @@ namespace market_manager.Models
         public string? DestinatarioId { get; set; }
         public Utilizadores? Utilizador { get; set; }
 
+        [EnumDataType(typeof(EstadoNotificacao))]
         public EstadoNotificacao? EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
         public DateTime? DataCriacao { get; set; } = DateTime.Now;
 
