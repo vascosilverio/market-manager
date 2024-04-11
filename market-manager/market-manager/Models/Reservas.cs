@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using static market_manager.Models.Notificacoes;
 
 namespace market_manager.Models
 {
@@ -27,7 +28,8 @@ namespace market_manager.Models
 
         public DateTime? DataCriacao { get; set; } = DateTime.Now;
 
-        public EstadoReserva? EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
+        [EnumDataType(typeof(EstadoReserva))]
+        public EstadoReserva EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
 
         public ICollection<Bancas> ListaBancas { get; set; }
         public ICollection<Notificacoes> ListaNotificacoes { get; set; }

@@ -15,6 +15,7 @@ namespace market_manager.Models
 
         [Required(ErrorMessage = "Introduza a categoria de produtos da banca.")]
         [Display(Name = "Categoria da Banca")]
+        [EnumDataType(typeof(CategoriaProdutos))]
         public CategoriaProdutos CategoriaBanca { get; set; }
 
         [Required(ErrorMessage = "Introduza a largura da banca.")]
@@ -32,10 +33,12 @@ namespace market_manager.Models
         public int LocalizacaoY { get; set; }
 
         [Required(ErrorMessage = "Introduza o estado atual da banca.")]
+        [EnumDataType(typeof(EstadoBanca))]
         public EstadoBanca EstadoActualBanca { get; set; } 
 
         public ICollection<Reservas>? Reservas { get; set; }
 
+        
         public enum EstadoBanca
         {
             /// <summary>
