@@ -8,7 +8,7 @@ using market_manager.Data;
 
 #nullable disable
 
-namespace market_manager.Data.Migrations
+namespace market_manager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -220,23 +220,19 @@ namespace market_manager.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificacaoId"));
 
-                    b.Property<DateTime?>("DataCriacao")
+                    b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DestinatarioId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("EstadoActualNotificacao")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ReservasReservaId")
+                    b.Property<int>("EstadoActualNotificacao")
                         .HasColumnType("int");
 
                     b.HasKey("NotificacaoId");
 
                     b.HasIndex("DestinatarioId");
-
-                    b.HasIndex("ReservasReservaId");
 
                     b.ToTable("Notificacoes");
                 });
@@ -249,21 +245,20 @@ namespace market_manager.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservaId"));
 
-                    b.Property<DateTime?>("DataCriacao")
+                    b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DataFim")
-                        .IsRequired()
+                    b.Property<DateTime>("DataFim")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DataInicio")
-                        .IsRequired()
+                    b.Property<DateTime>("DataInicio")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EstadoActualReserva")
+                    b.Property<int>("EstadoActualReserva")
                         .HasColumnType("int");
 
                     b.Property<string>("UtilizadorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ReservaId");
@@ -295,8 +290,7 @@ namespace market_manager.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly?>("DataNascimento")
-                        .IsRequired()
+                    b.Property<DateOnly>("DataNascimento")
                         .HasColumnType("date");
 
                     b.Property<string>("Discriminator")
@@ -394,18 +388,8 @@ namespace market_manager.Data.Migrations
                 {
                     b.HasBaseType("market_manager.Models.Utilizadores");
 
-                    b.Property<string>("Cargo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<DateTime?>("DataAdmissao")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Departamento")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NumeroIdentificacaoFuncionario")
                         .IsRequired()
@@ -419,13 +403,13 @@ namespace market_manager.Data.Migrations
                 {
                     b.HasBaseType("market_manager.Models.Utilizadores");
 
-                    b.Property<byte[]>("DocumentoCC")
+                    b.Property<string>("DocumentoCC")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("DocumentoCartaoComerciante")
+                    b.Property<string>("DocumentoCartaoComerciante")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("EstadoActualRegisto")
                         .HasColumnType("int");
@@ -512,11 +496,9 @@ namespace market_manager.Data.Migrations
                 {
                     b.HasOne("market_manager.Models.Utilizadores", "Utilizador")
                         .WithMany("ListaNotificacoes")
-                        .HasForeignKey("DestinatarioId");
-
-                    b.HasOne("market_manager.Models.Reservas", null)
-                        .WithMany("ListaNotificacoes")
-                        .HasForeignKey("ReservasReservaId");
+                        .HasForeignKey("DestinatarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Utilizador");
                 });
@@ -525,14 +507,11 @@ namespace market_manager.Data.Migrations
                 {
                     b.HasOne("market_manager.Models.Utilizadores", "Utilizador")
                         .WithMany("ListaReservas")
-                        .HasForeignKey("UtilizadorId");
+                        .HasForeignKey("UtilizadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Utilizador");
-                });
-
-            modelBuilder.Entity("market_manager.Models.Reservas", b =>
-                {
-                    b.Navigation("ListaNotificacoes");
                 });
 
             modelBuilder.Entity("market_manager.Models.Utilizadores", b =>
