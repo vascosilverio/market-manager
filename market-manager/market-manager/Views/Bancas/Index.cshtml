@@ -1,0 +1,71 @@
+﻿@model IEnumerable<market_manager.Models.Bancas>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NomeIdentificadorBanca)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CategoriaBanca)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Largura)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comprimento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LocalizacaoX)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LocalizacaoY)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EstadoActualBanca)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoriaBanca)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Largura)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comprimento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LocalizacaoX)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LocalizacaoY)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EstadoActualBanca)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.BancaId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BancaId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BancaId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -13,7 +13,7 @@ namespace market_manager.Models
         public int ReservaId { get; set; }
 
         [ForeignKey(nameof(Utilizador))]
-        public string UtilizadorId { get; set; }
+        public int UtilizadorId { get; set; }
         public Utilizadores? Utilizador { get; set; }
 
         [Required(ErrorMessage ="Introduza a data de início da reserva.")]

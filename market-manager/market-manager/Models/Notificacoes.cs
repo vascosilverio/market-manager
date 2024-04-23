@@ -10,8 +10,8 @@ namespace market_manager.Models
         public int NotificacaoId { get; set; }
 
         [ForeignKey(nameof(Utilizador))]
-        public string? DestinatarioId { get; set; }
-        public Utilizadores? Utilizador { get; set; }
+        public int DestinatarioId { get; set; }
+        public Utilizadores Utilizador { get; set; }
 
         public EstadoNotificacao? EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
         public DateTime? DataCriacao { get; set; } = DateTime.Now;
