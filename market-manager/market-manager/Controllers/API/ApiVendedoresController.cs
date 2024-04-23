@@ -13,11 +13,32 @@ namespace market_manager.Controllers.API
         public ApiVendedoresController(ApplicationDbContext context) {
             _context = context;
         }
-            
+
+        [HttpGet]
         [Route("")]
         public ActionResult Index()
         {
-        return Ok(_context.Vendedores.ToList());
+         var listaDb = _context.Vendedores.ToList();
+            var listaRes = new List<VendedorDTO>();
+
+            foreach (var item in listaDb) {
+                VendedorDTO coldto = new VendedorDTO();
+                coldto.Nome = item.PrimeiroNome;
+                coldto.CC = item.CC;
+
+            }
+
+            return Ok(listaRes);
         }
+
+        [HttpPost]
+        [Route("")]
+        public ActionResult InsereVendedor(VendedorDTO vendedor) {
+            VendedorDTO vendedorCol = new VendedoresDTO;
+            vendedorCol.nome = 
+
+        }
+
+       
     }
 }
