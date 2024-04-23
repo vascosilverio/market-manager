@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace market_manager.Models
 {
@@ -14,6 +15,7 @@ namespace market_manager.Models
         public string NISS { get; set; }
 
         [Display(Name = "Estado de Registo")]
+        [HiddenInput]
         public EstadoRegisto EstadoActualRegisto{ get; set; } = EstadoRegisto.Pendente;
 
         [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de comerciante.")]

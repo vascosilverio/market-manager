@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace market_manager.Models
 {
@@ -17,12 +19,16 @@ namespace market_manager.Models
         [Display(Name = "Categoria da Banca")]
         public CategoriaProdutos CategoriaBanca { get; set; }
 
-        [Required(ErrorMessage = "Introduza a largura da banca.")]
-        [Range(0.1, double.MaxValue)]
+        [NotMapped]
+        [Required(ErrorMessage = "Introduza a largura da banca com máximo de 3 dígitos de unidades e máximo de 2 dígitos de precisão")]
+        [RegularExpression("^[0-9]{0,2}[.,]?[0-9]{0,2}$", ErrorMessage="só aceita dígitos numéricos separados por um ponto, ou uma vírgula.")]
+        public string LarguraAux { get; set; }
         public decimal Largura { get; set; }
 
-        [Required(ErrorMessage = "Introduza o comprimento da banca.")]
-        [Range(0.1, double.MaxValue)]
+        [NotMapped]
+        [Required(ErrorMessage = "Introduza o comprimento da banca com máximo de 3 dígitos de unidades e máximo de 2 dígitos de precisão")]
+        [RegularExpression("^[0-9]{0,2}[.,]?[0-9]{0,2}$", ErrorMessage = "só aceita dígitos numéricos separados por um ponto, ou uma vírgula.")]
+        public string ComprimentoAux { get; set; }
         public decimal Comprimento { get; set; }
 
         [Required(ErrorMessage = "Introduza a coordenada X de localização da banca.")]
@@ -31,8 +37,8 @@ namespace market_manager.Models
         [Required(ErrorMessage = "Introduza a coordenada X de localização da banca.")]
         public int LocalizacaoY { get; set; }
 
-        [Required(ErrorMessage = "Introduza o estado atual da banca.")]
-        public EstadoBanca EstadoActualBanca { get; set; } 
+        [Display(Name = "Estado Atual da Banca")]
+        public EstadoBanca EstadoAtualBanca { get; set; } 
 
         public ICollection<Reservas>? Reservas { get; set; }
 

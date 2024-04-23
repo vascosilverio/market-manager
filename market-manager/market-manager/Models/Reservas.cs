@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace market_manager.Models
 {
@@ -14,19 +15,27 @@ namespace market_manager.Models
 
         [ForeignKey(nameof(Utilizador))]
         public int UtilizadorId { get; set; }
-        public Utilizadores? Utilizador { get; set; }
+        public Utilizadores Utilizador { get; set; }
 
         [Required(ErrorMessage ="Introduza a data de início da reserva.")]
+        [DataType(DataType.Date)]
         [Display(Name = "Data de início da Reserva.")]
-        public DateTime DataInicio { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
+        public DateOnly DataInicio { get; set; }
 
         [Required(ErrorMessage = "Introduza a data de fim da reserva.")]
+        [DataType(DataType.Date)]
         [Display(Name = "Data de fim da Reserva.")]
-        public DateTime DataFim { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
+        public DateOnly DataFim { get; set; }
 
+
+        [HiddenInput]
+        [DataType(DataType.Date)]
         public DateTime DataCriacao { get; set; } = DateTime.Now;
 
-        public EstadoReserva? EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
+        [HiddenInput]
+        public EstadoReserva EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
 
         public ICollection<Bancas> ListaBancas { get; set; }
 

@@ -54,15 +54,15 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NISS,EstadoActualRegisto,DocumentoCartaoComerciante,DocumentoCC,UtilizadorId,DataNascimento,PrimeiroNome,UltimoNome,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC")] Vendedores vendedores)
+        public async Task<IActionResult> Create([Bind("NISS,EstadoActualRegisto,DocumentoCartaoComerciante,DocumentoCC,UtilizadorId,DataNascimento,PrimeiroNome,UltimoNome,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC")] Vendedores vendedor)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(vendedores);
+                _context.Add(vendedor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(vendedores);
+            return View(vendedor);
         }
 
         // GET: Vendedores/Edit/5

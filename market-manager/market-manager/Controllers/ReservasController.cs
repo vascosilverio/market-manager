@@ -57,16 +57,16 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReservaId,UtilizadorId,DataInicio,DataFim,DataCriacao,EstadoActualReserva")] Reservas reservas)
+        public async Task<IActionResult> Create([Bind("UtilizadorId,DataInicio,DataFim,DataCriacao,EstadoActualReserva")] Reservas reserva)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(reservas);
+                _context.Add(reserva);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.UtilizadorId);
-            return View(reservas);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reserva.UtilizadorId);
+            return View(reserva);
         }
 
         // GET: Reservas/Edit/5

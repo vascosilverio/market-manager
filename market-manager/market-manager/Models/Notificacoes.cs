@@ -13,8 +13,10 @@ namespace market_manager.Models
         public int DestinatarioId { get; set; }
         public Utilizadores Utilizador { get; set; }
 
-        public EstadoNotificacao? EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
-        public DateTime? DataCriacao { get; set; } = DateTime.Now;
+        public EstadoNotificacao EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
+        
+        [DataType(DataType.Date)]
+        public DateTime DataCriacao { get; set; } = DateTime.Now;
 
         public enum EstadoNotificacao
         {
