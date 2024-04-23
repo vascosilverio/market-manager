@@ -40,7 +40,7 @@ namespace market_manager.Models
       
         [Required(ErrorMessage = "Introduza o estado atual da banca.")]
         [EnumDataType(typeof(EstadoBanca))]
-        public EstadoBanca EstadoActualBanca { get; set; } 
+        public EstadoBanca EstadoAtualBanca { get; set; } 
 
         public ICollection<Reservas>? Reservas { get; set; }
 

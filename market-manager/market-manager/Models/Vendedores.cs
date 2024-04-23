@@ -16,9 +16,8 @@ namespace market_manager.Models
         public string NISS { get; set; }
 
         [Display(Name = "Estado de Registo")]
-        
         [HiddenInput]
-        public EstadoRegisto EstadoActualRegisto{ get; set; } = EstadoRegisto.Pendente;
+        public EstadoRegisto EstadoActualRegisto{ get; set; }
 
         [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de comerciante.")]
         [Display(Name = "Fotocópia do Cartão de Comerciante")]
