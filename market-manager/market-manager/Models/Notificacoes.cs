@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using static market_manager.Models.Bancas;
 
 namespace market_manager.Models
 {
@@ -17,6 +18,7 @@ namespace market_manager.Models
         
         [DataType(DataType.Date)]
         public DateTime DataCriacao { get; set; } = DateTime.Now;
+
 
         public enum EstadoNotificacao
         {

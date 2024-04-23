@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace market_manager.Models
 {
     public class Reservas
@@ -35,6 +36,7 @@ namespace market_manager.Models
         public DateTime DataCriacao { get; set; } = DateTime.Now;
 
         [HiddenInput]
+        [EnumDataType(typeof(EstadoReserva))]
         public EstadoReserva EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
 
         public ICollection<Bancas> ListaBancas { get; set; }

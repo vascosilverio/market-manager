@@ -48,7 +48,9 @@ namespace market_manager.Controllers
         // GET: Reservas/Create
         public IActionResult Create()
         {
+
             ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC");
+
             return View();
         }
 
@@ -57,6 +59,7 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Create([Bind("UtilizadorId,DataInicio,DataFim,DataCriacao,EstadoActualReserva")] Reservas reserva)
         {
             if (ModelState.IsValid)
@@ -67,6 +70,7 @@ namespace market_manager.Controllers
             }
             ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reserva.UtilizadorId);
             return View(reserva);
+            
         }
 
         // GET: Reservas/Edit/5
@@ -82,7 +86,9 @@ namespace market_manager.Controllers
             {
                 return NotFound();
             }
+
             ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.UtilizadorId);
+
             return View(reservas);
         }
 
@@ -118,7 +124,9 @@ namespace market_manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.UtilizadorId);
+
             return View(reservas);
         }
 
