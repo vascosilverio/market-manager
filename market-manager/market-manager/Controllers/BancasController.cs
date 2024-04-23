@@ -54,15 +54,19 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BancaId,NomeIdentificadorBanca,CategoriaBanca,Largura,Comprimento,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas bancas)
+        public async Task<IActionResult> Create([Bind("NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas banca)
         {
+
             if (ModelState.IsValid)
             {
-                _context.Add(bancas);
+                //transferir o valor de PropinasAux para Propinas
+                banca.Largura=Convert.ToDecimal(banca.LarguraAux.Replace('.',','));
+                banca.Comprimento = Convert.ToDecimal(banca.ComprimentoAux.Replace('.', ','));
+                _context.Add(banca);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(bancas);
+            return View(banca);
         }
 
         // GET: Bancas/Edit/5

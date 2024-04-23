@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace market_manager.Models
 {
-    public class Utilizadores : IdentityUser
+    public class Utilizadores 
     {
         
         public Utilizadores() { 
-            ListaReservas = new HashSet<Reservas>();
             ListaNotificacoes = new HashSet<Notificacoes>();
+            ListaReservas = new HashSet<Reservas>();
         }
+        
+        [Key]
+        public int UtilizadorId { get; set; }
 
         [Required(ErrorMessage = "Deve inserir a sua data de nascimento.")]
         [DataType(DataType.Date)]
@@ -26,11 +29,13 @@ namespace market_manager.Models
         [StringLength(20, ErrorMessage = "Último nome não deve ter mais do que 20 caracteres.")]
         [Display(Name = "Último Nome")]
         public string UltimoNome { get; set; }
-       
-        [Required(ErrorMessage = "Deve inserir o seu número de telemóvel.")]
+
+        [Required(ErrorMessage = "Deve inserir o seu número de telemóvel.")]        
         [Phone]
+        [StringLength(9)]
+        [RegularExpression("^9[1236][0-9]{7}$", ErrorMessage = "o {0} só aceita 9 dígitos.")]
         [Display(Name = "Número de Telemóvel")]
-        public string NumeroTelemovel { get; set; }
+        public string Telemovel { get; set; }
 
         [Required(ErrorMessage = "Deve inserir a sua morada.")]
         [StringLength(100, ErrorMessage = "A morada não deve ter mais do que 100 caracteres.")]
@@ -54,8 +59,8 @@ namespace market_manager.Models
         [StringLength(9, MinimumLength = 8, ErrorMessage = "O número de identificação civil deve ter pelo menos 8 caracteres..")]
         public string CC { get; set; }
 
-        public ICollection<Reservas> ListaReservas { get; set; }
         public ICollection<Notificacoes> ListaNotificacoes { get; set; }
+        public ICollection<Reservas> ListaReservas { get; set; }
 
     }
 }

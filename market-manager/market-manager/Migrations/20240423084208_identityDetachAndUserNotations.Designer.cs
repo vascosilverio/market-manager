@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using market_manager.Data;
 
@@ -11,13 +12,15 @@ using market_manager.Data;
 namespace market_manager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240423084208_identityDetachAndUserNotations")]
+    partial class identityDetachAndUserNotations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -255,7 +258,7 @@ namespace market_manager.Migrations
                     b.Property<decimal>("Comprimento")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("EstadoAtualBanca")
+                    b.Property<int>("EstadoActualBanca")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Largura")
@@ -285,13 +288,13 @@ namespace market_manager.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificacaoId"));
 
-                    b.Property<DateTime>("DataCriacao")
+                    b.Property<DateTime?>("DataCriacao")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("DestinatarioId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EstadoActualNotificacao")
+                    b.Property<int?>("EstadoActualNotificacao")
                         .HasColumnType("int");
 
                     b.HasKey("NotificacaoId");
@@ -312,13 +315,13 @@ namespace market_manager.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("DataFim")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DataFim")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("DataInicio")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DataInicio")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("EstadoActualReserva")
+                    b.Property<int?>("EstadoActualReserva")
                         .HasColumnType("int");
 
                     b.Property<int>("UtilizadorId")
@@ -400,10 +403,10 @@ namespace market_manager.Migrations
                 {
                     b.HasBaseType("market_manager.Models.Utilizadores");
 
-                    b.Property<DateOnly>("DataAdmissao")
-                        .HasColumnType("date");
+                    b.Property<DateTime?>("DataAdmissao")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("NumIdFuncionario")
+                    b.Property<string>("NumeroIdentificacaoFuncionario")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
