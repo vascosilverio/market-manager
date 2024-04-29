@@ -9,7 +9,6 @@ namespace market_manager.Models
         public Gestores() {
             ListaNotificacoes = new HashSet<Notificacoes>();
         }
-        public int GestorId { get; set; }
 
         [DataType(DataType.Date)]
         [Display(Name = "Data de Admissão")]

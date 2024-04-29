@@ -13,8 +13,6 @@ namespace market_manager.Models
             ListaNotificacoes = new HashSet<Notificacoes>();
         }
 
-        public int VendedorId { get; set; }
-
         [Required(ErrorMessage = "Deve inserir o seu número de identificação da segurança social.")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "O seu número de identificação da segurança social deve ter 11 caracteres.")]
         [Display(Name = "Data de Identificação da Segurança Social")]
