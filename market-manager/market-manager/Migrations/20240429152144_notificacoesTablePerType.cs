@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace market_manager.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreateSingleTableIdentity : Migration
+    public partial class notificacoesTablePerType : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,22 +30,6 @@ namespace market_manager.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DataNascimento = table.Column<DateOnly>(type: "date", nullable: false),
-                    PrimeiroNome = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    UltimoNome = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    NumeroTelemovel = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Morada = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CodigoPostal = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
-                    Localidade = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    NIF = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
-                    CC = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    DataAdmissao = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NumeroIdentificacaoFuncionario = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    NISS = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
-                    EstadoActualRegisto = table.Column<int>(type: "int", nullable: true),
-                    DocumentoCartaoComerciante = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DocumentoCC = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -78,11 +62,61 @@ namespace market_manager.Migrations
                     Comprimento = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     LocalizacaoX = table.Column<int>(type: "int", nullable: false),
                     LocalizacaoY = table.Column<int>(type: "int", nullable: false),
-                    EstadoActualBanca = table.Column<int>(type: "int", nullable: false)
+                    EstadoAtualBanca = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Bancas", x => x.BancaId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Gestores",
+                columns: table => new
+                {
+                    UtilizadorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GestorId = table.Column<int>(type: "int", nullable: false),
+                    DataAdmissao = table.Column<DateOnly>(type: "date", nullable: false),
+                    NumIdFuncionario = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    DataNascimento = table.Column<DateOnly>(type: "date", nullable: false),
+                    PrimeiroNome = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    UltimoNome = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Telemovel = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
+                    Morada = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CodigoPostal = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    Localidade = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    NIF = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
+                    CC = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Gestores", x => x.UtilizadorId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vendedores",
+                columns: table => new
+                {
+                    UtilizadorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VendedorId = table.Column<int>(type: "int", nullable: false),
+                    NISS = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    EstadoActualRegisto = table.Column<int>(type: "int", nullable: false),
+                    DocumentoCartaoComerciante = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DocumentoCC = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DataNascimento = table.Column<DateOnly>(type: "date", nullable: false),
+                    PrimeiroNome = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    UltimoNome = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Telemovel = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
+                    Morada = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CodigoPostal = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    Localidade = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    NIF = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
+                    CC = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vendedores", x => x.UtilizadorId);
                 });
 
             migrationBuilder.CreateTable(
@@ -197,7 +231,8 @@ namespace market_manager.Migrations
                 {
                     NotificacaoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DestinatarioId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VendedorId = table.Column<int>(type: "int", nullable: false),
+                    GestorId = table.Column<int>(type: "int", nullable: false),
                     EstadoActualNotificacao = table.Column<int>(type: "int", nullable: false),
                     DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -205,10 +240,16 @@ namespace market_manager.Migrations
                 {
                     table.PrimaryKey("PK_Notificacoes", x => x.NotificacaoId);
                     table.ForeignKey(
-                        name: "FK_Notificacoes_AspNetUsers_DestinatarioId",
-                        column: x => x.DestinatarioId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
+                        name: "FK_Notificacoes_Gestores_GestorId",
+                        column: x => x.GestorId,
+                        principalTable: "Gestores",
+                        principalColumn: "UtilizadorId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notificacoes_Vendedores_VendedorId",
+                        column: x => x.VendedorId,
+                        principalTable: "Vendedores",
+                        principalColumn: "UtilizadorId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -218,9 +259,9 @@ namespace market_manager.Migrations
                 {
                     ReservaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UtilizadorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DataInicio = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DataFim = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VendedorId = table.Column<int>(type: "int", nullable: false),
+                    DataInicio = table.Column<DateOnly>(type: "date", nullable: false),
+                    DataFim = table.Column<DateOnly>(type: "date", nullable: false),
                     DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EstadoActualReserva = table.Column<int>(type: "int", nullable: false)
                 },
@@ -228,10 +269,10 @@ namespace market_manager.Migrations
                 {
                     table.PrimaryKey("PK_Reservas", x => x.ReservaId);
                     table.ForeignKey(
-                        name: "FK_Reservas_AspNetUsers_UtilizadorId",
-                        column: x => x.UtilizadorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
+                        name: "FK_Reservas_Vendedores_VendedorId",
+                        column: x => x.VendedorId,
+                        principalTable: "Vendedores",
+                        principalColumn: "UtilizadorId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -299,9 +340,14 @@ namespace market_manager.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notificacoes_DestinatarioId",
+                name: "IX_Notificacoes_GestorId",
                 table: "Notificacoes",
-                column: "DestinatarioId");
+                column: "GestorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notificacoes_VendedorId",
+                table: "Notificacoes",
+                column: "VendedorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReservaBanca_ReservaId",
@@ -309,9 +355,9 @@ namespace market_manager.Migrations
                 column: "ReservaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reservas_UtilizadorId",
+                name: "IX_Reservas_VendedorId",
                 table: "Reservas",
-                column: "UtilizadorId");
+                column: "VendedorId");
         }
 
         /// <inheritdoc />
@@ -342,13 +388,19 @@ namespace market_manager.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Gestores");
+
+            migrationBuilder.DropTable(
                 name: "Bancas");
 
             migrationBuilder.DropTable(
                 name: "Reservas");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Vendedores");
         }
     }
 }

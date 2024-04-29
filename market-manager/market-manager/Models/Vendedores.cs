@@ -1,14 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace market_manager.Models
 {
+    [Table("Vendedores")]
     public class Vendedores : Utilizadores
     {
         public Vendedores() {
-
+            ListaReservas = new HashSet<Reservas>();
+            ListaNotificacoes = new HashSet<Notificacoes>();
         }
+
+        public int VendedorId { get; set; }
 
         [Required(ErrorMessage = "Deve inserir o seu número de identificação da segurança social.")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "O seu número de identificação da segurança social deve ter 11 caracteres.")]
@@ -16,9 +21,8 @@ namespace market_manager.Models
         public string NISS { get; set; }
 
         [Display(Name = "Estado de Registo")]
-        
         [HiddenInput]
-        public EstadoRegisto EstadoActualRegisto{ get; set; } = EstadoRegisto.Pendente;
+        public EstadoRegisto EstadoActualRegisto{ get; set; }
 
         [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de comerciante.")]
         [Display(Name = "Fotocópia do Cartão de Comerciante")]
@@ -37,6 +41,7 @@ namespace market_manager.Models
             Recusado,
             Pendente
         }
-
+        public ICollection<Notificacoes> ListaNotificacoes { get; set; }
+        public ICollection<Reservas> ListaReservas { get; set; }
     }
 }
