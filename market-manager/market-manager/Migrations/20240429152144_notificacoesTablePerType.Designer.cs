@@ -12,8 +12,8 @@ using market_manager.Data;
 namespace market_manager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240423103032_fix")]
-    partial class fix
+    [Migration("20240429152144_notificacoesTablePerType")]
+    partial class notificacoesTablePerType
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -280,6 +280,73 @@ namespace market_manager.Migrations
                     b.ToTable("Bancas");
                 });
 
+            modelBuilder.Entity("market_manager.Models.Gestores", b =>
+                {
+                    b.Property<int>("UtilizadorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtilizadorId"));
+
+                    b.Property<string>("CC")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("CodigoPostal")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<DateOnly>("DataAdmissao")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DataNascimento")
+                        .HasColumnType("date");
+
+                    b.Property<int>("GestorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Localidade")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Morada")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NIF")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("NumIdFuncionario")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PrimeiroNome")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Telemovel")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("UltimoNome")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("UtilizadorId");
+
+                    b.ToTable("Gestores");
+                });
+
             modelBuilder.Entity("market_manager.Models.Notificacoes", b =>
                 {
                     b.Property<int>("NotificacaoId")
@@ -291,15 +358,20 @@ namespace market_manager.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DestinatarioId")
+                    b.Property<int>("EstadoActualNotificacao")
                         .HasColumnType("int");
 
-                    b.Property<int>("EstadoActualNotificacao")
+                    b.Property<int>("GestorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VendedorId")
                         .HasColumnType("int");
 
                     b.HasKey("NotificacaoId");
 
-                    b.HasIndex("DestinatarioId");
+                    b.HasIndex("GestorId");
+
+                    b.HasIndex("VendedorId");
 
                     b.ToTable("Notificacoes");
                 });
@@ -324,17 +396,17 @@ namespace market_manager.Migrations
                     b.Property<int>("EstadoActualReserva")
                         .HasColumnType("int");
 
-                    b.Property<int>("UtilizadorId")
+                    b.Property<int>("VendedorId")
                         .HasColumnType("int");
 
                     b.HasKey("ReservaId");
 
-                    b.HasIndex("UtilizadorId");
+                    b.HasIndex("VendedorId");
 
                     b.ToTable("Reservas");
                 });
 
-            modelBuilder.Entity("market_manager.Models.Utilizadores", b =>
+            modelBuilder.Entity("market_manager.Models.Vendedores", b =>
                 {
                     b.Property<int>("UtilizadorId")
                         .ValueGeneratedOnAdd()
@@ -355,10 +427,16 @@ namespace market_manager.Migrations
                     b.Property<DateOnly>("DataNascimento")
                         .HasColumnType("date");
 
-                    b.Property<string>("Discriminator")
+                    b.Property<string>("DocumentoCC")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DocumentoCartaoComerciante")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstadoActualRegisto")
+                        .HasColumnType("int");
 
                     b.Property<string>("Localidade")
                         .IsRequired()
@@ -375,6 +453,11 @@ namespace market_manager.Migrations
                         .HasMaxLength(9)
                         .HasColumnType("nvarchar(9)");
 
+                    b.Property<string>("NISS")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
                     b.Property<string>("PrimeiroNome")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -390,51 +473,12 @@ namespace market_manager.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("UtilizadorId");
-
-                    b.ToTable("Utilizadores");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Utilizadores");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("market_manager.Models.Gestores", b =>
-                {
-                    b.HasBaseType("market_manager.Models.Utilizadores");
-
-                    b.Property<DateOnly>("DataAdmissao")
-                        .HasColumnType("date");
-
-                    b.Property<string>("NumIdFuncionario")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasDiscriminator().HasValue("Gestores");
-                });
-
-            modelBuilder.Entity("market_manager.Models.Vendedores", b =>
-                {
-                    b.HasBaseType("market_manager.Models.Utilizadores");
-
-                    b.Property<string>("DocumentoCC")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DocumentoCartaoComerciante")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EstadoActualRegisto")
+                    b.Property<int>("VendedorId")
                         .HasColumnType("int");
 
-                    b.Property<string>("NISS")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                    b.HasKey("UtilizadorId");
 
-                    b.HasDiscriminator().HasValue("Vendedores");
+                    b.ToTable("Vendedores");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -509,27 +553,40 @@ namespace market_manager.Migrations
 
             modelBuilder.Entity("market_manager.Models.Notificacoes", b =>
                 {
-                    b.HasOne("market_manager.Models.Utilizadores", "Utilizador")
+                    b.HasOne("market_manager.Models.Gestores", "Gestor")
                         .WithMany("ListaNotificacoes")
-                        .HasForeignKey("DestinatarioId")
+                        .HasForeignKey("GestorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Utilizador");
+                    b.HasOne("market_manager.Models.Vendedores", "Vendedor")
+                        .WithMany("ListaNotificacoes")
+                        .HasForeignKey("VendedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gestor");
+
+                    b.Navigation("Vendedor");
                 });
 
             modelBuilder.Entity("market_manager.Models.Reservas", b =>
                 {
-                    b.HasOne("market_manager.Models.Utilizadores", "Utilizador")
+                    b.HasOne("market_manager.Models.Vendedores", "Vendedor")
                         .WithMany("ListaReservas")
-                        .HasForeignKey("UtilizadorId")
+                        .HasForeignKey("VendedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Utilizador");
+                    b.Navigation("Vendedor");
                 });
 
-            modelBuilder.Entity("market_manager.Models.Utilizadores", b =>
+            modelBuilder.Entity("market_manager.Models.Gestores", b =>
+                {
+                    b.Navigation("ListaNotificacoes");
+                });
+
+            modelBuilder.Entity("market_manager.Models.Vendedores", b =>
                 {
                     b.Navigation("ListaNotificacoes");
 

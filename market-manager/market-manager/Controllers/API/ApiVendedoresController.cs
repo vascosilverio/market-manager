@@ -1,6 +1,7 @@
 ﻿using market_manager.Data;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace market_manager.Controllers.API
 {
     [Route("api/[controller]")]
@@ -14,6 +15,7 @@ namespace market_manager.Controllers.API
             _context = context;
         }
 
+       /*
         [HttpGet]
         [Route("")]
         public ActionResult Index()
@@ -30,15 +32,15 @@ namespace market_manager.Controllers.API
 
             return Ok(listaRes);
         }
+        
+       [HttpPost]
+       [Route("")]
+       public ActionResult InsereVendedor([FromBody] VendedorDTO vendedor) {
+           VendedorDTO vendedorCol = new VendedoresDTO;
+           vendedorCol.nome = 
 
-        [HttpPost]
-        [Route("")]
-        public ActionResult InsereVendedor(VendedorDTO vendedor) {
-            VendedorDTO vendedorCol = new VendedoresDTO;
-            vendedorCol.nome = 
+       }
+       */
 
-        }
-
-       
     }
 }

@@ -22,7 +22,7 @@ namespace market_manager.Controllers
         // GET: Reservas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Reservas.Include(r => r.Utilizador);
+            var applicationDbContext = _context.Reservas.Include(r => r.Vendedor);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace market_manager.Controllers
             }
 
             var reservas = await _context.Reservas
-                .Include(r => r.Utilizador)
+                .Include(r => r.Vendedor)
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
             if (reservas == null)
             {
@@ -68,7 +68,7 @@ namespace market_manager.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reserva.UtilizadorId);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reserva.VendedorId);
             return View(reserva);
             
         }
@@ -87,7 +87,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.UtilizadorId);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.VendedorId);
 
             return View(reservas);
         }
@@ -125,7 +125,7 @@ namespace market_manager.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.UtilizadorId);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.VendedorId);
 
             return View(reservas);
         }
@@ -139,7 +139,7 @@ namespace market_manager.Controllers
             }
 
             var reservas = await _context.Reservas
-                .Include(r => r.Utilizador)
+                .Include(r => r.Vendedor)
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
             if (reservas == null)
             {

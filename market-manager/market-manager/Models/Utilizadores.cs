@@ -3,13 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace market_manager.Models
 {
+
     public class Utilizadores 
     {
-        
-        public Utilizadores() { 
-            ListaNotificacoes = new HashSet<Notificacoes>();
-            ListaReservas = new HashSet<Reservas>();
-        }
         
         [Key]
         public int UtilizadorId { get; set; }
@@ -30,7 +26,7 @@ namespace market_manager.Models
         [Display(Name = "Último Nome")]
         public string UltimoNome { get; set; }
 
-        [Required(ErrorMessage = "Deve inserir o seu número de telemóvel.")]        
+        [Required(ErrorMessage = "Deve inserir o seu número de telemóvel.")]
         [Phone]
         [StringLength(9)]
         [RegularExpression("^9[1236][0-9]{7}$", ErrorMessage = "o {0} só aceita 9 dígitos.")]
@@ -58,9 +54,5 @@ namespace market_manager.Models
         [Required(ErrorMessage = "Deve inserir o seu número de identificação civil.")]
         [StringLength(9, MinimumLength = 8, ErrorMessage = "O número de identificação civil deve ter pelo menos 8 caracteres..")]
         public string CC { get; set; }
-
-        public ICollection<Notificacoes> ListaNotificacoes { get; set; }
-        public ICollection<Reservas> ListaReservas { get; set; }
-
     }
 }
