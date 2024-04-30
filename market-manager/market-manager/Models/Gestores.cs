@@ -17,6 +17,7 @@ namespace market_manager.Models
 
         [Required]
         [StringLength(20)]
+        [Display(Name = "Número de Funcionário")]
         public string NumIdFuncionario { get; set; }
 
         public ICollection<Notificacoes> ListaNotificacoes { get; set; }

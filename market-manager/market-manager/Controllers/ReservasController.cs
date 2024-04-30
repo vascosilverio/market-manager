@@ -68,7 +68,7 @@ namespace market_manager.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reserva.VendedorId);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reserva.Vendedor);
             return View(reserva);
             
         }
@@ -87,7 +87,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.VendedorId);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Vendedor);
 
             return View(reservas);
         }
@@ -125,7 +125,7 @@ namespace market_manager.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.VendedorId);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Vendedor);
 
             return View(reservas);
         }
