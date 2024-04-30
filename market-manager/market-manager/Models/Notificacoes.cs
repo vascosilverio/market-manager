@@ -10,14 +10,9 @@ namespace market_manager.Models
         [Key]
         public int NotificacaoId { get; set; }
 
-        [ForeignKey(nameof(Vendedor))]
-        public int? VendedorId { get; set; }
-        public Vendedores Vendedor { get; set; }
+        public virtual Vendedores? Vendedor { get; set; }
 
-
-        [ForeignKey(nameof(Gestor))]
-        public int? GestorId { get; set; }
-        public Gestores Gestor { get; set; }
+        public virtual Gestores? Gestor { get; set; }
 
         public EstadoNotificacao EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
         

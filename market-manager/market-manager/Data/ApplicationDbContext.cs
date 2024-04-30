@@ -23,21 +23,6 @@ namespace market_manager.Data
             base.OnModelCreating(builder);
 
             builder.Entity<Reservas>()
-                .HasOne(r => r.Vendedor)
-                .WithMany(u => u.ListaReservas)
-                .HasForeignKey(r => r.VendedorId);
-
-            builder.Entity<Notificacoes>()
-                .HasOne(n => n.Vendedor)
-                .WithMany(u => u.ListaNotificacoes)
-                .HasForeignKey(n => n.VendedorId);
-
-            builder.Entity<Notificacoes>()
-                .HasOne(n => n.Gestor)
-                .WithMany(u => u.ListaNotificacoes)
-                .HasForeignKey(n => n.GestorId);
-
-            builder.Entity<Reservas>()
                 .HasMany(r => r.ListaBancas)
                 .WithMany(b => b.Reservas)
                 .UsingEntity<ReservaBanca>(

@@ -14,9 +14,7 @@ namespace market_manager.Models
         [Key]
         public int ReservaId { get; set; }
 
-        [ForeignKey(nameof(Vendedor))]
-        public int VendedorId { get; set; }
-        public Vendedores Vendedor { get; set; }
+        public virtual Vendedores Vendedor { get; set; }
 
         [Required(ErrorMessage ="Introduza a data de início da reserva.")]
         [DataType(DataType.Date)]

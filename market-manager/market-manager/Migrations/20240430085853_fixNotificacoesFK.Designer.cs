@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using market_manager.Data;
 
@@ -11,9 +12,11 @@ using market_manager.Data;
 namespace market_manager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240430085853_fixNotificacoesFK")]
+    partial class fixNotificacoesFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -394,12 +397,12 @@ namespace market_manager.Migrations
                     b.Property<int>("EstadoActualReserva")
                         .HasColumnType("int");
 
-                    b.Property<int>("VendedorUtilizadorId")
+                    b.Property<int>("VendedorId")
                         .HasColumnType("int");
 
                     b.HasKey("ReservaId");
 
-                    b.HasIndex("VendedorUtilizadorId");
+                    b.HasIndex("VendedorId");
 
                     b.ToTable("Reservas");
                 });
@@ -565,7 +568,7 @@ namespace market_manager.Migrations
                 {
                     b.HasOne("market_manager.Models.Vendedores", "Vendedor")
                         .WithMany("ListaReservas")
-                        .HasForeignKey("VendedorUtilizadorId")
+                        .HasForeignKey("VendedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
