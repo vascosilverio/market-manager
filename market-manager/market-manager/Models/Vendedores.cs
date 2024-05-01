@@ -24,11 +24,7 @@ namespace market_manager.Models
 
         [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de comerciante.")]
         [Display(Name = "Fotocópia do Cartão de Comerciante")]
-        public string DocumentoCartaoComerciante { get; set; }
-
-        [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de cidadão.")]
-        [Display(Name = "Fotocópia do Cartão de Cidadão")]
-        public string DocumentoCC { get; set; }
+        public string? DocumentoCartaoComerciante { get; set; }
 
         public enum EstadoRegisto
         {
