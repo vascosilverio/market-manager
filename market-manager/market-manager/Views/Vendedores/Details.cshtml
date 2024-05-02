@@ -26,13 +26,10 @@
             @Html.DisplayNameFor(model => model.DocumentoCartaoComerciante)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DocumentoCartaoComerciante)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DocumentoCC)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DocumentoCC)
+            <img src="~/DocumentosVendedor/@Html.DisplayFor(model => model.DocumentoCartaoComerciante)"
+                  alt="Documento de Cartão Comerciante @Html.DisplayFor(model => model.PrimeiroNome)"
+                  title="@Html.DisplayFor(model => model.PrimeiroNome)"
+                         width="100px" />
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.DataNascimento)

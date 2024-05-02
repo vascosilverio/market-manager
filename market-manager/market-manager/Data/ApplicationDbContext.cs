@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection.Emit;
 
 namespace market_manager.Data
 {
@@ -33,6 +34,28 @@ namespace market_manager.Data
                         j.Property(rb => rb.BancaId).HasColumnName("BancaId");
                         j.Property(rb => rb.ReservaId).HasColumnName("ReservaId");
                     });
+
+            builder.Entity<Reservas>()
+                .HasOne(r => r.Vendedor)
+                .WithMany(v => v.ListaReservas)
+                .OnDelete(DeleteBehavior.Cascade);
+
+           
+            builder.Entity<ReservaBanca>()
+                .HasOne(rb => rb.Banca)
+                .WithMany()
+                .HasForeignKey(rb => rb.BancaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Notificacoes>()
+                .HasOne(n => n.Vendedor)
+                .WithMany(v => v.ListaNotificacoes)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Notificacoes>()
+                .HasOne(n => n.Gestor)
+                .WithMany(g => g.ListaNotificacoes)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 

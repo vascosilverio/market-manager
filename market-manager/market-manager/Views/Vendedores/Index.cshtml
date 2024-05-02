@@ -22,9 +22,6 @@
                 @Html.DisplayNameFor(model => model.DocumentoCartaoComerciante)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DocumentoCC)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.DataNascimento)
             </th>
             <th>
@@ -64,10 +61,10 @@
                 @Html.DisplayFor(modelItem => item.EstadoActualRegisto)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DocumentoCartaoComerciante)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DocumentoCC)
+                    <img src="~/DocumentosVendedor/@Html.DisplayFor(modelItem => item.DocumentoCartaoComerciante)"
+                         alt="Documento de Cartão Comerciante @Html.DisplayFor(modelItem => item.PrimeiroNome)"
+                         title="@Html.DisplayFor(modelItem => item.PrimeiroNome)"
+                         width="100px" />
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DataNascimento)

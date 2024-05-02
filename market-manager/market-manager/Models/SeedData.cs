@@ -64,7 +64,6 @@ public static class SeedData
                     CC = "456789012",
                     NIF = "456789012",
                     NISS = "12345678901",
-                    DocumentoCC = "documento_cc.pdf",
                     DocumentoCartaoComerciante = "documento_cartao.pdf",
                     DataNascimento = new DateOnly(1990, 3, 10),
                     Morada = "Rua do Comércio, 789",

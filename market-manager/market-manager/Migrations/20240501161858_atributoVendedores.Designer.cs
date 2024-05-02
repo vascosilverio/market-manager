@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using market_manager.Data;
 
@@ -11,9 +12,11 @@ using market_manager.Data;
 namespace market_manager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240501161858_atributoVendedores")]
+    partial class atributoVendedores
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -546,13 +549,11 @@ namespace market_manager.Migrations
                 {
                     b.HasOne("market_manager.Models.Gestores", "Gestor")
                         .WithMany("ListaNotificacoes")
-                        .HasForeignKey("GestorUtilizadorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("GestorUtilizadorId");
 
                     b.HasOne("market_manager.Models.Vendedores", "Vendedor")
                         .WithMany("ListaNotificacoes")
-                        .HasForeignKey("VendedorUtilizadorId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("VendedorUtilizadorId");
 
                     b.Navigation("Gestor");
 
