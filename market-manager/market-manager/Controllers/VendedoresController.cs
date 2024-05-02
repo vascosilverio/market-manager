@@ -47,7 +47,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            return RedirectToAction(nameof(Index));
+            return View(vendedores);
         }
 
         // GET: Vendedores/Create
@@ -137,14 +137,14 @@ namespace market_manager.Controllers
                         return View(vendedor);
                     }
                 }
-                    // redireciona o user para a página index
-                    return RedirectToAction(nameof(Index));
-                }
-                //se cheguei aqui é porque alguma coisa correu mal :'(
-                //volta à View com os dados fornecidos pela View
-                return View(vendedor);
+                // redireciona o user para a página index
+                return RedirectToAction(nameof(Index));
             }
-        
+            //se cheguei aqui é porque alguma coisa correu mal :'(
+            //volta à View com os dados fornecidos pela View
+            return View(vendedor);
+        }
+
 
         // GET: Vendedores/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -167,23 +167,59 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NISS,EstadoActualRegisto,DocumentoCartaoComerciante,DocumentoCC,UtilizadorId,DataNascimento,PrimeiroNome,UltimoNome,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC")] Vendedores vendedores)
+        public async Task<IActionResult> Edit(int id, [Bind("NISS,EstadoActualRegisto,UtilizadorId,DataNascimento,PrimeiroNome,UltimoNome,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC")] Vendedores vendedor, IFormFile DocumentoCartaoComerciante)
         {
-            if (id != vendedores.UtilizadorId)
+
+            if (id != vendedor.UtilizadorId)
             {
                 return NotFound();
+            }
+
+            string nomeDocumentoCartaoComerciante = "";
+            bool haDocumentoCartaoComerciante = false;
+
+            if (DocumentoCartaoComerciante == null)
+            {
+                ModelState.AddModelError("", "Fornecimento da cópia do documento de Cartão Comerciante é obrigatória.");
+                return View(vendedor);
+            }
+            else
+            {
+                if (!(DocumentoCartaoComerciante.ContentType == "image/png"
+                ||
+                    DocumentoCartaoComerciante.ContentType == "image/jpeg"
+                ||
+                    DocumentoCartaoComerciante.ContentType == "application/pdf"))
+                {
+                    ModelState.AddModelError("", "Insira a documentação no formato png, jpeg ou pdf.");
+                    return View(vendedor);
+                }
+                else
+                {
+                    haDocumentoCartaoComerciante = true;
+
+                    Guid g = Guid.NewGuid();
+                    nomeDocumentoCartaoComerciante = g.ToString();
+                    //obter a extensão
+                    string extensao = Path.GetExtension(DocumentoCartaoComerciante.FileName);
+
+                    nomeDocumentoCartaoComerciante += extensao;
+                    //adicionar o nome do ficheiro ao objeto que vem do browser
+                    vendedor.DocumentoCartaoComerciante = nomeDocumentoCartaoComerciante;
+                    ModelState.Remove("DocumentoCartaoComerciante");
+                }
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(vendedores);
+                    _context.Update(vendedor);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ce)
                 {
-                    if (!VendedoresExists(vendedores.UtilizadorId))
+                    if (!VendedoresExists(vendedor.UtilizadorId))
                     {
                         return NotFound();
                     }
@@ -192,9 +228,41 @@ namespace market_manager.Controllers
                         throw;
                     }
                 }
+                // se há ficheiro de imagem, vamos guardar no disco rígido do servidor.
+                if (haDocumentoCartaoComerciante)
+                {
+                    try
+                    {
+                        string nomePastaOndeGuardarImagem = _webHostEnvironment.WebRootPath;
+                        //adicionar pasta imagens
+                        nomePastaOndeGuardarImagem = Path.Combine(nomePastaOndeGuardarImagem, "DocumentosVendedor");
+                        // e, existe a pasta imagens?
+                        if (!Directory.Exists(nomePastaOndeGuardarImagem))
+                        {
+                            // se nao existe, cria-se
+                            Directory.CreateDirectory(nomePastaOndeGuardarImagem);
+                        }
+                        // juntar o nome do ficheiro à sua localização
+                        string nomeFinalDocumentoCartaoComerciante = Path.Combine(nomePastaOndeGuardarImagem, nomeDocumentoCartaoComerciante);
+                        // guardar a imagem no disco rigido
+                        using var streamCartaoComerciante = new FileStream(nomeFinalDocumentoCartaoComerciante, FileMode.CreateNew);
+                        await DocumentoCartaoComerciante.CopyToAsync(streamCartaoComerciante);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Tratar a exceção de forma adequada
+                        // Por exemplo, registrar o erro em um log e exibir uma mensagem de erro para o usuário
+                        ModelState.AddModelError("", "Ocorreu um erro ao salvar o arquivo: " + ex.Message);
+                        return View(vendedor);
+                    }
+                }
+                // redireciona o user para a página index
                 return RedirectToAction(nameof(Index));
+
             }
-            return View(vendedores);
+            //se cheguei aqui é porque alguma coisa correu mal :'(
+            //volta à View com os dados fornecidos pela View
+            return View(vendedor);
         }
 
         // GET: Vendedores/Delete/5
