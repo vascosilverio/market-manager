@@ -5,7 +5,7 @@ using static market_manager.Models.Bancas;
 using static market_manager.Models.Notificacoes;
 using static market_manager.Models.Reservas;
 
-namespace MvcMovie.Models;
+namespace market_manager.Models.Seed;
 
 public static class SeedData
 {
@@ -82,7 +82,7 @@ public static class SeedData
                     DataFim = new DateOnly(2023, 6, 15),
                     DataCriacao = DateTime.Now,
                     EstadoActualReserva = EstadoReserva.Pendente,
-                    Vendedor = novoVendedor 
+                    Vendedor = novoVendedor
                 },
                 new Reservas
                 {

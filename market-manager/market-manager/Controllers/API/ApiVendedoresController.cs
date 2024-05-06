@@ -14,8 +14,7 @@ namespace market_manager.Controllers.API
         public ApiVendedoresController(ApplicationDbContext context) {
             _context = context;
         }
-
-       /*
+        /*
         [HttpGet]
         [Route("")]
         public ActionResult Index()

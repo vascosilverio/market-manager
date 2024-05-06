@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-
-namespace market_manager.Models
+﻿namespace market_manager.Models.DTOmodels
 {
     public class VendedorDTO
     {
@@ -11,4 +8,5 @@ namespace market_manager.Models
 
         public string DocumentoCC { get; set; }
     }
+
 }
