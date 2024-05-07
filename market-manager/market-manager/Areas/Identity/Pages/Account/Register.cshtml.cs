@@ -53,38 +53,37 @@ namespace market_manager.Areas.Identity.Pages.Account
         public InputModel Input { get; set; }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        ///  esta variável irá conter o "destino" a ser aplicado pela aplicação, quando 
+        ///  após o "registo" a aplicação pretender ser repocisionada
         /// </summary>
         public string ReturnUrl { get; set; }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        /// se se adicionar as chaves de autenticação por "providers" externos, aqui
+        /// serão listados por esta variável (por exemplo login com conta google, twitter, etc)
+        /// ver: https://go.microsoft.com/fwlink/?LinkID=532715
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
+        /// "inner class"
+        /// define os atributos a serem enviados/recebidos para/da interface
         /// </summary>
         public class InputModel
         {
             /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
+            /// Email do utilizador
             /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage ="O {0} é de preenchimento obrigatório.")]
+            [EmailAddress(ErrorMessage ="Escreva um {0} válido, por favor")]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
             /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
+            /// Password de acesso ao sistemam, pelo utilizador
             /// </summary>
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "O {0} é de preenchimento obrigatório.")]
+            [StringLength(20, ErrorMessage = "A {0} tem de ter no mínimo {2}, e no máximo {1} como número de caracteres.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
@@ -94,9 +93,10 @@ namespace market_manager.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            [Display(Name = "Confirmar password")]
+            [Compare("Password", ErrorMessage = "A password e a sua confirmação não coincidem.")]
             public string ConfirmPassword { get; set; }
+
         }
 
 
