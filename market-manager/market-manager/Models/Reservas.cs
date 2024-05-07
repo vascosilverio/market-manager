@@ -28,7 +28,6 @@ namespace market_manager.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
         public DateOnly DataFim { get; set; }
 
-
         [HiddenInput]
         [DataType(DataType.Date)]
         public DateTime DataCriacao { get; set; } = DateTime.Now;

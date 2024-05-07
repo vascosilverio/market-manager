@@ -10,19 +10,16 @@
 
   <ItemGroup>
     <Compile Remove="Data\Migrations\**" />
-    <Compile Remove="Models\NewFolder\**" />
     <Content Remove="Data\Migrations\**" />
-    <Content Remove="Models\NewFolder\**" />
     <EmbeddedResource Remove="Data\Migrations\**" />
-    <EmbeddedResource Remove="Models\NewFolder\**" />
     <None Remove="Data\Migrations\**" />
-    <None Remove="Models\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
     
@@ -32,6 +29,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
