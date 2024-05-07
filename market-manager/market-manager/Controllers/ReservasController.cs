@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using market_manager.Data;
 using market_manager.Models;
+using System.Linq;
 
 namespace market_manager.Controllers
 {
@@ -46,12 +44,23 @@ namespace market_manager.Controllers
         }
 
         // GET: Reservas/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            try
+            {
+                ViewData["Bancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC");
+                var vendedores = await _context.Vendedores.ToListAsync();
+                ViewBag.VendedoresList = new SelectList(vendedores, "UtilizadorId", "NISS");
 
-            return View();
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ocorreu um erro ao gerar a página: " + ex.Message);
+                throw;
+            }
+          
         }
 
         // POST: Reservas/Create
@@ -60,17 +69,19 @@ namespace market_manager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Create([Bind("UtilizadorId,DataInicio,DataFim,DataCriacao,EstadoActualReserva")] Reservas reserva)
+        public async Task<IActionResult> Create([Bind("UtilizadorId,DataInicio,DataFim,EstadoActualReserva")] Reservas reserva, List<int> selectedBancasIds)
         {
             if (ModelState.IsValid)
             {
+                reserva.ListaBancas = selectedBancasIds.Select(id => _context.Bancas.FirstOrDefault(b => b.BancaId == id)).ToList();
+
                 _context.Add(reserva);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reserva.Vendedor);
+
+            ViewData["Bancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca", selectedBancasIds);
             return View(reserva);
-            
         }
 
         // GET: Reservas/Edit/5

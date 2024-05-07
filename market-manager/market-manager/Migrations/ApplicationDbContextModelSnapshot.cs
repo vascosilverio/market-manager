@@ -22,6 +22,21 @@ namespace market_manager.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BancasReservas", b =>
+                {
+                    b.Property<int>("ListaBancasBancaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReservasReservaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ListaBancasBancaId", "ReservasReservaId");
+
+                    b.HasIndex("ReservasReservaId");
+
+                    b.ToTable("BancasReservas");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -222,23 +237,6 @@ namespace market_manager.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("market_manager.Data.ReservaBanca", b =>
-                {
-                    b.Property<int>("BancaId")
-                        .HasColumnType("int")
-                        .HasColumnName("BancaId");
-
-                    b.Property<int>("ReservaId")
-                        .HasColumnType("int")
-                        .HasColumnName("ReservaId");
-
-                    b.HasKey("BancaId", "ReservaId");
-
-                    b.HasIndex("ReservaId");
-
-                    b.ToTable("ReservaBanca");
                 });
 
             modelBuilder.Entity("market_manager.Models.Bancas", b =>
@@ -472,6 +470,21 @@ namespace market_manager.Migrations
                     b.ToTable("Vendedores");
                 });
 
+            modelBuilder.Entity("BancasReservas", b =>
+                {
+                    b.HasOne("market_manager.Models.Bancas", null)
+                        .WithMany()
+                        .HasForeignKey("ListaBancasBancaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("market_manager.Models.Reservas", null)
+                        .WithMany()
+                        .HasForeignKey("ReservasReservaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -521,25 +534,6 @@ namespace market_manager.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("market_manager.Data.ReservaBanca", b =>
-                {
-                    b.HasOne("market_manager.Models.Bancas", "Banca")
-                        .WithMany()
-                        .HasForeignKey("BancaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("market_manager.Models.Reservas", "Reserva")
-                        .WithMany()
-                        .HasForeignKey("ReservaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Banca");
-
-                    b.Navigation("Reserva");
                 });
 
             modelBuilder.Entity("market_manager.Models.Notificacoes", b =>

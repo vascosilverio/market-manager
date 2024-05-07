@@ -22,6 +22,50 @@ public static class SeedData
                 return;
             }
 
+            // Adiciona bancas
+            context.Bancas.AddRange(
+                new Bancas
+                {
+                    NomeIdentificadorBanca = "A01",
+                    CategoriaBanca = CategoriaProdutos.Refrigerados,
+                    Comprimento = 3.5m,
+                    Largura = 2.0m,
+                    LocalizacaoX = 10,
+                    LocalizacaoY = 20,
+                    EstadoAtualBanca = EstadoBanca.Ocupada
+                },
+                new Bancas
+                {
+                    NomeIdentificadorBanca = "B02",
+                    CategoriaBanca = CategoriaProdutos.Refrigerados,
+                    Comprimento = 4.0m,
+                    Largura = 2.5m,
+                    LocalizacaoX = 30,
+                    LocalizacaoY = 15,
+                    EstadoAtualBanca = EstadoBanca.Ocupada
+                },
+                new Bancas
+                {
+                    NomeIdentificadorBanca = "C03",
+                    CategoriaBanca = CategoriaProdutos.Peixe,
+                    Comprimento = 3.0m,
+                    Largura = 2.0m,
+                    LocalizacaoX = 50,
+                    LocalizacaoY = 25,
+                    EstadoAtualBanca = EstadoBanca.Livre
+                },
+                new Bancas
+                {
+                    NomeIdentificadorBanca = "D04",
+                    CategoriaBanca = CategoriaProdutos.Frescos,
+                    Comprimento = 4.5m,
+                    Largura = 3.0m,
+                    LocalizacaoX = 20,
+                    LocalizacaoY = 40,
+                    EstadoAtualBanca = EstadoBanca.Ocupada
+                }
+            );
+
 
             // Adiciona gestores
             context.Gestores.AddRange(
@@ -103,51 +147,7 @@ public static class SeedData
                     EstadoActualNotificacao = EstadoNotificacao.Vista,
                     Vendedor = novoVendedor
                 }
-            );
-
-            // Adiciona bancas
-            context.Bancas.AddRange(
-                new Bancas
-                {
-                    NomeIdentificadorBanca = "A01",
-                    CategoriaBanca = CategoriaProdutos.Refrigerados,
-                    Comprimento = 3.5m,
-                    Largura = 2.0m,
-                    LocalizacaoX = 10,
-                    LocalizacaoY = 20,
-                    EstadoAtualBanca = EstadoBanca.Ocupada
-                },
-                new Bancas
-                {
-                    NomeIdentificadorBanca = "B02",
-                    CategoriaBanca = CategoriaProdutos.Refrigerados,
-                    Comprimento = 4.0m,
-                    Largura = 2.5m,
-                    LocalizacaoX = 30,
-                    LocalizacaoY = 15,
-                    EstadoAtualBanca = EstadoBanca.Ocupada
-                },
-                new Bancas
-                {
-                    NomeIdentificadorBanca = "C03",
-                    CategoriaBanca = CategoriaProdutos.Peixe,
-                    Comprimento = 3.0m,
-                    Largura = 2.0m,
-                    LocalizacaoX = 50,
-                    LocalizacaoY = 25,
-                    EstadoAtualBanca = EstadoBanca.Livre
-                },
-                new Bancas
-                {
-                    NomeIdentificadorBanca = "D04",
-                    CategoriaBanca = CategoriaProdutos.Frescos,
-                    Comprimento = 4.5m,
-                    Largura = 3.0m,
-                    LocalizacaoX = 20,
-                    LocalizacaoY = 40,
-                    EstadoAtualBanca = EstadoBanca.Ocupada
-                }
-            );
+            );  
 
             context.SaveChanges();
         }
