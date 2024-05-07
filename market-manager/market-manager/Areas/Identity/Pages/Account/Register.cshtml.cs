@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using market_manager.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -74,8 +75,8 @@ namespace market_manager.Areas.Identity.Pages.Account
             /// <summary>
             /// Email do utilizador
             /// </summary>
-            [Required(ErrorMessage ="O {0} é de preenchimento obrigatório.")]
-            [EmailAddress(ErrorMessage ="Escreva um {0} válido, por favor")]
+            [Required(ErrorMessage = "O {0} é de preenchimento obrigatório.")]
+            [EmailAddress(ErrorMessage = "Escreva um {0} válido, por favor")]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
@@ -96,10 +97,21 @@ namespace market_manager.Areas.Identity.Pages.Account
             [Display(Name = "Confirmar password")]
             [Compare("Password", ErrorMessage = "A password e a sua confirmação não coincidem.")]
             public string ConfirmPassword { get; set; }
-
+            /// <summary>
+            /// 
+            /// </summary>
+            public Vendedores Vendedor { get; set; }
         }
 
+ 
 
+        /// <summary>
+        /// este método reage ao verbo HTTP GET
+        /// </summary>
+        /// <param name="returnUrl">o endereço onde "estávamos" quando foi feito o pedido para
+        /// nos registarmos
+        /// </param>
+        /// <returns></returns>
         public async Task OnGetAsync(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
@@ -116,6 +128,7 @@ namespace market_manager.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                //estamos aqui a verdadeiramente guardar os dados da autenticação na base de dados
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
@@ -131,6 +144,10 @@ namespace market_manager.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
+                    // envia email para o utilizador com o código
+                    // de validação do email inserido
+                    // SÓ APÓS a aceitação desta tarefa o utilizador pode entrar na app
+                    // isto é apenas a interface, tem de ser configurado primeiro
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
