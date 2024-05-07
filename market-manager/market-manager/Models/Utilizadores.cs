@@ -10,6 +10,8 @@ namespace market_manager.Models
         [Key]
         public int UtilizadorId { get; set; }
 
+        public string UserId { get; set; }
+
         [Required(ErrorMessage = "Deve inserir a sua data de nascimento.")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]

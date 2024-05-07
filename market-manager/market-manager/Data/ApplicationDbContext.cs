@@ -24,27 +24,8 @@ namespace market_manager.Data
             base.OnModelCreating(builder);
 
             builder.Entity<Reservas>()
-                .HasMany(r => r.ListaBancas)
-                .WithMany(b => b.Reservas)
-                .UsingEntity<ReservaBanca>(
-                    j => j.HasOne(rb => rb.Banca).WithMany().HasForeignKey(rb => rb.BancaId),
-                    j => j.HasOne(rb => rb.Reserva).WithMany().HasForeignKey(rb => rb.ReservaId),
-                    j =>
-                    {
-                        j.Property(rb => rb.BancaId).HasColumnName("BancaId");
-                        j.Property(rb => rb.ReservaId).HasColumnName("ReservaId");
-                    });
-
-            builder.Entity<Reservas>()
                 .HasOne(r => r.Vendedor)
                 .WithMany(v => v.ListaReservas)
-                .OnDelete(DeleteBehavior.Cascade);
-
-           
-            builder.Entity<ReservaBanca>()
-                .HasOne(rb => rb.Banca)
-                .WithMany()
-                .HasForeignKey(rb => rb.BancaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Notificacoes>()
