@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using market_manager.Data;
 using market_manager.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -30,13 +31,15 @@ namespace market_manager.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +47,7 @@ namespace market_manager.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -118,10 +122,15 @@ namespace market_manager.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+
+
+
+
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+          //  ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -134,6 +143,46 @@ namespace market_manager.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    // **********************************************************
+                    // vamos escrever na BD os dados do Gestor
+                    // na prática, quero aguarda na BD os dados
+                    // do atributo 'input.Gestor'
+                    // **********************************************************
+
+                    // vamos guardar o valor do atributo
+                    // que fará a 'ponte' entre a BD
+                    // de autenticação e a BD do 'negócio'
+                    Input.Vendedor.UserId = user.Id;
+
+                    try
+                    {
+                        // guardar os dados na BD
+                        _context.Add(Input.Vendedor);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        // há que registar os dados do que aconteceu mal, para se reparar o problema
+
+                        // se cheguei aqui é pq não se conseguiu escrever os dados do Professor na BD
+                        // há que tomar uma decisão sobre o que fazer...
+                        
+                        // Sugestão:
+                        // - guardar os dados da exceção num ficheiro de 'log' no disco rígido do servidor
+                        // - guardar os dados da exceção numa tabela da BD
+                        // - apagar o 'utilizador' criado dentro do try
+                        //
+                        //- notificar a pessoa que está a interagir com a aplicação do sucedido
+                        // - redirecionar a pessoa para uma página de erro
+
+                        _logger.LogInformation(ex.ToString()); // na consola do servidor não do computador
+                        
+                        throw;
+                    }
+                    
+
+                    // **********************************************************
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

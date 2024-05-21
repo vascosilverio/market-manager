@@ -9,9 +9,12 @@ using market_manager.Data;
 using market_manager.Models;
 using static System.Net.Mime.MediaTypeNames;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace market_manager.Controllers
 {
+    [Authorize] // Qualquer tarefa desta classe só pode ser efetuada por pessoas autorizadas (e autenticadas)
+                //exceto se se criar uma exceção
     public class VendedoresController : Controller
     {
         private readonly ApplicationDbContext _context;

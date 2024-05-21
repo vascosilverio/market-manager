@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-market_manager-5ea0c8d8-b4ed-4056-89f4-19193c14b639</UserSecretsId>
     <RootNamespace>market_manager</RootNamespace>

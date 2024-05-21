@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using market_manager.Data;
 using market_manager.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace market_manager.Controllers
 {
+    [Authorize] // Qualquer tarefa desta classe só pode ser efetuada por pessoas autorizadas (e autenticadas)
+                //exceto se se criar uma exceção
     public class GestoresController : Controller
     {
         private readonly ApplicationDbContext _context;

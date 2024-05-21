@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using market_manager.Data;
 using market_manager.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace market_manager.Controllers
 {
@@ -15,6 +16,8 @@ namespace market_manager.Controllers
         }
 
         // GET: Bancas
+        //mostra todas as bancas da base de dados
+        [AllowAnonymous] //permite a visualização das bancas da base de dados, sem a necessidade de autenticação
         public async Task<IActionResult> Index()
         {
             return View(await _context.Bancas.ToListAsync());

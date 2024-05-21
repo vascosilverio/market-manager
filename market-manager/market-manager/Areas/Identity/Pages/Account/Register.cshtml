@@ -9,10 +9,11 @@
 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
 <div class="row">
+        <h2>Create a new account.</h2>
+        <hr />
 
-    <div class="col-md-4">
-            <h2>Create a new account.</h2>
-            <hr />
+
+    <div class="col-md-4">            
             
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
@@ -33,31 +34,32 @@
         
     </div>
 
-        <div class="col-md-6 col-md-offset-2">
+        <div class="col-md-6">
             @*Vamos aqui recolher os dados específicos do Vendedor*@
+
+
+
             <div class="form-floating mb-3">
                  <input asp-for="Input.Vendedor.NISS" class="form-control" aria-required="true"  />
                  <label asp-for="Input.Vendedor.NISS"></label>
                  <span asp-validation-for="Input.Vendedor.NISS" class="text-danger"></span>
             </div>
-        </div>
-        <div class="col-md-6 col-md-offset-2">
+      
             @*Vamos aqui recolher os dados específicos do Vendedor*@
             <div class="form-floating mb-3">
                 <input asp-for="Input.Vendedor.DataNascimento" class="form-control" aria-required="true" />
                 <label asp-for="Input.Vendedor.DataNascimento"></label>
                 <span asp-validation-for="Input.Vendedor.DataNascimento" class="text-danger"></span>
             </div>
-        </div>
-        <div class="col-md-6 col-md-offset-2">
+      
             @*Vamos aqui recolher os dados específicos do Vendedor*@
             <div class="form-floating mb-3">
                 <input asp-for="Input.Vendedor.PrimeiroNome" class="form-control" aria-required="true" />
                 <label asp-for="Input.Vendedor.PrimeiroNome"></label>
                 <span asp-validation-for="Input.Vendedor.PrimeiroNome" class="text-danger"></span>
             </div>
-        </div>
-        <div class="col-md-6 col-md-offset-2">
+      
+
             @*Vamos aqui recolher os dados específicos do Vendedor*@
             <div class="form-floating mb-3">
                 <input asp-for="Input.Vendedor.UltimoNome" class="form-control" aria-required="true" />
@@ -69,7 +71,7 @@
 
     <div class="col-md-4">
         <br/>
-        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Registar</button>
      </div>
      
 </div>

@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using market_manager.Data;
 using market_manager.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace market_manager.Controllers
 {
+    
     public class ReservasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,6 +20,8 @@ namespace market_manager.Controllers
         }
 
         // GET: Reservas
+        //mostra todas as reservas da base de dados
+        [AllowAnonymous] //permite a visualização das reservas da base de dados, sem a necessidade de autenticação
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Reservas.Include(r => r.Vendedor);
