@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using market_manager.Data;
 using market_manager.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace market_manager.Controllers
 {
+    // [Authorize]
     public class BancasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -44,6 +46,14 @@ namespace market_manager.Controllers
         // GET: Bancas/Create
         public IActionResult Create()
         {
+            //procurar os dados a apresentar na "dropdown" das Bancas
+            ViewData["BancaFK"] = new SelectList(_context.Bancas.OrderBy(c => c.NomeIdentificadorBanca), "Id", "Nome");
+
+            //Obter a lista de bancas, para enviar para a View
+            //em SQL: SELECT * FROM Bancas p ORDER BY p.Nome
+            //em LINQ:
+            var listaBancas = _context.Bancas.OrderBy(p => p.NomeIdentificadorBanca).ToList();
+            ViewData["listaBancas"] = listaBancas;
             return View();
         }
 
@@ -52,8 +62,20 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas banca)
+        public async Task<IActionResult> Create([Bind("NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas banca, int[] escolhaBanca)
         {
+            // var. auxiliar
+            bool haErros = false;
+
+            // Validações
+            if (escolhaBanca.Length == 0)
+            {
+                // não escolhi nenhuma banca
+                ModelState.AddModelError(" ", "Escolha uma banca");
+                haErros = true;
+
+            }
+
 
             if (ModelState.IsValid)
             {

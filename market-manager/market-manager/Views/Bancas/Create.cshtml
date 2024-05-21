@@ -52,8 +52,29 @@
                 <span asp-validation-for="EstadoAtualBanca" class="text-danger"></span>
 
             </div>
+
+            @* listar as bancas *@
             <div class="form-group">
+                <label class="control-label">Bancas</label>
+
+                @foreach(var banca in (List<Bancas>)ViewData["listaBancas"] ?? Enumerable.Empty<Bancas>())
+                {
+                    // <input class=""type="checkbox"/> @banca.NomeIdentificadorBanca<br/> (ESTE COMENTÁRIO É UM COMENTÁRIO C SHARP)
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="@banca.BancaId" name="escolhaBanca">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            @banca.NomeIdentificadorBanca
+                        </label>
+                    </div>
+                }
+
+
+            </div>
+
+            <div class="form-group">
+                <br />
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <br />
             </div>
         </form>
     </div>
