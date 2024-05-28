@@ -28,14 +28,17 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            var bancas = await _context.Bancas
-                .FirstOrDefaultAsync(m => m.BancaId == id);
-            if (bancas == null)
+            //procura os dados da Banca
+            //em SQL: SELECT * FROM Bancas banca INNER JOIN (nao acabado)
+            var banca = await _context.Bancas
+                .Include(u => u.NomeIdentificadorBanca)
+				.FirstOrDefaultAsync(m => m.BancaId == id);
+            if (banca == null)
             {
                 return NotFound();
             }
 
-            return View(bancas);
+            return View(banca);
         }
 
         // GET: Bancas/Create

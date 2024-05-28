@@ -1,13 +1,14 @@
 ﻿@model market_manager.Models.Bancas
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Banca";
 }
 
-<h1>Details</h1>
+<h1>Detalhes da Banca</h1>
+<h4>@Model.NomeIdentificadorBanca</h4> @* model representa os dados que chegam a vista, a linha 1 
+                                          carcateriza o que tem a variavel model *@
 
 <div>
-    <h4>Bancas</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
