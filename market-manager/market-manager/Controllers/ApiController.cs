@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using market_manager.Models;
+using market_manager.Data;
 
 namespace market_manager.Controllers
 {
@@ -7,5 +9,6 @@ namespace market_manager.Controllers
 	[ApiController]
 	public class ApiController : ControllerBase
 	{
+		private readonly apiContext
 	}
 }
