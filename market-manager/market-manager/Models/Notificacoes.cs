@@ -10,13 +10,16 @@ namespace market_manager.Models
         [Key]
         public int NotificacaoId { get; set; }
 
-        [ForeignKey(nameof(Utilizador))]
-        public string? DestinatarioId { get; set; }
-        public Utilizadores? Utilizador { get; set; }
+        public virtual Vendedores? Vendedor { get; set; }
 
-        [EnumDataType(typeof(EstadoNotificacao))]
-        public EstadoNotificacao? EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
-        public DateTime? DataCriacao { get; set; } = DateTime.Now;
+        public virtual Gestores? Gestor { get; set; }
+
+        public EstadoNotificacao EstadoActualNotificacao { get; set; } = EstadoNotificacao.Enviada;
+        
+        [DataType(DataType.Date)]
+        public DateTime DataCriacao { get; set; } = DateTime.Now;
+
+        public string Conteudo { get; set; }
 
         public enum EstadoNotificacao
         {

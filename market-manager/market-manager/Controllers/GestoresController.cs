@@ -5,22 +5,22 @@ using market_manager.Models;
 
 namespace market_manager.Controllers
 {
-    public class BancasController : Controller
+    public class GestoresController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public BancasController(ApplicationDbContext context)
+        public GestoresController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Bancas
+        // GET: Gestores
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Bancas.ToListAsync());
+            return View(await _context.Gestores.ToListAsync());
         }
 
-        // GET: Bancas/Details/5
+        // GET: Gestores/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -28,43 +28,39 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            var bancas = await _context.Bancas
-                .FirstOrDefaultAsync(m => m.BancaId == id);
-            if (bancas == null)
+            var gestores = await _context.Gestores
+                .FirstOrDefaultAsync(m => m.UtilizadorId == id);
+            if (gestores == null)
             {
                 return NotFound();
             }
 
-            return View(bancas);
+            return View(gestores);
         }
 
-        // GET: Bancas/Create
+        // GET: Gestores/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Bancas/Create
+        // POST: Gestores/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas banca)
+        public async Task<IActionResult> Create([Bind("DataAdmissao,NumeroIdentificacaoFuncionario,UtilizadorId,DataNascimento,PrimeiroNome,UltimoNome,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC")] Gestores gestor)
         {
-
             if (ModelState.IsValid)
             {
-                //transferir o valor de PropinasAux para Propinas
-                banca.Largura=Convert.ToDecimal(banca.LarguraAux.Replace('.',','));
-                banca.Comprimento = Convert.ToDecimal(banca.ComprimentoAux.Replace('.', ','));
-                _context.Add(banca);
+                _context.Add(gestor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(banca);
+            return View(gestor);
         }
 
-        // GET: Bancas/Edit/5
+        // GET: Gestores/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -72,22 +68,22 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            var bancas = await _context.Bancas.FindAsync(id);
-            if (bancas == null)
+            var gestores = await _context.Gestores.FindAsync(id);
+            if (gestores == null)
             {
                 return NotFound();
             }
-            return View(bancas);
+            return View(gestores);
         }
 
-        // POST: Bancas/Edit/5
+        // POST: Gestores/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BancaId,NomeIdentificadorBanca,CategoriaBanca,Largura,Comprimento,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas bancas)
+        public async Task<IActionResult> Edit(int id, [Bind("DataAdmissao,NumeroIdentificacaoFuncionario,UtilizadorId,DataNascimento,PrimeiroNome,UltimoNome,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC")] Gestores gestores)
         {
-            if (id != bancas.BancaId)
+            if (id != gestores.UtilizadorId)
             {
                 return NotFound();
             }
@@ -96,12 +92,12 @@ namespace market_manager.Controllers
             {
                 try
                 {
-                    _context.Update(bancas);
+                    _context.Update(gestores);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BancasExists(bancas.BancaId))
+                    if (!GestoresExists(gestores.UtilizadorId))
                     {
                         return NotFound();
                     }
@@ -112,10 +108,10 @@ namespace market_manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(bancas);
+            return View(gestores);
         }
 
-        // GET: Bancas/Delete/5
+        // GET: Gestores/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -123,34 +119,34 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            var bancas = await _context.Bancas
-                .FirstOrDefaultAsync(m => m.BancaId == id);
-            if (bancas == null)
+            var gestores = await _context.Gestores
+                .FirstOrDefaultAsync(m => m.UtilizadorId == id);
+            if (gestores == null)
             {
                 return NotFound();
             }
 
-            return View(bancas);
+            return View(gestores);
         }
 
-        // POST: Bancas/Delete/5
+        // POST: Gestores/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var bancas = await _context.Bancas.FindAsync(id);
-            if (bancas != null)
+            var gestores = await _context.Gestores.FindAsync(id);
+            if (gestores != null)
             {
-                _context.Bancas.Remove(bancas);
+                _context.Gestores.Remove(gestores);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BancasExists(int id)
+        private bool GestoresExists(int id)
         {
-            return _context.Bancas.Any(e => e.BancaId == id);
+            return _context.Gestores.Any(e => e.UtilizadorId == id);
         }
     }
 }

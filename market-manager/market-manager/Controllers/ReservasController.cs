@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using market_manager.Data;
 using market_manager.Models;
+using System.Linq;
 
 namespace market_manager.Controllers
 {
@@ -22,7 +20,7 @@ namespace market_manager.Controllers
         // GET: Reservas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Reservas.Include(r => r.Utilizador);
+            var applicationDbContext = _context.Reservas.Include(r => r.Vendedor);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +33,7 @@ namespace market_manager.Controllers
             }
 
             var reservas = await _context.Reservas
-                .Include(r => r.Utilizador)
+                .Include(r => r.Vendedor)
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
             if (reservas == null)
             {
@@ -46,10 +44,23 @@ namespace market_manager.Controllers
         }
 
         // GET: Reservas/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["UtilizadorId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
+            try
+            {
+                ViewData["Bancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
+
+                var vendedores = await _context.Vendedores.ToListAsync();
+                ViewBag.VendedoresList = new SelectList(vendedores, "UtilizadorId", "NISS");
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Ocorreu um erro ao gerar a página: " + ex.Message);
+                throw;
+            }
+          
         }
 
         // POST: Reservas/Create
@@ -57,16 +68,20 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReservaId,UtilizadorId,DataInicio,DataFim,DataCriacao,EstadoActualReserva")] Reservas reservas)
+
+        public async Task<IActionResult> Create([Bind("UtilizadorId,DataInicio,DataFim,EstadoActualReserva")] Reservas reserva, List<int> selectedBancasIds)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(reservas);
+                reserva.ListaBancas = selectedBancasIds.Select(id => _context.Bancas.FirstOrDefault(b => b.BancaId == id)).ToList();
+
+                _context.Add(reserva);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UtilizadorId"] = new SelectList(_context.Users, "Id", "Id", reservas.UtilizadorId);
-            return View(reservas);
+
+            ViewData["Bancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca", selectedBancasIds);
+            return View(reserva);
         }
 
         // GET: Reservas/Edit/5
@@ -82,7 +97,9 @@ namespace market_manager.Controllers
             {
                 return NotFound();
             }
-            ViewData["UtilizadorId"] = new SelectList(_context.Users, "Id", "Id", reservas.UtilizadorId);
+
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Vendedor);
+
             return View(reservas);
         }
 
@@ -118,7 +135,9 @@ namespace market_manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UtilizadorId"] = new SelectList(_context.Users, "Id", "Id", reservas.UtilizadorId);
+
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Vendedor);
+
             return View(reservas);
         }
 
@@ -131,7 +150,7 @@ namespace market_manager.Controllers
             }
 
             var reservas = await _context.Reservas
-                .Include(r => r.Utilizador)
+                .Include(r => r.Vendedor)
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
             if (reservas == null)
             {

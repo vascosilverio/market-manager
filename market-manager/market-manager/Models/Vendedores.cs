@@ -1,27 +1,30 @@
-﻿using System.ComponentModel.DataAnnotations;
-using static market_manager.Models.Reservas;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace market_manager.Models
 {
+    [Table("Vendedores")]
     public class Vendedores : Utilizadores
     {
+        public Vendedores() {
+            ListaReservas = new HashSet<Reservas>();
+            ListaNotificacoes = new HashSet<Notificacoes>();
+        }
 
         [Required(ErrorMessage = "Deve inserir o seu número de identificação da segurança social.")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "O seu número de identificação da segurança social deve ter 11 caracteres.")]
         [Display(Name = "Data de Identificação da Segurança Social")]
-        public string? NISS { get; set; }
+        public string NISS { get; set; }
 
         [Display(Name = "Estado de Registo")]
-        [EnumDataType(typeof(EstadoRegisto))]
-        public EstadoRegisto? EstadoActualRegisto{ get; set; } = EstadoRegisto.Pendente;
+        [HiddenInput]
+        public EstadoRegisto EstadoActualRegisto{ get; set; }
 
         [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de comerciante.")]
         [Display(Name = "Fotocópia do Cartão de Comerciante")]
-        public byte[]? DocumentoCartaoComerciante { get; set; }
-
-        [Required(ErrorMessage = "Deve inserir uma cópia do seu cartão de cidadão.")]
-        [Display(Name = "Fotocópia do Cartão de Cidadão")]
-        public byte[]? DocumentoCC { get; set; }
+        public string? DocumentoCartaoComerciante { get; set; }
 
         public enum EstadoRegisto
         {
@@ -32,6 +35,7 @@ namespace market_manager.Models
             Recusado,
             Pendente
         }
-
+        public ICollection<Notificacoes> ListaNotificacoes { get; set; }
+        public ICollection<Reservas> ListaReservas { get; set; }
     }
 }
