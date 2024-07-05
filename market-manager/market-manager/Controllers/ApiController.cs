@@ -7,12 +7,12 @@ namespace market_manager.Controllers
 {
 	[Route("api/[controller]/[action]")]
 	[ApiController]
-	public class ApiController : ControllerBase
+	public class ApiController : Controller
 	{
-		private readonly APIContext _context;
+		private readonly ApplicationDbContext _context;
 
 		// Construtor que recebe o contexto da bd APIContext como uma dependência.
-		public ApiController(APIContext context)
+		public ApiController(ApplicationDbContext context)
 		{
 			// permitir o acesso ao contexto da bd dentro das ações do controlador, _ indica uma variável privada
 			_context = context;
