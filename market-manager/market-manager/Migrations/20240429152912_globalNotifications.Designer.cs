@@ -9,36 +9,21 @@ using market_manager.Data;
 
 #nullable disable
 
-namespace market_manager.Data.Migrations
+namespace market_manager.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240331050530_market-manager")]
-    partial class marketmanager
+    [Migration("20240429152912_globalNotifications")]
+    partial class globalNotifications
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("BancasReservas", b =>
-                {
-                    b.Property<int>("BancasBancaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReservasReservaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BancasBancaId", "ReservasReservaId");
-
-                    b.HasIndex("ReservasReservaId");
-
-                    b.ToTable("BancasReservas");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -242,6 +227,23 @@ namespace market_manager.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("market_manager.Data.ReservaBanca", b =>
+                {
+                    b.Property<int>("BancaId")
+                        .HasColumnType("int")
+                        .HasColumnName("BancaId");
+
+                    b.Property<int>("ReservaId")
+                        .HasColumnType("int")
+                        .HasColumnName("ReservaId");
+
+                    b.HasKey("BancaId", "ReservaId");
+
+                    b.HasIndex("ReservaId");
+
+                    b.ToTable("ReservaBanca");
+                });
+
             modelBuilder.Entity("market_manager.Models.Bancas", b =>
                 {
                     b.Property<int>("BancaId")
@@ -250,16 +252,14 @@ namespace market_manager.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BancaId"));
 
-                    b.Property<string>("CategoriaProdutos")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CategoriaBanca")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Comprimento")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("EstadoAtualBanca")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Largura")
                         .HasColumnType("decimal(18,2)");
@@ -270,13 +270,81 @@ namespace market_manager.Data.Migrations
                     b.Property<int>("LocalizacaoY")
                         .HasColumnType("int");
 
-                    b.Property<string>("NomeBanca")
+                    b.Property<string>("NomeIdentificadorBanca")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.HasKey("BancaId");
 
                     b.ToTable("Bancas");
+                });
+
+            modelBuilder.Entity("market_manager.Models.Gestores", b =>
+                {
+                    b.Property<int>("UtilizadorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtilizadorId"));
+
+                    b.Property<string>("CC")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("CodigoPostal")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<DateOnly>("DataAdmissao")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DataNascimento")
+                        .HasColumnType("date");
+
+                    b.Property<int>("GestorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Localidade")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Morada")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NIF")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("NumIdFuncionario")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PrimeiroNome")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Telemovel")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("UltimoNome")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("UtilizadorId");
+
+                    b.ToTable("Gestores");
                 });
 
             modelBuilder.Entity("market_manager.Models.Notificacoes", b =>
@@ -290,44 +358,20 @@ namespace market_manager.Data.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DestinatarioId")
+                    b.Property<int>("EstadoActualNotificacao")
                         .HasColumnType("int");
 
-                    b.Property<string>("DestinatarioTipo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RegistoId")
+                    b.Property<int?>("GestorId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReservaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UtilizadoresUtilizadorId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UtilizadoresUtilizadorId1")
+                    b.Property<int?>("VendedorId")
                         .HasColumnType("int");
 
                     b.HasKey("NotificacaoId");
 
-                    b.HasIndex("DestinatarioId");
+                    b.HasIndex("GestorId");
 
-                    b.HasIndex("RegistoId");
-
-                    b.HasIndex("ReservaId");
-
-                    b.HasIndex("UtilizadoresUtilizadorId");
-
-                    b.HasIndex("UtilizadoresUtilizadorId1");
+                    b.HasIndex("VendedorId");
 
                     b.ToTable("Notificacoes");
                 });
@@ -343,27 +387,26 @@ namespace market_manager.Data.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DataFim")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DataFim")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime>("DataInicio")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DataInicio")
+                        .HasColumnType("date");
 
-                    b.Property<string>("Estado")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("EstadoActualReserva")
+                        .HasColumnType("int");
 
-                    b.Property<int>("UtilizadorId")
+                    b.Property<int>("VendedorId")
                         .HasColumnType("int");
 
                     b.HasKey("ReservaId");
 
-                    b.HasIndex("UtilizadorId");
+                    b.HasIndex("VendedorId");
 
                     b.ToTable("Reservas");
                 });
 
-            modelBuilder.Entity("market_manager.Models.Utilizadores", b =>
+            modelBuilder.Entity("market_manager.Models.Vendedores", b =>
                 {
                     b.Property<int>("UtilizadorId")
                         .ValueGeneratedOnAdd()
@@ -371,68 +414,71 @@ namespace market_manager.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtilizadorId"));
 
+                    b.Property<string>("CC")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
                     b.Property<string>("CodigoPostal")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
-                    b.Property<string>("Email")
+                    b.Property<DateOnly>("DataNascimento")
+                        .HasColumnType("date");
+
+                    b.Property<string>("DocumentoCC")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Estado")
+                    b.Property<string>("DocumentoCartaoComerciante")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstadoActualRegisto")
+                        .HasColumnType("int");
 
                     b.Property<string>("Localidade")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Morada")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NIF")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
 
-                    b.Property<string>("NomeCompleto")
+                    b.Property<string>("NISS")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
-                    b.Property<string>("NomeUtilizador")
+                    b.Property<string>("PrimeiroNome")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("PalavraPasse")
+                    b.Property<string>("Telemovel")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
 
-                    b.Property<string>("Telefone")
+                    b.Property<string>("UltimoNome")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("TipoUtilizador")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("VendedorId")
+                        .HasColumnType("int");
 
                     b.HasKey("UtilizadorId");
 
-                    b.ToTable("Utilizadores");
-                });
-
-            modelBuilder.Entity("BancasReservas", b =>
-                {
-                    b.HasOne("market_manager.Models.Bancas", null)
-                        .WithMany()
-                        .HasForeignKey("BancasBancaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("market_manager.Models.Reservas", null)
-                        .WithMany()
-                        .HasForeignKey("ReservasReservaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.ToTable("Vendedores");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -486,63 +532,61 @@ namespace market_manager.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("market_manager.Models.Notificacoes", b =>
+            modelBuilder.Entity("market_manager.Data.ReservaBanca", b =>
                 {
-                    b.HasOne("market_manager.Models.Utilizadores", "Destinatario")
+                    b.HasOne("market_manager.Models.Bancas", "Banca")
                         .WithMany()
-                        .HasForeignKey("DestinatarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("market_manager.Models.Utilizadores", "Registo")
-                        .WithMany()
-                        .HasForeignKey("RegistoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("BancaId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("market_manager.Models.Reservas", "Reserva")
-                        .WithMany("Notificacoes")
+                        .WithMany()
                         .HasForeignKey("ReservaId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("market_manager.Models.Utilizadores", null)
-                        .WithMany("NotificacaoesEnviadas")
-                        .HasForeignKey("UtilizadoresUtilizadorId");
-
-                    b.HasOne("market_manager.Models.Utilizadores", null)
-                        .WithMany("NotificacoesRecebidas")
-                        .HasForeignKey("UtilizadoresUtilizadorId1");
-
-                    b.Navigation("Destinatario");
-
-                    b.Navigation("Registo");
+                    b.Navigation("Banca");
 
                     b.Navigation("Reserva");
                 });
 
+            modelBuilder.Entity("market_manager.Models.Notificacoes", b =>
+                {
+                    b.HasOne("market_manager.Models.Gestores", "Gestor")
+                        .WithMany("ListaNotificacoes")
+                        .HasForeignKey("GestorId");
+
+                    b.HasOne("market_manager.Models.Vendedores", "Vendedor")
+                        .WithMany("ListaNotificacoes")
+                        .HasForeignKey("VendedorId");
+
+                    b.Navigation("Gestor");
+
+                    b.Navigation("Vendedor");
+                });
+
             modelBuilder.Entity("market_manager.Models.Reservas", b =>
                 {
-                    b.HasOne("market_manager.Models.Utilizadores", "Utilizador")
-                        .WithMany("Reservas")
-                        .HasForeignKey("UtilizadorId")
+                    b.HasOne("market_manager.Models.Vendedores", "Vendedor")
+                        .WithMany("ListaReservas")
+                        .HasForeignKey("VendedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Utilizador");
+                    b.Navigation("Vendedor");
                 });
 
-            modelBuilder.Entity("market_manager.Models.Reservas", b =>
+            modelBuilder.Entity("market_manager.Models.Gestores", b =>
                 {
-                    b.Navigation("Notificacoes");
+                    b.Navigation("ListaNotificacoes");
                 });
 
-            modelBuilder.Entity("market_manager.Models.Utilizadores", b =>
+            modelBuilder.Entity("market_manager.Models.Vendedores", b =>
                 {
-                    b.Navigation("NotificacaoesEnviadas");
+                    b.Navigation("ListaNotificacoes");
 
-                    b.Navigation("NotificacoesRecebidas");
-
-                    b.Navigation("Reservas");
+                    b.Navigation("ListaReservas");
                 });
 #pragma warning restore 612, 618
         }

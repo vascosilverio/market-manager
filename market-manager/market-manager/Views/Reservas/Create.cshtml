@@ -13,8 +13,14 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="UtilizadorId" class="control-label"></label>
-                <select asp-for="UtilizadorId" class ="form-control" asp-items="ViewBag.UtilizadorId"></select>
+                <label asp-for="ListaBancas" class="control-label">Selecione a Banca</label>
+                    @Html.ListBoxFor(m => m.ListaBancas, ViewBag.Bancas as MultiSelectList, new { @class = "form-control" })
+                <span asp-validation-for="ListaBancas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Vendedor" class="control-label">Selecione o Vendedor</label>
+                @Html.DropDownList("VendedoresList", (IEnumerable<SelectListItem>)ViewBag.VendedoresList, htmlAttributes: new { @class = "form-control" })
+                <span asp-validation-for="Vendedor" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DataInicio" class="control-label"></label>
@@ -33,7 +39,9 @@
             </div>
             <div class="form-group">
                 <label asp-for="EstadoActualReserva" class="control-label"></label>
-                <input asp-for="EstadoActualReserva" class="form-control" />
+                <select asp-for="EstadoActualReserva" asp-items="@Html.GetEnumSelectList<Reservas.EstadoReserva>()">
+                    <option selected="selected" value="">Selecione o Estado da Reserva</option>
+                </select>
                 <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace market_manager.Data.Migrations
+namespace market_manager.Migrations
 {
     /// <inheritdoc />
-    public partial class notationEnum : Migration
+    public partial class fixNullable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

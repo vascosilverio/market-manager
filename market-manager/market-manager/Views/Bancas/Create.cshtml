@@ -1,16 +1,18 @@
-﻿@model market_manager.Models.Bancas
+@model market_manager.Models.Bancas
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<h1>Adicionar Banca</h1>
 
-<h4>Bancas</h4>
+<h1>Adicionar uma nova banca</h1>
+
+<h4>Adiconar</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <form asp-action="Create">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="NomeIdentificadorBanca" class="control-label"></label>
@@ -19,18 +21,20 @@
             </div>
             <div class="form-group">
                 <label asp-for="CategoriaBanca" class="control-label"></label>
-                <select asp-for="CategoriaBanca" class="form-control" asp-items="@Html.GetEnumSelectList<Bancas.CategoriaProdutos>()"></select>
+                <select asp-for="CategoriaBanca" asp-items="@Html.GetEnumSelectList<Bancas.CategoriaProdutos>()">
+                    <option selected="selected" value="">Selecione o Estado da Banca</option>
+                </select>
                 <span asp-validation-for="CategoriaBanca" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Largura" class="control-label"></label>
-                <input asp-for="Largura" class="form-control" />
-                <span asp-validation-for="Largura" class="text-danger"></span>
+                <label asp-for="LarguraAux" class="control-label"></label>
+                <input asp-for="LarguraAux" class="form-control" />
+                <span asp-validation-for="LarguraAux" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Comprimento" class="control-label"></label>
-                <input asp-for="Comprimento" class="form-control" />
-                <span asp-validation-for="Comprimento" class="text-danger"></span>
+                <label asp-for="ComprimentoAux" class="control-label"></label>
+                <input asp-for="ComprimentoAux" class="form-control" />
+                <span asp-validation-for="ComprimentoAux" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="LocalizacaoX" class="control-label"></label>
@@ -43,9 +47,10 @@
                 <span asp-validation-for="LocalizacaoY" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="EstadoActualBanca" class="control-label"></label>
-                <select asp-for="EstadoActualBanca" class="form-control" asp-items="@Html.GetEnumSelectList<Bancas.EstadoBanca>()">Selecione o estado da Banca...</select>
-                <span asp-validation-for="EstadoActualBanca" class="text-danger"></span>
+                <label asp-for="EstadoAtualBanca" class="control-label"></label>
+                <select asp-for="EstadoAtualBanca" class="form-control"></select>
+                <span asp-validation-for="EstadoAtualBanca" class="text-danger"></span>
+
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -55,7 +60,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Regressar à listagem</a>
 </div>
 
 @section Scripts {

@@ -1,23 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace market_manager.Models
 {
+    [Table("Gestores")]
     public class Gestores : Utilizadores
     {
+        public Gestores() {
+            ListaNotificacoes = new HashSet<Notificacoes>();
+        }
 
-        [Required]
-        [StringLength(100)]
-        public string? Cargo { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string? Departamento { get; set; }
-
-        public DateTime? DataAdmissao { get; set; }
+        [DataType(DataType.Date)]
+        [Display(Name = "Data de Admissão")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
+        public DateOnly DataAdmissao { get; set; }
 
         [Required]
         [StringLength(20)]
-        public string? NumeroIdentificacaoFuncionario { get; set; }
+        [Display(Name = "Número de Funcionário")]
+        public string NumIdFuncionario { get; set; }
 
+        public ICollection<Notificacoes> ListaNotificacoes { get; set; }
     }
 }

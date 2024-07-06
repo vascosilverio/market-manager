@@ -1,10 +1,12 @@
 ﻿using market_manager.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Reflection.Emit;
 
 namespace market_manager.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<Utilizadores>
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -22,26 +24,19 @@ namespace market_manager.Data
             base.OnModelCreating(builder);
 
             builder.Entity<Reservas>()
-                .HasOne(r => r.Utilizador)
-                .WithMany(u => u.ListaReservas)
-                .HasForeignKey(r => r.UtilizadorId);
+                .HasOne(r => r.Vendedor)
+                .WithMany(v => v.ListaReservas)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Notificacoes>()
-                .HasOne(n => n.Utilizador)
-                .WithMany(u => u.ListaNotificacoes)
-                .HasForeignKey(n => n.DestinatarioId);
+                .HasOne(n => n.Vendedor)
+                .WithMany(v => v.ListaNotificacoes)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Reservas>()
-                .HasMany(r => r.ListaBancas)
-                .WithMany(b => b.Reservas)
-                .UsingEntity<ReservaBanca>(
-                    j => j.HasOne(rb => rb.Banca).WithMany().HasForeignKey(rb => rb.BancaId),
-                    j => j.HasOne(rb => rb.Reserva).WithMany().HasForeignKey(rb => rb.ReservaId),
-                    j =>
-                    {
-                        j.Property(rb => rb.BancaId).HasColumnName("BancaId");
-                        j.Property(rb => rb.ReservaId).HasColumnName("ReservaId");
-                    });
+            builder.Entity<Notificacoes>()
+                .HasOne(n => n.Gestor)
+                .WithMany(g => g.ListaNotificacoes)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 
