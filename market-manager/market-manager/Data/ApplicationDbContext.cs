@@ -22,7 +22,7 @@ namespace market_manager.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+      
             builder.Entity<Reservas>()
                 .HasOne(r => r.Vendedor)
                 .WithMany(v => v.ListaReservas)

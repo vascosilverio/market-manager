@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using market_manager.Models;
 using market_manager.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace market_manager.Controllers
 {
@@ -43,6 +44,7 @@ namespace market_manager.Controllers
 		/// têm a ver com users
 		/// </summary>
 
+		// criar user
 		[HttpPost]
 		[Route("createUser")]
 		public async Task<ActionResult> CreateUser() 
@@ -69,6 +71,35 @@ namespace market_manager.Controllers
 			}   
 		}
 
+
+		// autenticar user
+		[HttpGet]
+		[Route("signInUser")]
+		// necessario o email e a password
+		public async Task<ActionResult> CreateUserAsync([FromQuery] string email, [FromQuery] string password) 
+		{
+
+			IdentityUser user = _userManager.FindByEmailAsync(email).Result; // .Result pois é um método assíncrono
+			// o resultado da tarefa acima vai ser um IdentityUser
+
+			// se o user existir
+			if (user != null)
+			{
+				/// <summary>
+				/// Vertificação da password
+				/// Recebe utilizador que esta na bd e recebe a password
+				/// vai fazer o hash da password, se for igual ao da bd, houve sucesso
+				/// </summary>
+				PasswordVerificationResult passWorks = new PasswordHasher<IdentityUser>().VerifyHashedPassword(null, user.PasswordHash, password);
+				if (passWorks.Equals(PasswordVerificationResult.Success))
+				{
+					await _signInManager.SignInAsync(user, false);
+					return Ok("Sign in com sucesso");
+				}
+			}
+			return Ok("ola");
+
+		}
 
 
 		/// <summary>
@@ -125,6 +156,7 @@ namespace market_manager.Controllers
 		}
 
 		// Get all
+		[Authorize]
 		[HttpGet()]
 		public JsonResult GetAll()
 		{
