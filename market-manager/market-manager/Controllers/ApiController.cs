@@ -76,7 +76,7 @@ namespace market_manager.Controllers
 		[HttpGet]
 		[Route("signInUser")]
 		// necessario o email e a password
-		public async Task<ActionResult> CreateUserAsync([FromQuery] string email, [FromQuery] string password) 
+		public async Task<ActionResult> SignInUserAsync([FromQuery] string email, [FromQuery] string password) 
 		{
 
 			IdentityUser user = _userManager.FindByEmailAsync(email).Result; // .Result pois é um método assíncrono
@@ -95,10 +95,22 @@ namespace market_manager.Controllers
 				{
 					await _signInManager.SignInAsync(user, false);
 					return Ok("Sign in com sucesso");
+					// aqui é adicionado à sessão o cookie de autenticação que irá permitir que o user autenticado faça requests
 				}
 			}
 			return Ok("ola");
 
+		}
+
+
+		// logout user
+		[HttpPost]
+		[Route("logoutUser")]
+		public async Task<ActionResult> LogoutUser()
+		{
+			// aqui é removido da sessão o cookie de autenticação, revogando as autorizações de requests ao utilizador atual
+			await _signInManager.SignOutAsync();
+			return Ok("Logout com sucesso");
 		}
 
 
