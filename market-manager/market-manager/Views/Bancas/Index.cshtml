@@ -1,11 +1,52 @@
 @model IEnumerable<market_manager.Models.Bancas>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Bancas";
+    int matrixSize = ViewBag.MatrixSize;
+    int svgSize = 300; // Size of the SVG in pixels
+    int cellSize = svgSize / matrixSize;
 }
 
 
 <h1>Index</h1>
+
+
+<h2>Matrix</h2>
+
+<div>
+    <label for="xCoord">X Coordinate:</label>
+    <input type="text" id="xCoord" readonly>
+    
+    <label for="yCoord">Y Coordinate:</label>
+    <input type="text" id="yCoord" readonly>
+</div>
+
+<div id="matrix"></div>
+
+<svg id="matrixGrid" width="@svgSize" height="@svgSize">
+    @for (int i = 0; i <= matrixSize; i++)
+    {
+        // Vertical lines
+        <line x1="@(i * cellSize)" y1="0" x2="@(i * cellSize)" y2="@svgSize" stroke="black" />
+        // Horizontal lines
+        <line x1="0" y1="@(i * cellSize)" x2="@svgSize" y2="@(i * cellSize)" stroke="black" />
+    }
+    @for (int y = 0; y < matrixSize; y++)
+    {
+        for (int x = 0; x < matrixSize; x++)
+        {
+            <circle cx="@(x * cellSize)" cy="@(y * cellSize)" r="4" fill="transparent"
+                    class="intersection-point" data-x="@x" data-y="@y" />
+        }
+    }
+</svg>
+
+@section Scripts {
+    <script src="~/js/matrix.js"></script>
+    <script>
+        // You can add any Bancas-specific JavaScript here
+    </script>
+}
 
 <p>
     <a asp-action="Create">Create New</a>

@@ -4,14 +4,15 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>Registar novo utilizador</h1>
+<h2>Criar uma nova conta.</h2>
+<hr />
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+    <div class="row">
+        <div class="col-md-4">
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                 <label asp-for="Input.Email">Email</label>
@@ -27,8 +28,69 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
+
+        </div>
+        <div class="col-md-6 col-md-offset-2">
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.PrimeiroNome" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.PrimeiroNome"></label>
+                <span asp-validation-for="Input.Utilizador.PrimeiroNome" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.UltimoNome" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.UltimoNome"></label>
+                <span asp-validation-for="Input.Utilizador.UltimoNome" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.DataNascimento" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.DataNascimento"></label>
+                <span asp-validation-for="Input.Utilizador.DataNascimento" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.Telemovel" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.Telemovel"></label>
+                <span asp-validation-for="Input.Utilizador.Telemovel" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.Localidade" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.Localidade"></label>
+                <span asp-validation-for="Input.Utilizador.Localidade" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.Morada" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.Morada"></label>
+                <span asp-validation-for="Input.Utilizador.Morada" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.CodigoPostal" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.CodigoPostal"></label>
+                <span asp-validation-for="Input.Utilizador.CodigoPostal" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.CC" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.CC"></label>
+                <span asp-validation-for="Input.Utilizador.CC" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Utilizador.NIF" class="form-control" aria-required="true" />
+                <label asp-for="Input.Utilizador.NIF"></label>
+                <span asp-validation-for="Input.Utilizador.NIF" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <br />
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Registar</button>
+        </div>
+    </div>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@*
     </div>
     <div class="col-md-6 col-md-offset-2">
         <section>
@@ -61,7 +123,4 @@
         </section>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+*@

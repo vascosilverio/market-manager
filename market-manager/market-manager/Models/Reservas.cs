@@ -14,7 +14,9 @@ namespace market_manager.Models
         [Key]
         public int ReservaId { get; set; }
 
-        public virtual Vendedores Vendedor { get; set; }
+        public string UtilizadorId { get; set; }
+
+        public Utilizadores Utilizador { get; set; }
 
         [Required(ErrorMessage ="Introduza a data de início da reserva.")]
         [DataType(DataType.Date)]

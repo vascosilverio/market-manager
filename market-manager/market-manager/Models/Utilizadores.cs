@@ -1,16 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace market_manager.Models
 {
 
-    public class Utilizadores 
+    public class Utilizadores : IdentityUser
     {
-        
-        [Key]
-        public int UtilizadorId { get; set; }
-
-        public string UserId { get; set; }
+    
+        public string Role { get; set; }
 
         [Required(ErrorMessage = "Deve inserir a sua data de nascimento.")]
         [DataType(DataType.Date)]
@@ -56,5 +54,18 @@ namespace market_manager.Models
         [Required(ErrorMessage = "Deve inserir o seu número de identificação civil.")]
         [StringLength(9, MinimumLength = 8, ErrorMessage = "O número de identificação civil deve ter pelo menos 8 caracteres..")]
         public string CC { get; set; }
+
+        public enum EstadoRegisto
+        {
+            /// <summary>
+            /// Enumerações permitidas para o estado de um registo de vendedor
+            /// </summary>
+            Aprovado,
+            Recusado,
+            Pendente
+        }
+
+        public ICollection<Reservas> ListaReservas { get; set; }
+
     }
 }

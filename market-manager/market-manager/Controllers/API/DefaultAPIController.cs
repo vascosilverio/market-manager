@@ -13,13 +13,13 @@ namespace market_manager.Controllers.API
     {
         public ApplicationDbContext _context;
 
-        public UserManager<IdentityUser> _userManager;
+        public UserManager<Utilizadores> _userManager;
 
-        public SignInManager<IdentityUser> _signInManager;
+        public SignInManager<Utilizadores> _signInManager;
 
         public DefaultAPIController(ApplicationDbContext context,
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager)
+            SignInManager<Utilizadores> signInManager,
+            UserManager<Utilizadores> userManager)
         {
             _context = context;
             _signInManager = signInManager;
@@ -39,7 +39,7 @@ namespace market_manager.Controllers.API
         {
             try
             {
-                IdentityUser user = new IdentityUser();
+                Utilizadores user = new Utilizadores();
                 
                 user.UserName = "aluno22350@ipt.pt";
                 user.Email = "aluno22350@ipt.pt";
@@ -48,7 +48,7 @@ namespace market_manager.Controllers.API
                 user.PasswordHash = null;
                 user.NormalizedUserName = user.UserName.ToUpper();
                 user.NormalizedEmail = user.Email.ToUpper();
-                user.PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(null, "qsc23FTP%/");
+                user.PasswordHash = new PasswordHasher<Utilizadores>().HashPassword(null, "qsc23FTP%/");
                 
                 _userManager.CreateAsync(user);
             }
