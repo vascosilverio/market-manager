@@ -20,6 +20,7 @@ namespace market_manager.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
         }
     }
 
