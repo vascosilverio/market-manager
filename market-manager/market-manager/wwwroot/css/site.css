@@ -20,3 +20,42 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+#matrix button {
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+}
+
+
+    #matrixGrid td {
+        padding: 0;
+    }
+
+.matrix-cell {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+    .matrix-cell:hover {
+        background-color: #e0e0e0;
+    }
+
+#matrixGrid {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+}
+
+.intersection-point {
+    cursor: pointer;
+}
+
+    .intersection-point:hover {
+        fill: rgba(255, 0, 0, 0.5);
+    }

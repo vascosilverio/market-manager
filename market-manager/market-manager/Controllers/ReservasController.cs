@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using market_manager.Data;
 using market_manager.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace market_manager.Controllers
 {
+    [Authorize]
     public class ReservasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,7 +22,7 @@ namespace market_manager.Controllers
         // GET: Reservas
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Reservas.Include(r => r.Vendedor);
+            var applicationDbContext = _context.Reservas.Include(r => r.Utilizador);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -33,7 +35,7 @@ namespace market_manager.Controllers
             }
 
             var reservas = await _context.Reservas
-                .Include(r => r.Vendedor)
+                .Include(r => r.Utilizador)
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
             if (reservas == null)
             {
@@ -50,8 +52,8 @@ namespace market_manager.Controllers
             {
                 ViewData["Bancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
 
-                var vendedores = await _context.Vendedores.ToListAsync();
-                ViewBag.VendedoresList = new SelectList(vendedores, "UtilizadorId", "NISS");
+                var vendedores = await _context.Utilizadores.ToListAsync();
+                ViewBag.UtilizadoresList = new SelectList(vendedores, "UtilizadorId", "NISS");
 
                 return View();
             }
@@ -98,7 +100,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Vendedor);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Utilizador);
 
             return View(reservas);
         }
@@ -136,7 +138,7 @@ namespace market_manager.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Vendedor);
+            ViewData["UtilizadorId"] = new SelectList(_context.Set<Utilizadores>(), "UtilizadorId", "CC", reservas.Utilizador);
 
             return View(reservas);
         }
@@ -150,7 +152,7 @@ namespace market_manager.Controllers
             }
 
             var reservas = await _context.Reservas
-                .Include(r => r.Vendedor)
+                .Include(r => r.Utilizador)
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
             if (reservas == null)
             {

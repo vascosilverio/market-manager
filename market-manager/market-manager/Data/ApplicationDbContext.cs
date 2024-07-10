@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 
 namespace market_manager.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    public class ApplicationDbContext : IdentityDbContext<Utilizadores>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -15,28 +15,11 @@ namespace market_manager.Data
 
         public DbSet<Bancas> Bancas { get; set; }
         public DbSet<Reservas> Reservas { get; set; }
-        public DbSet<Notificacoes> Notificacoes { get; set; }
-        public DbSet<Gestores> Gestores { get; set; }
-        public DbSet<Vendedores> Vendedores { get; set; }
+        public DbSet<Utilizadores> Utilizadores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            builder.Entity<Reservas>()
-                .HasOne(r => r.Vendedor)
-                .WithMany(v => v.ListaReservas)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<Notificacoes>()
-                .HasOne(n => n.Vendedor)
-                .WithMany(v => v.ListaNotificacoes)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<Notificacoes>()
-                .HasOne(n => n.Gestor)
-                .WithMany(g => g.ListaNotificacoes)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 

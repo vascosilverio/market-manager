@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34616.47
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "market-manager", "market-manager\market-manager.csproj", "{11E8A56D-3E15-464A-9AF4-9B9168A0A543}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "market-manager", "market-manager\market-manager.csproj", "{11E8A56D-3E15-464A-9AF4-9B9168A0A543}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -22,9 +22,14 @@
             <div class="form-group">
                 <label asp-for="CategoriaBanca" class="control-label"></label>
                 <select asp-for="CategoriaBanca" asp-items="@Html.GetEnumSelectList<Bancas.CategoriaProdutos>()">
-                    <option selected="selected" value="">Selecione o Estado da Banca</option>
+                    <option selected="selected" value="">Selecione a Categoria da Banca</option>
                 </select>
                 <span asp-validation-for="CategoriaBanca" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LocalizacaoX" class="control-label"></label>
+                <input asp-for="LocalizacaoX" class="form-control" />
+                <span asp-validation-for="LocalizacaoX" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="LarguraAux" class="control-label"></label>
@@ -37,11 +42,6 @@
                 <span asp-validation-for="ComprimentoAux" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="LocalizacaoX" class="control-label"></label>
-                <input asp-for="LocalizacaoX" class="form-control" />
-                <span asp-validation-for="LocalizacaoX" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="LocalizacaoY" class="control-label"></label>
                 <input asp-for="LocalizacaoY" class="form-control" />
                 <span asp-validation-for="LocalizacaoY" class="text-danger"></span>
@@ -50,7 +50,10 @@
                 <label asp-for="EstadoAtualBanca" class="control-label"></label>
                 <select asp-for="EstadoAtualBanca" class="form-control"></select>
                 <span asp-validation-for="EstadoAtualBanca" class="text-danger"></span>
-
+            </div>
+            <div class="form-group">
+                <label asp-for="FotografiaBanca" class="control-label"></label>
+                <input type="file" name="FotografiaBanca" accept=".png, .jpg, .jpeg, .pdf" class="form-control" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
