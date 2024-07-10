@@ -1,0 +1,41 @@
+.SharedTrips {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .SharedTrips div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 25px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    width: 80%;
+    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.1);
+  }
+  
+  .SharedTrips h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .SharedTrips p {
+    text-align: justify;
+    margin: 10px 0;
+  }
+  
+  .SharedTrips p.descricao {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  
+  .FotoDestino {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+  }
+  
