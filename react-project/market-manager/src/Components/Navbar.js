@@ -17,18 +17,22 @@ function Navbar() {
         <img src={Logo} alt=""/>
           <div className='hiddenLinks'>
             <Link to="/"> Home </Link>
-            <Link to="/shared_trips"> Shared Trips </Link>
-            <Link to="/share_your_trip"> Share Your Trip </Link>
-            <Link to="/about_us"> About us </Link>
-            <Link to="/admin_dashboard"> Admin Dashboard </Link>
+            <Link to="/bancas"> Bancas </Link>
+            <Link to="/reservas"> Reservas </Link>
+            <Link to="/vendedores"> Vendedores </Link>
+            <Link to="/gestores"> Gestores </Link>
+            <Link to="/registo"> Registo </Link>
+            <Link to="/login"> Login </Link>
           </div>
         </div>
         <div className='rightSide'>
             <Link to="/"> Home </Link>
-            <Link to="/shared_trips"> Shared Trips </Link>
-            <Link to="/share_your_trip"> Share Your Trip </Link>
-            <Link to="/about_us"> About us </Link>
-            <Link to="/admin_dashboard"> Admin Dashboard </Link>
+            <Link to="/bancas"> Bancas </Link>
+            <Link to="/reservas"> Reservas </Link>
+            <Link to="/vendedores"> Vendedores </Link>
+            <Link to="/gestores"> Gestores </Link>
+            <Link to="/registo"> Registo </Link>
+            <Link to="/login"> Login </Link>
             <button onClick={NavbarToggle}>  
             <ReorderIcon />
           </button>  

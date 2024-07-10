@@ -22,6 +22,7 @@ function Footer() {
           </a>
       </div>
       <p> &copy; 2024 MarketManager</p>
+      <Link to="/privacidade"> Privacidade </Link>
       <Link to="/about_us"> About us </Link>
     </div>
   );
