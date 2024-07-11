@@ -13,9 +13,9 @@ namespace market_manager.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BancasController(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment)
-        {
+        public BancasController(
+            ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment) {
             _context = context;
             _webHostEnvironment = webHostEnvironment;
         }
@@ -169,23 +169,86 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BancaId,NomeIdentificadorBanca,CategoriaBanca,Largura,Comprimento,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas bancas)
+        public async Task<IActionResult> Edit(int id, [Bind("BancaId,NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas banca, IFormFile FotografiaBanca)
         {
-            if (id != bancas.BancaId)
+            string nomeFotoBanca = "";
+            bool haFotoBanca = false;
+
+            if (id != banca.BancaId)
             {
                 return NotFound();
             }
 
+            if (FotografiaBanca == null)
+            {
+                ModelState.AddModelError("", "Manter a mesma foto.");
+            }
+            else
+            {
+                if (!(FotografiaBanca.ContentType == "image/png"
+                ||
+                    FotografiaBanca.ContentType == "image/jpeg"))
+                {
+                    ModelState.AddModelError("", "Insira a fotogradia no formato png ou jpeg.");
+                }
+                else
+                {
+                    haFotoBanca = true;
+
+                    Guid g = Guid.NewGuid();
+                    nomeFotoBanca = g.ToString();
+                    //obter a extensão
+                    string extensao = Path.GetExtension(FotografiaBanca.FileName);
+
+                    nomeFotoBanca += extensao;
+                    //adicionar o nome do ficheiro ao objeto que vem do browser
+                    banca.FotografiaBanca = nomeFotoBanca;
+                    ModelState.Remove("FotografiaBanca");
+                }
+            }
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(bancas);
+                    //transferir o valor de ComprimentoAux e LarguraAux para Comprimento e Largura
+                    banca.Largura = Convert.ToDecimal(banca.LarguraAux.Replace('.', ','));
+                    banca.Comprimento = Convert.ToDecimal(banca.ComprimentoAux.Replace('.', ','));
+
+                    _context.Update(banca);
                     await _context.SaveChangesAsync();
+
+                    // se há ficheiro de imagem, vamos guardar no disco rígido do servidor.
+                    if (haFotoBanca)
+                    {
+                        try
+                        {
+                            string nomePastaOndeGuardarImagem = _webHostEnvironment.WebRootPath;
+                            //adicionar pasta imagens
+                            nomePastaOndeGuardarImagem = Path.Combine(nomePastaOndeGuardarImagem, "FotosBancas");
+                            // e, existe a pasta imagens?
+                            if (!Directory.Exists(nomePastaOndeGuardarImagem))
+                            {
+                                // se nao existe, cria-se
+                                Directory.CreateDirectory(nomePastaOndeGuardarImagem);
+                            }
+                            // juntar o nome do ficheiro à sua localização
+                            string nomeFinalFotografiaBanca = Path.Combine(nomePastaOndeGuardarImagem, nomeFotoBanca);
+                            // guardar a imagem no disco rigido
+                            using var streamFotografiaBanca = new FileStream(nomeFinalFotografiaBanca, FileMode.CreateNew);
+                            await FotografiaBanca.CopyToAsync(streamFotografiaBanca);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Tratar a exceção de forma adequada
+                            // Por exemplo, registrar o erro em um log e exibir uma mensagem de erro para o usuário
+                            ModelState.AddModelError("", "Ocorreu um erro ao salvar o arquivo: " + ex.Message);
+                            return View(banca);
+                        }
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BancasExists(bancas.BancaId))
+                    if (!BancasExists(banca.BancaId))
                     {
                         return NotFound();
                     }
@@ -196,7 +259,7 @@ namespace market_manager.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(bancas);
+            return View(banca);
         }
 
         // GET: Bancas/Delete/5
@@ -222,10 +285,10 @@ namespace market_manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var bancas = await _context.Bancas.FindAsync(id);
-            if (bancas != null)
+            var banca = await _context.Bancas.FindAsync(id);
+            if (banca != null)
             {
-                _context.Bancas.Remove(bancas);
+                _context.Bancas.Remove(banca);
             }
 
             await _context.SaveChangesAsync();

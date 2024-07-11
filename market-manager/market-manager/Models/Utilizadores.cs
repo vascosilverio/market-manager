@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace market_manager.Models
 {
-
     public class Utilizadores : IdentityUser
     {
     
@@ -16,15 +15,9 @@ namespace market_manager.Models
         [Display(Name = "Data de Nascimento")]
         public DateOnly DataNascimento { get; set; }
 
-        [Required(ErrorMessage = "Deve inserir o seu primeiro nome.")]
-        [StringLength(20, ErrorMessage = "Primeiro nome não deve ter mais do que 20 caracteres.")]
-        [Display(Name = "Primeiro Nome")]
-        public string PrimeiroNome { get; set; }
-
-        [Required(ErrorMessage = "Deve inserir o seu último nome.")]
-        [StringLength(20, ErrorMessage = "Último nome não deve ter mais do que 20 caracteres.")]
-        [Display(Name = "Último Nome")]
-        public string UltimoNome { get; set; }
+        [Required(ErrorMessage = "Deve inserir o seu nome completo.")]
+        [Display(Name = "Nome completo")]
+        public string NomeCompleto { get; set; }
 
         [Required(ErrorMessage = "Deve inserir o seu número de telemóvel.")]
         [Phone]

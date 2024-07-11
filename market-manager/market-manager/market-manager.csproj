@@ -37,4 +37,12 @@
     <Folder Include="wwwroot\FotosBancas\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Views\Utilizadores\Create.cshtml" />
+    <None Include="Views\Utilizadores\Delete.cshtml" />
+    <None Include="Views\Utilizadores\Details.cshtml" />
+    <None Include="Views\Utilizadores\Edit.cshtml" />
+    <None Include="Views\Utilizadores\Index.cshtml" />
+  </ItemGroup>
+
 </Project>

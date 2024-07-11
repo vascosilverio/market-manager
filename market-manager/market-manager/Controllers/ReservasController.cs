@@ -22,7 +22,13 @@ namespace market_manager.Controllers
         // GET: Reservas
         public async Task<IActionResult> Index()
         {
+            var reservas = await _context.Reservas
+               .Include(r => r.Utilizador)  
+               .Include(r => r.ListaBancas)
+               .ToListAsync();
+
             var applicationDbContext = _context.Reservas.Include(r => r.Utilizador);
+
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -50,10 +56,13 @@ namespace market_manager.Controllers
         {
             try
             {
-                ViewData["Bancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
 
-                var vendedores = await _context.Utilizadores.ToListAsync();
-                ViewBag.UtilizadoresList = new SelectList(vendedores, "UtilizadorId", "NISS");
+                var utilizadores = _context.Users.ToList();
+                ViewBag.Utilizadores = new SelectList(utilizadores, "Id", "UserName");
+
+                var bancas = _context.Bancas.ToList();
+                ViewBag.Bancas = new MultiSelectList(bancas, "BancaId", "NomeIdentificadorBanca");
+
 
                 return View();
             }
@@ -71,18 +80,28 @@ namespace market_manager.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Create([Bind("UtilizadorId,DataInicio,DataFim,EstadoActualReserva")] Reservas reserva, List<int> selectedBancasIds)
+        public async Task<IActionResult> Create([Bind("ReservaId,UtilizadorId,DataInicio,DataFim,SelectedBancaIds")] Reservas reserva)
         {
             if (ModelState.IsValid)
             {
-                reserva.ListaBancas = selectedBancasIds.Select(id => _context.Bancas.FirstOrDefault(b => b.BancaId == id)).ToList();
+                if (reserva.SelectedBancaIds != null && reserva.SelectedBancaIds.Any())
+                {
+                    reserva.ListaBancas = await _context.Bancas
+                        .Where(b => reserva.SelectedBancaIds.Contains(b.BancaId))
+                        .ToListAsync();
+                }
 
                 _context.Add(reserva);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["Bancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca", selectedBancasIds);
+            var utilizadores = _context.Users.ToList();
+            ViewBag.Utilizadores = new SelectList(utilizadores, "Id", "UserName", reserva.UtilizadorId);
+
+            var bancas = _context.Bancas.ToList();
+            ViewBag.Bancas = new MultiSelectList(bancas, "BancaId", "NomeIdentificadorBanca");
+
             return View(reserva);
         }
 

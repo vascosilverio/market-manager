@@ -27,7 +27,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.EstadoActualReserva)
             </th>
-            <th></th>
+            <th>
+                Bancas
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -51,11 +53,32 @@
                 @Html.DisplayFor(modelItem => item.EstadoActualReserva)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ReservaId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ReservaId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ReservaId">Delete</a>
-            </td>
-        </tr>
-}
+                    @if (item.ListaBancas != null && item.ListaBancas.Any())
+                    {
+                        <ul>
+                            @foreach (var banca in item.ListaBancas)
+                            {
+                                <li>
+                                    @banca.NomeIdentificadorBanca
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>
+                            Sem bancas associadas.
+                        </span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ReservaId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ReservaId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ReservaId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+

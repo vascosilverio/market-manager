@@ -74,9 +74,10 @@
                 @Html.DisplayNameFor(model => model.LocalizacaoY)
             </th>
             <th>
-
                 @Html.DisplayNameFor(model => model.EstadoAtualBanca)
-
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FotografiaBanca)
             </th>
             <th></th>
         </tr>
@@ -103,11 +104,15 @@
                 @Html.DisplayFor(modelItem => item.LocalizacaoY)
             </td>
             <td>
-
                 @Html.DisplayFor(modelItem => item.EstadoAtualBanca)
-
+                </td>
+                <td>
+                    <img src="~/FotosBancas/@Html.DisplayFor(modelItem => item.FotografiaBanca)"
+                         alt="Fotografia da Banca @Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)"
+                         title="@Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)"
+                         width="100px" />
             </td>
-            <td>
+                <td>
                 <a asp-action="Edit" asp-route-id="@item.BancaId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.BancaId">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.BancaId">Delete</a>

@@ -54,6 +54,15 @@
             @Html.DisplayFor(model => model.EstadoAtualBanca)
 
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FotografiaBanca)
+        </dt>
+        <dd class="col-sm-10">
+            <img src="~/FotosBancas/@Html.DisplayFor(model => model.FotografiaBanca)"
+                 alt="Fotografia da Banca @Html.DisplayFor(model => model.NomeIdentificadorBanca)"
+                 title="@Html.DisplayFor(model => model.NomeIdentificadorBanca)"
+                 width="100px" />
+        </dd>
     </dl>
 </div>
 <div>

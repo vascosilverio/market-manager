@@ -7,9 +7,6 @@ namespace market_manager.Models
 {
     public class Reservas
     {
-        public Reservas() { 
-            ListaBancas = new HashSet<Bancas>();
-        }
 
         [Key]
         public int ReservaId { get; set; }
@@ -39,6 +36,9 @@ namespace market_manager.Models
         public EstadoReserva EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
 
         public ICollection<Bancas> ListaBancas { get; set; }
+
+        [NotMapped]
+        public List<int> SelectedBancaIds { get; set; }
 
         public enum EstadoReserva
         {
