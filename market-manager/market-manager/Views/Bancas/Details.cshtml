@@ -1,0 +1,71 @@
+﻿@model market_manager.Models.Bancas
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Bancas</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NomeIdentificadorBanca)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NomeIdentificadorBanca)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CategoriaBanca)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CategoriaBanca)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Largura)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Largura)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Comprimento)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Comprimento)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LocalizacaoX)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LocalizacaoX)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LocalizacaoY)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LocalizacaoY)
+        </dd>
+        <dt class = "col-sm-2">
+
+            @Html.DisplayNameFor(model => model.EstadoAtualBanca)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EstadoAtualBanca)
+
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FotografiaBanca)
+        </dt>
+        <dd class="col-sm-10">
+            <img src="~/FotosBancas/@Html.DisplayFor(model => model.FotografiaBanca)"
+                 alt="Fotografia da Banca @Html.DisplayFor(model => model.NomeIdentificadorBanca)"
+                 title="@Html.DisplayFor(model => model.NomeIdentificadorBanca)"
+                 width="100px" />
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.BancaId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

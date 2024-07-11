@@ -1,0 +1,123 @@
+@model IEnumerable<market_manager.Models.Bancas>
+
+@{
+    ViewData["Title"] = "Bancas";
+    int matrixSize = ViewBag.MatrixSize;
+    int svgSize = 300; // Size of the SVG in pixels
+    int cellSize = svgSize / matrixSize;
+}
+
+
+<h1>Index</h1>
+
+
+<h2>Matrix</h2>
+
+<div>
+    <label for="xCoord">X Coordinate:</label>
+    <input type="text" id="xCoord" readonly>
+    
+    <label for="yCoord">Y Coordinate:</label>
+    <input type="text" id="yCoord" readonly>
+</div>
+
+<div id="matrix"></div>
+
+<svg id="matrixGrid" width="@svgSize" height="@svgSize">
+    @for (int i = 0; i <= matrixSize; i++)
+    {
+        // Vertical lines
+        <line x1="@(i * cellSize)" y1="0" x2="@(i * cellSize)" y2="@svgSize" stroke="black" />
+        // Horizontal lines
+        <line x1="0" y1="@(i * cellSize)" x2="@svgSize" y2="@(i * cellSize)" stroke="black" />
+    }
+    @for (int y = 0; y < matrixSize; y++)
+    {
+        for (int x = 0; x < matrixSize; x++)
+        {
+            <circle cx="@(x * cellSize)" cy="@(y * cellSize)" r="4" fill="transparent"
+                    class="intersection-point" data-x="@x" data-y="@y" />
+        }
+    }
+</svg>
+
+@section Scripts {
+    <script src="~/js/matrix.js"></script>
+    <script>
+        // You can add any Bancas-specific JavaScript here
+    </script>
+}
+
+<p>
+    <a asp-action="Create">Create New</a>
+
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NomeIdentificadorBanca)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CategoriaBanca)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Largura)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comprimento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LocalizacaoX)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LocalizacaoY)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EstadoAtualBanca)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FotografiaBanca)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoriaBanca)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Largura)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comprimento)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LocalizacaoX)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LocalizacaoY)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EstadoAtualBanca)
+                </td>
+                <td>
+                    <img src="~/FotosBancas/@Html.DisplayFor(modelItem => item.FotografiaBanca)"
+                         alt="Fotografia da Banca @Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)"
+                         title="@Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)"
+                         width="100px" />
+            </td>
+                <td>
+                <a asp-action="Edit" asp-route-id="@item.BancaId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.BancaId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.BancaId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
