@@ -5,16 +5,3 @@ Instituto Politécnico de Tomar
 
 Descrição:
 Gestor de Reservas de Bancas em Mercado Municipal.
-
-
-
-TODO NEXT:
-
--Roles de Users
-
--Seed Automatizada
-
--Registo e Login de Users
-
--Comentarios
-
