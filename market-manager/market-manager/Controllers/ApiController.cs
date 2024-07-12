@@ -8,7 +8,7 @@ using market_manager.Models.DTOs;
 
 namespace market_manager.Controllers
 {
-	[Route("api/[controller]/[action]")]
+	[Route("api/[action]")]
 	[ApiController]
 	public class ApiController : Controller
 	{
