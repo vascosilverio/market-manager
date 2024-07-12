@@ -134,15 +134,35 @@ body {
     border-color: #444;
 }
 
-/* Adjust text color for specific table states */
-.table-success {
-    color: #98FB98 !important;
+
+
+.banca-card {
+    background-color: #314e6c;
+    color: #121212;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
 }
 
-.table-primary {
-    color: #ADD8E6 !important;
-}
+    .banca-card.selected {
+        background-color: #007bff;
+    }
 
-.table-danger {
-    color: #FFA07A !important;
+    .banca-card img {
+        width: 100%;
+        height: auto;
+    }
+
+    .banca-card h5 {
+        margin-top: 10px;
+    }
+
+    .banca-card p {
+        margin-bottom: 5px;
+    }
+
+.banca-card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }

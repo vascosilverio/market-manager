@@ -17,6 +17,7 @@ namespace market_manager.Controllers
         private readonly UserManager<Utilizadores> _userManager;
         private readonly int PageSize = 5;
 
+
         public ReservasController(ApplicationDbContext context, UserManager<Utilizadores> userManager)
         {
             _context = context;
@@ -114,10 +115,10 @@ namespace market_manager.Controllers
         }
 
         // GET: Reservas/Create
-        [Authorize(Roles = "Vendedor")]
         public IActionResult Create()
         {
-            ViewData["ListaBancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
+            var bancas = _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToList();
+            ViewData["Bancas"] = bancas;
             return View();
         }
 
@@ -131,31 +132,26 @@ namespace market_manager.Controllers
 
             if (ModelState.IsValid)
             {
-                if (DateTime.Compare(reserva.DataInicio, DateTime.Now.Date) <= 0)
+                var existingReservasCount = await _context.Reservas
+                    .CountAsync(r => r.UtilizadorId == user.Id);
+
+                if (existingReservasCount >= 2)
                 {
-                    ModelState.AddModelError("DataInicio", "A data de início deve ser posterior à data atual.");
-                    ViewData["ListaBancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
+                    ModelState.AddModelError("", "Já tem duas reservas feitas.");
+                    ViewData["Bancas"] = _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToList();
                     return View(reserva);
                 }
 
-                if (DateTime.Compare(reserva.DataFim, reserva.DataInicio) <= 0)
+                // verifica se o utilizador ja tem uma reserva associada a alguma das bancas escolhidas
+                var existingReservas = await _context.Reservas
+                    .Where(r => r.UtilizadorId == user.Id && r.ListaBancas.Any(b => reserva.SelectedBancaIds.Contains(b.BancaId)))
+                    .ToListAsync();
+
+                if (existingReservas.Any())
                 {
-                    ModelState.AddModelError("DataFim", "A data de fim deve ser posterior à data de início.");
-                    ViewData["ListaBancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
+                    ModelState.AddModelError("", "Já tem uma reserva associada a esta banca.");
+                    ViewData["Bancas"] = _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToList();
                     return View(reserva);
-                }
-
-                foreach (var bancaId in reserva.SelectedBancaIds)
-                {
-                    var existingReserva = await _context.Reservas
-                        .AnyAsync(r => r.UtilizadorId == user.Id && r.ListaBancas.Any(b => b.BancaId == bancaId));
-
-                    if (existingReserva)
-                    {
-                        ModelState.AddModelError("", $"Você já tem uma reserva para a banca {bancaId}.");
-                        ViewData["ListaBancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
-                        return View(reserva);
-                    }
                 }
 
                 reserva.UtilizadorId = user.Id;
@@ -174,7 +170,7 @@ namespace market_manager.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ListaBancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca");
+            ViewData["Bancas"] = _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToList();
             return View(reserva);
         }
 
@@ -185,7 +181,7 @@ namespace market_manager.Controllers
             {
                 return NotFound();
             }
-                
+
             var reserva = await _context.Reservas
                 .Include(r => r.ListaBancas)
                 .FirstOrDefaultAsync(r => r.ReservaId == id);
@@ -198,17 +194,22 @@ namespace market_manager.Controllers
             var user = await _userManager.GetUserAsync(User);
             var isGestor = await _userManager.IsInRoleAsync(user, "Gestor");
 
-            if (!isGestor && reserva.UtilizadorId != user.Id)
+            if (!isGestor)
             {
-                return Forbid();
+                ViewData["UtilizadorId"] = user.Id;
+            }
+            else
+            {
+                ViewData["UtilizadorId"] = new SelectList(_context.Utilizadores, "Id", "NomeCompleto", reserva.UtilizadorId);
             }
 
-            ViewData["ListaBancas"] = new MultiSelectList(_context.Bancas, "BancaId", "NomeIdentificadorBanca", reserva.ListaBancas.Select(b => b.BancaId));
+            ViewData["Bancas"] = _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToList();
+
             return View(reserva);
         }
 
-        // POST: Reservas/Edit/5
-        [HttpPost]
+            // POST: Reservas/Edit/5
+            [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ReservaId,DataInicio,DataFim,SelectedBancaIds,EstadoActualReserva")] Reservas reserva)
         {
@@ -220,9 +221,16 @@ namespace market_manager.Controllers
             var user = await _userManager.GetUserAsync(User);
             var isGestor = await _userManager.IsInRoleAsync(user, "Gestor");
 
+
             var existingReserva = await _context.Reservas
                 .Include(r => r.ListaBancas)
                 .FirstOrDefaultAsync(r => r.ReservaId == id);
+
+            if(!isGestor)
+            {
+                reserva.UtilizadorId = user.Id;
+                reserva.EstadoActualReserva = existingReserva.EstadoActualReserva;
+            }
 
             if (existingReserva == null)
             {
@@ -319,6 +327,12 @@ namespace market_manager.Controllers
             if (!isGestor && reserva.UtilizadorId != user.Id)
             {
                 return Forbid();
+            }
+
+            if (reserva.EstadoActualReserva == Reservas.EstadoReserva.Aprovada)
+            {
+                ModelState.AddModelError("", "Não pode apagar um reserva aprovada.");
+                return View(reserva);
             }
 
             _context.Reservas.Remove(reserva);

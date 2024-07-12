@@ -71,6 +71,13 @@ namespace market_manager.Controllers
         {
             if (ModelState.IsValid)
             {
+                // verificações
+                if (await _context.Utilizadores.AnyAsync(u => u.Email == utilizador.Email))
+                {
+                    ModelState.AddModelError("NomeCompleto", "Um utilizador com o mesmo e-mail já existe.");
+                    return View(utilizador);
+                }
+
                 _context.Add(utilizador);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

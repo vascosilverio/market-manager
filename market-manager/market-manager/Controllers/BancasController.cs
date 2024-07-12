@@ -21,6 +21,7 @@ namespace market_manager.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly int PageSize = 5;
 
+
         public BancasController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -218,6 +219,8 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            banca.LarguraAux = banca.Largura.ToString("0.00").Replace(",", ".");
+            banca.ComprimentoAux = banca.Comprimento.ToString("0.00").Replace(",", ".");
             ViewData["FotografiaBanca"] = banca.FotografiaBanca;
 
             return View(banca);

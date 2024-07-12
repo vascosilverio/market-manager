@@ -9,19 +9,20 @@
 <h4>Reservas</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="SelectedBancaIds" class="control-label">Bancas</label>
-                <select asp-for="SelectedBancaIds" class="form-control" asp-items="ViewBag.Bancas" multiple></select>
-                <span asp-validation-for="SelectedBancaIds" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UtilizadorId" class="control-label">Utilizador</label>
-                <select asp-for="UtilizadorId" class="form-control" asp-items="ViewBag.Utilizadores"></select>
-                <span asp-validation-for="UtilizadorId" class="text-danger"></span>
-            </div>
+            @if (User.IsInRole("Gestor"))
+            {
+                <div class="form-group">
+                    <label asp-for="UtilizadorId" class="control-label"></label>
+                    <select asp-for="UtilizadorId" class="form-control" asp-items="ViewBag.Utilizadores"></select>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="UtilizadorId" value="@ViewData["UtilizadorId"]" />
+            }
             <div class="form-group">
                 <label asp-for="DataInicio" class="control-label"></label>
                 <input asp-for="DataInicio" class="form-control" />
@@ -37,12 +38,29 @@
                 <input asp-for="DataCriacao" class="form-control" />
                 <span asp-validation-for="DataCriacao" class="text-danger"></span>
             </div>
+            @if (User.IsInRole("Gestor"))
+            {
+                <div class="form-group">
+                    <label asp-for="EstadoActualReserva" class="control-label"></label>
+                    <select asp-for="EstadoActualReserva" class="form-control"></select>
+                    <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
+                </div>
+            }
             <div class="form-group">
-                <label asp-for="EstadoActualReserva" class="control-label"></label>
-                <select asp-for="EstadoActualReserva" asp-items="@Html.GetEnumSelectList<Reservas.EstadoReserva>()">
-                    <option selected="selected" value="">Selecione o Estado da Reserva</option>
-                </select>
-                <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
+                <label class="control-label">Bancas</label>
+                <div class="col-md-4">
+                    <div class="banca-card-container">
+                        @foreach (var banca in ViewData["Bancas"] as List<market_manager.Models.Bancas>)
+                        {
+                            <div class="banca-card" data-banca-id="@banca.BancaId">
+                                <img src="~/FotosBancas/@banca.FotografiaBanca" alt="Banca Image">
+                                <h5>@banca.NomeIdentificadorBanca</h5>
+                                <p>Categoria: @banca.CategoriaBanca</p>
+                                <p>Localizacao: (@banca.LocalizacaoX, @banca.LocalizacaoY)</p>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -56,47 +74,42 @@
 </div>
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const bancaItems = document.querySelectorAll('.banca-item');
-        const selectedBancaIds = document.getElementById('SelectedBancaIds');
-
-        bancaItems.forEach(item => {
-            item.addEventListener('click', function () {
-                const bancaId = this.getAttribute('data-banca-id');
-                const isSelected = this.classList.contains('selected');
-
-                if (isSelected) {
-                    this.classList.remove('selected');
-                    removeSelectedBanca(bancaId);
-                } else {
-                    this.classList.add('selected');
-                    addSelectedBanca(bancaId);
-                }
-            });
-        });
-
-        function addSelectedBanca(bancaId) {
-            const option = document.createElement('option');
-            option.value = bancaId;
-            option.selected = true;
-            selectedBancaIds.appendChild(option);
-        }
-
-        function removeSelectedBanca(bancaId) {
-            const options = selectedBancaIds.options;
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value === bancaId) {
-                    selectedBancaIds.remove(i);
-                    break;
-                }
-            }
-        }
-    });
-</script>
 
 
 @section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bancaCards = document.querySelectorAll('.banca-card');
+            const selectedBancasText = document.getElementById('selected-bancas-text');
+
+            bancaCards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const bancaId = this.getAttribute('data-banca-id');
+                    const isSelected = this.classList.contains('selected');
+
+                    if (isSelected) {
+                        this.classList.remove('selected');
+                        removeSelectedBanca(bancaId);
+                    } else {
+                        this.classList.add('selected');
+                        addSelectedBanca(bancaId);
+                    }
+                });
+            });
+
+            function addSelectedBanca(bancaId) {
+                const selectedBancas = document.querySelectorAll('.banca-card.selected');
+                const selectedBancaNames = Array.from(selectedBancas).map(card => card.querySelector('h5').textContent);
+                selectedBancasText.textContent = selectedBancaNames.join(', ');
+            }
+
+            function removeSelectedBanca(bancaId) {
+                const selectedBancas = document.querySelectorAll('.banca-card.selected');
+                const selectedBancaNames = Array.from(selectedBancas).map(card => card.querySelector('h5').textContent);
+                selectedBancasText.textContent = selectedBancaNames.join(', ');
+            }
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

@@ -48,7 +48,7 @@ namespace market_manager.Models
             Aprovada,
             Recusada,
             Pendente,
-            Concluída
+            Concluida
         }
 
     }

@@ -8,6 +8,7 @@
     var isVendedor = await UserManager.IsInRoleAsync(user, "Vendedor");
 }
 
+
 <h1>@ViewData["Title"]</h1>
 
 @if (!isVendedor)
@@ -82,6 +83,9 @@
                 <td>
                     @if (!string.IsNullOrEmpty(item.FotografiaBanca))
                     {
+                        <a href="#" class="banca-image-link" data-bs-toggle="modal" data-bs-target="#imageModal" data-image-url="@Url.Content($"~/FotosBancas/{item.FotografiaBanca}")">
+                            <img src="@Url.Content($"~/FotosBancas/{item.FotografiaBanca}")" alt="Foto da Banca" style="max-width: 100px; max-height: 100px;" />
+                        </a>
                         <img src="~/FotosBancas/@item.FotografiaBanca" alt="Foto da Banca" style="max-width: 100px; max-height: 100px;" />
                         <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -95,22 +99,9 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>  
 
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const imageLinks = document.querySelectorAll('.banca-image-link');
-                                const fullscreenImage = document.getElementById('fullscreenImage');
-
-                                imageLinks.forEach(link => {
-                                    link.addEventListener('click', function (event) {
-                                        event.preventDefault();
-                                        const imageSrc = this.querySelector('img').getAttribute('src');
-                                        fullscreenImage.setAttribute('src', imageSrc);
-                                    });
-                                });
-                            });
-                        </script>
+                     
                     
                     }
                     else
@@ -138,6 +129,8 @@
 </table>
 
 @{
+
+
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
@@ -168,3 +161,18 @@
         </li>
     </ul>
 </nav>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageModal = document.getElementById('imageModal');
+            const fullscreenImage = document.getElementById('fullscreenImage');
+
+            imageModal.addEventListener('show.bs.modal', function (event) {
+                const imageLink = event.relatedTarget;
+                const imageUrl = imageLink.getAttribute('data-image-url');
+                fullscreenImage.setAttribute('src', imageUrl);
+            });
+        });
+    </script>
+}
