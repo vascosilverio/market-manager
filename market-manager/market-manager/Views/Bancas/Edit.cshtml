@@ -1,19 +1,16 @@
 ﻿@model market_manager.Models.Bancas
-
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Bancas";
 }
-
-<h1>Edit</h1>
-
+<h1>Editar</h1>
 <h4>Bancas</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit"
-              method="post"
               enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BancaId" />
             <div class="form-group">
                 <label asp-for="NomeIdentificadorBanca" class="control-label"></label>
                 <input asp-for="NomeIdentificadorBanca" class="form-control" />
@@ -22,7 +19,7 @@
             <div class="form-group">
                 <label asp-for="CategoriaBanca" class="control-label"></label>
                 <select asp-for="CategoriaBanca" asp-items="@Html.GetEnumSelectList<Bancas.CategoriaProdutos>()">
-                    <option selected="selected" value="">Selecione a Categoria da Banca</option>
+                    <option value="">Selecione a Categoria da Banca</option>
                 </select>
                 <span asp-validation-for="CategoriaBanca" class="text-danger"></span>
             </div>
@@ -32,14 +29,14 @@
                 <span asp-validation-for="LocalizacaoX" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Largura" class="control-label"></label>
-                <input asp-for="Largura" class="form-control" />
-                <span asp-validation-for="Largura" class="text-danger"></span>
+                <label asp-for="LarguraAux" class="control-label"></label>
+                <input asp-for="LarguraAux" class="form-control" />
+                <span asp-validation-for="LarguraAux" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Comprimento" class="control-label"></label>
-                <input asp-for="Comprimento" class="form-control" />
-                <span asp-validation-for="Comprimento" class="text-danger"></span>
+                <label asp-for="ComprimentoAux" class="control-label"></label>
+                <input asp-for="ComprimentoAux" class="form-control" />
+                <span asp-validation-for="ComprimentoAux" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="LocalizacaoY" class="control-label"></label>
@@ -49,25 +46,59 @@
             <div class="form-group">
                 <label asp-for="EstadoAtualBanca" class="control-label"></label>
                 <select asp-for="EstadoAtualBanca" asp-items="@Html.GetEnumSelectList<Bancas.EstadoBanca>()">
-                    <option selected="selected" value="">Selecione o Estado da Banca</option>
+                    <option value="">Selecione o Estado da Banca</option>
                 </select>
                 <span asp-validation-for="EstadoAtualBanca" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FotografiaBanca" class="control-label"></label>
-                <input type="file" name="FotografiaBanca" accept=".png, .jpg, .jpeg, .pdf" class="form-control" />
+                <label for="FotografiaBancaInput" class="control-label">Fotografia Banca</label>
+                <input id="FotografiaBancaInput" name="FotografiaBancaInput" type="file" class="form-control" value="@ViewData["FotografiaBanca"]" />
             </div>
+            @if (!string.IsNullOrEmpty(Model.FotografiaBanca))
+            {
+                <div class="form-group">
+                    <img src="~/FotosBancas/@Model.FotografiaBanca" alt="Fotografia da Banca" width="200" />
+                    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="imageModalLabel">Banca Image</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img id="fullscreenImage" src="" alt="Fullscreen Banca Image" class="img-fluid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const imageLinks = document.querySelectorAll('.banca-image-link');
+                            const fullscreenImage = document.getElementById('fullscreenImage');
+
+                            imageLinks.forEach(link => {
+                                link.addEventListener('click', function (event) {
+                                    event.preventDefault();
+                                    const imageSrc = this.querySelector('img').getAttribute('src');
+                                    fullscreenImage.setAttribute('src', imageSrc);
+                                });
+                            });
+                        });
+                    </script>
+                </div>
+            }
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Guardar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Voltar à Lista</a>
 </div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

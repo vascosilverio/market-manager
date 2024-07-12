@@ -1,61 +1,148 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+@media (min-height: 768px) {
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #121212;
+    color: #e0e0e0;
 }
 
-#matrix button {
-    width: 40px;
-    height: 40px;
-    margin: 2px;
+/* Custom styles */
+.table {
+    color: #e0e0e0;
 }
 
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #aaa6a6;
+}
 
-    #matrixGrid td {
-        padding: 0;
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: #878282;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.table a {
+    color: #314e6c;
+    text-decoration: none;
+}
+
+    .table a:hover {
+        text-decoration: underline;
     }
 
-.matrix-cell {
-    width: 40px;
-    height: 40px;
-    margin: 0;
-    padding: 0;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    cursor: pointer;
-    font-size: 12px;
+.btn-group .btn {
+    margin-right: 5px;
 }
 
-    .matrix-cell:hover {
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+.navbar {
+    background-color: #1e1e1e;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.nav-link {
+    color: #b0b0b0;
+}
+
+    .nav-link:hover {
+        color: #ffffff;
+    }
+
+.container {
+    padding-top: 20px;
+}
+
+/* Custom button styles */
+.btn-outline-primary, .btn-outline-info, .btn-outline-danger {
+    color: #e0e0e0;
+    border-color: #e0e0e0;
+}
+
+    .btn-outline-primary:hover, .btn-outline-info:hover, .btn-outline-danger:hover {
+        color: #121212;
         background-color: #e0e0e0;
     }
 
-#matrixGrid {
-    margin-top: 20px;
-    border: 1px solid #ccc;
+/* Form styles */
+.form-control {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #444;
 }
 
-.intersection-point {
-    cursor: pointer;
-}
-
-    .intersection-point:hover {
-        fill: rgba(255, 0, 0, 0.5);
+    .form-control:focus {
+        background-color: #3a3a3a;
+        color: #ffffff;
+        border-color: #666;
     }
+
+/* Pagination styles */
+.pagination .page-link {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4da6ff;
+    border-color: #4da6ff;
+    color: #ffffff;
+}
+
+.pagination .page-link:hover {
+    background-color: #3a3a3a;
+    border-color: #666;
+    color: #ffffff;
+}
+
+/* Table header styles */
+.table thead th {
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border-color: #444;
+}
+
+/* Adjust text color for specific table states */
+.table-success {
+    color: #98FB98 !important;
+}
+
+.table-primary {
+    color: #ADD8E6 !important;
+}
+
+.table-danger {
+    color: #FFA07A !important;
+}
