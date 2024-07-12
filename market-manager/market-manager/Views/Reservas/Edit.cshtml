@@ -39,7 +39,7 @@
             {
                 <div class="form-group">
                     <label asp-for="EstadoActualReserva" class="control-label"></label>
-                    <select asp-for="EstadoActualReserva" class="form-control"></select>
+                    <select asp-for="EstadoActualReserva" class="form-control" asp-items="ViewBag.EstadoEstadoActualReserva"></select>
                     <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
                 </div>
             }

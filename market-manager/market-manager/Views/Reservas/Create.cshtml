@@ -16,7 +16,12 @@
             {
                 <div class="form-group">
                     <label asp-for="UtilizadorId" class="control-label"></label>
-                    <select asp-for="UtilizadorId" class="form-control" asp-items="ViewBag.Utilizadores"></select>
+                    <select asp-for="UtilizadorId" class="form-control" asp-items="ViewBag.UtilizadorId"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="EstadoActualReserva" class="control-label"></label>
+                    <select asp-for="EstadoActualReserva" class="form-control" asp-items="ViewBag.EstadoActualReserva"></select>
+                    <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
                 </div>
             }
             else
@@ -34,19 +39,6 @@
                 <span asp-validation-for="DataFim" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="DataCriacao" class="control-label"></label>
-                <input asp-for="DataCriacao" class="form-control" />
-                <span asp-validation-for="DataCriacao" class="text-danger"></span>
-            </div>
-            @if (User.IsInRole("Gestor"))
-            {
-                <div class="form-group">
-                    <label asp-for="EstadoActualReserva" class="control-label"></label>
-                    <select asp-for="EstadoActualReserva" class="form-control"></select>
-                    <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
-                </div>
-            }
-            <div class="form-group">
                 <label class="control-label">Bancas</label>
                 <div class="col-md-4">
                     <div class="banca-card-container">
@@ -57,6 +49,7 @@
                                 <h5>@banca.NomeIdentificadorBanca</h5>
                                 <p>Categoria: @banca.CategoriaBanca</p>
                                 <p>Localizacao: (@banca.LocalizacaoX, @banca.LocalizacaoY)</p>
+                                <input type="checkbox" name="SelectedBancaIds" value="@banca.BancaId" style="display: none;" />
                             </div>
                         }
                     </div>
@@ -73,41 +66,18 @@
     <a asp-action="Index">Voltar à Listagem</a>
 </div>
 
-
-
-
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const bancaCards = document.querySelectorAll('.banca-card');
-            const selectedBancasText = document.getElementById('selected-bancas-text');
 
             bancaCards.forEach(card => {
                 card.addEventListener('click', function () {
-                    const bancaId = this.getAttribute('data-banca-id');
-                    const isSelected = this.classList.contains('selected');
-
-                    if (isSelected) {
-                        this.classList.remove('selected');
-                        removeSelectedBanca(bancaId);
-                    } else {
-                        this.classList.add('selected');
-                        addSelectedBanca(bancaId);
-                    }
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected');
                 });
             });
-
-            function addSelectedBanca(bancaId) {
-                const selectedBancas = document.querySelectorAll('.banca-card.selected');
-                const selectedBancaNames = Array.from(selectedBancas).map(card => card.querySelector('h5').textContent);
-                selectedBancasText.textContent = selectedBancaNames.join(', ');
-            }
-
-            function removeSelectedBanca(bancaId) {
-                const selectedBancas = document.querySelectorAll('.banca-card.selected');
-                const selectedBancaNames = Array.from(selectedBancas).map(card => card.querySelector('h5').textContent);
-                selectedBancasText.textContent = selectedBancaNames.join(', ');
-            }
         });
     </script>
     @{

@@ -189,11 +189,21 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
-            // ir buscar à base de dados o utilizador
-            var utilizador = await _context.Utilizadores
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var utilizador = await _context.Utilizadores.FindAsync(id);
 
-            // retornar para a view o utilizador
+            if (utilizador == null)
+            {
+                return NotFound();
+            }
+
+            var reservas = await _context.Reservas.Where(r => r.UtilizadorId == id).ToListAsync();
+
+            if (reservas.Any())
+            {
+                ModelState.AddModelError("", "Não é possível apagar o utilizador porque existem reservas associadas a ele.");
+                return View(utilizador);
+            }
+
             return View(utilizador);
         }
 
@@ -205,7 +215,7 @@ namespace market_manager.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string? id)
         {
             // verificar se existem utilizadores que podem ser removidos
             if (_context.Utilizadores == null)
