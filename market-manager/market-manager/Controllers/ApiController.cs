@@ -115,8 +115,7 @@ namespace market_manager.Controllers
 
 
 		/// <summary>
-		/// operações CRUD da API sobre tabelas 
-		/// excluindo tudo o que tenha a ver com users
+		/// operações CRUD da API sobre bancas
 		/// </summary>
 
 		// Create/Edit
@@ -216,6 +215,88 @@ namespace market_manager.Controllers
 		public JsonResult GetAllBancas()
 		{
 			var result = _context.Bancas.ToList();
+
+			return new JsonResult(Ok(result));
+		}
+
+
+		/// <summary>
+		/// operações CRUD da API sobre reservas
+		/// </summary>
+
+		// Create
+		[HttpPost]
+		public ActionResult<Reservas> CreateReserva([FromBody] Reservas dto)
+		{
+			Reservas reserva = new Reservas();
+			reserva.DataInicio = dto.DataInicio;
+			reserva.DataFim = dto.DataFim;
+			reserva.UtilizadorId = dto.UtilizadorId;
+			reserva.EstadoActualReserva = dto.EstadoActualReserva;
+			_context.Reservas.Add(reserva);
+			_context.SaveChanges();
+
+			return Ok("Reserva criada com sucesso");
+		}
+
+		// Read
+		[HttpGet]
+		public JsonResult ReadReserva(int id)
+		{
+			var result = _context.Reservas.Find(id);
+
+			if (result == null)
+				return new JsonResult(NotFound());
+
+			return new JsonResult(Ok(result));
+		}
+
+		// Update
+		[HttpPut]
+		public async Task<IActionResult> UpdateReservaEstado(int id, [FromBody] ReservasDTO dto)
+		{
+			if (dto == null)
+			{
+				return BadRequest("Invalid data.");
+			}
+
+			var reserva = _context.Reservas.Find(id);
+			if (reserva == null)
+			{
+				return NotFound("Reserva não encontrada");
+			}
+
+			reserva.DataInicio = dto.DataInicio;
+			reserva.DataFim = dto.DataFim;
+			reserva.UtilizadorId = dto.UtilizadorId;
+			reserva.EstadoActualReserva = dto.EstadoActualReserva;
+
+			_context.Reservas.Update(reserva);
+			await _context.SaveChangesAsync();
+
+			return Ok("Estado da Reserva Atualizado com sucesso");
+		}
+
+		// Delete
+		[HttpDelete]
+		public JsonResult DeleteReserva(int id)
+		{
+			var result = _context.Reservas.Find(id);
+
+			if (result == null)
+				return new JsonResult(NotFound());
+
+			_context.Reservas.Remove(result);
+			_context.SaveChanges();
+
+			return new JsonResult(NoContent());
+		}
+
+		// Get all
+		[HttpGet()]
+		public JsonResult GetAllReservas()
+		{
+			var result = _context.Reservas.ToList();
 
 			return new JsonResult(Ok(result));
 		}
