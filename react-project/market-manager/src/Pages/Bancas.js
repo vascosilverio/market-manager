@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Axios from "axios";
 import "../CSS_Styles/Bancas.css";
+import BancaFoto from "../Content/Banca.jpg"
 
 function Bancas() {
   //varivel de estado que armazena o conteúdo da bd com as bancas
@@ -27,7 +28,7 @@ function Bancas() {
 
   return (
     //funcionalidade de pesquisa
-    <div className='Banca'>
+    <div className='Bancas'>
       <h1 className=''></h1>
       <input
         type="text"
@@ -37,10 +38,20 @@ function Bancas() {
       {filteredBanca.length > 0 ? filteredBanca.map((banca, index) => (
         //dar display do conteúdo da bd no ecrã
         <div key={index}>
-          <p>Publicação de {banca.bancaId}</p>
-          <p className="identificador">Nome Identificador da Banca:</p>
-          <p>{banca.nomeIdentificadorBanca}</p>
-        </div>
+          <img className='BancaFoto' src={BancaFoto} />
+            <div className="BancaDetails">
+              <p>ID da Banca: {banca.bancaId}</p>
+              <p>Comprimento: {banca.comprimento}</p>
+              <p>Categoria da Banca: {banca.categoriaBanca}</p>
+              <p>Largura: {banca.largura}</p>
+              <p className="identificador">Nome Identificador da Banca: {banca.nomeIdentificadorBanca}</p>
+              <p>LocalizaoX: {banca.localizacaoX}</p>
+              {banca.estadoAtualBanca === 0 && <p>Estado Atual da Banca: Ocupada</p>}
+              {banca.estadoAtualBanca === 1 && <p>Estado Atual da Banca: Livre</p>}
+              {banca.estadoAtualBanca === 2 && <p>Estado Atual da Banca: Em Manutenção</p>}
+              <p>LocalizaoY: {banca.localizacaoY}</p>
+            </div>  
+          </div>
       )) : <p>Loading...</p>}
     </div>
   );

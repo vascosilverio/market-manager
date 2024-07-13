@@ -1,41 +1,83 @@
-.SharedTrips {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .SharedTrips div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 25px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    width: 80%;
-    box-shadow: 0 10px 20px 0 rgba(0,0,0,0.1);
-  }
-  
-  .SharedTrips h1 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .SharedTrips p {
-    text-align: justify;
-    margin: 10px 0;
-  }
-  
-  .SharedTrips p.descricao {
-    font-weight: bold;
-    text-decoration: underline;
-  }
-  
-  .FotoDestino {
-    width: 100%;
-    max-width: 600px;
-    height: auto;
-  }
-  
+.Bancas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.Bancas input[type="text"] {
+  margin: 20px 0;
+  padding: 10px;
+  width: 80%;
+  max-width: 600px;
+  font-size: 16px;
+}
+
+.Bancas div {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  width: 80%;
+  box-shadow: 0 10px 20px 0 rgba(0,0,0,0.1);
+}
+
+.Banca h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.Banca p {
+  text-align: justify;
+  margin: 5px;
+  flex: 1;
+}
+
+.Banca p.identificador {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.BancaFoto {
+  width: 200px;
+  height: auto;
+  margin: 10px;
+}
+
+.BancaDetails {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.BancaDetails p {
+  width: 45%;
+  margin: 5px 2.5%;
+}
+
+.BancaButtons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin: 10px;
+}
+
+.BancaButtons button {
+  padding: 10px;
+  margin: 5px 0;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+}
+
+.BancaButtons button:hover {
+  background-color: #0056b3;
+}
