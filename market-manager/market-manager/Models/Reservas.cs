@@ -19,13 +19,13 @@ namespace market_manager.Models
         [DataType(DataType.Date)]
         [Display(Name = "Data de início da Reserva.")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
-        public DateOnly DataInicio { get; set; }
+        public DateTime DataInicio { get; set; }
 
         [Required(ErrorMessage = "Introduza a data de fim da reserva.")]
         [DataType(DataType.Date)]
         [Display(Name = "Data de fim da Reserva.")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
-        public DateOnly DataFim { get; set; }
+        public DateTime DataFim { get; set; }
 
         [HiddenInput]
         [DataType(DataType.Date)]
@@ -47,7 +47,8 @@ namespace market_manager.Models
             /// </summary>
             Aprovada,
             Recusada,
-            Pendente
+            Pendente,
+            Concluída
         }
 
     }

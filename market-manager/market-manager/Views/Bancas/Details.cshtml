@@ -1,10 +1,13 @@
 ﻿@model market_manager.Models.Bancas
-
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Utilizadores> UserManager
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Bancas";
+    var user = await UserManager.GetUserAsync(User);
+    var isVendedor = await UserManager.IsInRoleAsync(user, "Vendedor");
 }
 
-<h1>Details</h1>
+<h1>Detalhes</h1>
 
 <div>
     <h4>Bancas</h4>
@@ -62,10 +65,41 @@
                  alt="Fotografia da Banca @Html.DisplayFor(model => model.NomeIdentificadorBanca)"
                  title="@Html.DisplayFor(model => model.NomeIdentificadorBanca)"
                  width="100px" />
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="imageModalLabel">Banca Image</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img id="fullscreenImage" src="" alt="Fullscreen Banca Image" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const imageLinks = document.querySelectorAll('.banca-image-link');
+                    const fullscreenImage = document.getElementById('fullscreenImage');
+
+                    imageLinks.forEach(link => {
+                        link.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            const imageSrc = this.querySelector('img').getAttribute('src');
+                            fullscreenImage.setAttribute('src', imageSrc);
+                        });
+                    });
+                });
+            </script>
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.BancaId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (!isVendedor)
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.BancaId">Editar</a>
+    }
+    <a asp-action="Index">Voltar à Lista</a>
 </div>

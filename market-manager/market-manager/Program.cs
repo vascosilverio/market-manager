@@ -32,8 +32,6 @@ options.SignIn.RequireConfirmedEmail = false;
 }
 
 )
-
-
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddMemoryCache();
