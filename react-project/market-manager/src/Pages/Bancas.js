@@ -3,54 +3,55 @@ import Axios from "axios";
 import "../CSS_Styles/Bancas.css";
 
 function Bancas() {
-  //varivel de estato que armazena o conteúdo do excel com os posts
-  //useState é um hook e posts é a variável de estado atual, sendo que set_post é a função que a atualiza
-  const [posts, set_post] = useState([]);
+  //varivel de estado que armazena o conteúdo da bd com as bancas
+  //useState é um hook e banca é a variável de estado atual, sendo que set_banca é a função que a atualiza
+  const [banca, set_banca] = useState([]);
   const [search, setSearch] = useState("");
+  const apiURL = "https://localhost:7172/api";
 
-  //transforma o conteúdo do excel num objeto e carrega para o site (com recurso a API)
-    useEffect(() =>{
-    Axios.get('https://sheetdb.io/api/v1/sx7b7l1ren6nm?sheet=posts').then((response) => {
-      set_post(response.data); //o estado "posts" é atualizado com os dados da resposta da solicitação HTTP
+  useEffect(() => {
+    Axios.get(`${apiURL}/GetAllBancas`).then((response) => {
+      console.log(response.data); // Verifique os dados recebidos
+      const data = response.data.value; // Acesse o campo "value"
+      set_banca(Array.isArray(data) ? data : []); // Garante que os dados são um array
+    }).catch((error) => {
+      console.error("Erro ao buscar dados da API:", error);
+      set_banca([]); // Define um array vazio em caso de erro
     });
-  },[]);
-  //este useEffect só vai ser executado uma vez, pois
-  //está inserido no "final" um array vazio
+  }, []);
   
-  //para uso na funcionalidade de pesquisa
-  const filteredPosts = posts.filter(post =>
-    post.Nome.toLowerCase().includes(search.toLowerCase()) ||
-    post.Descricao.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredBanca = Array.isArray(banca) ? banca.filter(banca =>
+    banca.bancaId.toString().toLowerCase().includes(search.toLowerCase()) ||
+    banca.nomeIdentificadorBanca.toLowerCase().includes(search.toLowerCase())
+  ) : [];
 
   return (
     //funcionalidade de pesquisa
-    <div className='Bancas'>
+    <div className='Banca'>
       <h1 className=''></h1>
       <input
         type="text"
         placeholder="Pesquisar..."
         onChange={e => setSearch(e.target.value)}
       />
-      {filteredPosts.length > 0 ? filteredPosts.map((post, index) => (
-        //dar display do conteúdo do excel no ecrã
+      {filteredBanca.length > 0 ? filteredBanca.map((banca, index) => (
+        //dar display do conteúdo da bd no ecrã
         <div key={index}>
-          <p>Publicação de {post.Nome}</p>
-          <img className='FotoDestino' src={post.Imagem} />
-          <p className="descricao">Descrição:</p>
-          <p>{post.Descricao}</p>
+          <p>Publicação de {banca.bancaId}</p>
+          <p className="identificador">Nome Identificador da Banca:</p>
+          <p>{banca.nomeIdentificadorBanca}</p>
         </div>
       )) : <p>Loading...</p>}
     </div>
   );
 }
 
-//<div key={index}>
-//Esta linha começa a definição de um elemento div para cada post. 
-//A propriedade key é usada para dar a cada div uma chave única. 
-//É necessária ao criar listas de elementos em React.
-// posts.map((post, index) , post vai ser o conteúdo da linha do excel
-// por isso é que fazemos post.Nome e etc
+// <div key={index}>
+// Esta linha começa a definição de um elemento div para cada banca. 
+// A propriedade key é usada para dar a cada div uma chave única. 
+// É necessária ao criar listas de elementos em React.
+// banca.map((banca, index) , banca vai ser o conteúdo da linha da bd
+// por isso é que fazemos banca.Nome e etc
 // <p>Loading...</p> é para caso não haja conteúdo (ou ainda esteja a ser carregado) ou aconteça alguma
 // coisa vá impedir o display do conteúdo, caso isto aconteça, é mostrado "Loading..."
 
