@@ -226,7 +226,7 @@ namespace market_manager.Controllers
 
 		// Create
 		[HttpPost]
-		public ActionResult<Reservas> CreateReserva([FromBody] Reservas dto)
+		public ActionResult<Reservas> CreateReserva([FromBody] ReservasDTO dto)
 		{
 			Reservas reserva = new Reservas();
 			reserva.DataInicio = dto.DataInicio;
