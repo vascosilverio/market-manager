@@ -1,10 +1,10 @@
 ﻿@model market_manager.Models.Reservas
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Reservas";
 }
 
-<h1>Create</h1>
+<h1>Adicionar</h1>
 
 <h4>Reservas</h4>
 <hr />
@@ -52,9 +52,52 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Voltar à Listagem</a>
 </div>
 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bancaItems = document.querySelectorAll('.banca-item');
+        const selectedBancaIds = document.getElementById('SelectedBancaIds');
+
+        bancaItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const bancaId = this.getAttribute('data-banca-id');
+                const isSelected = this.classList.contains('selected');
+
+                if (isSelected) {
+                    this.classList.remove('selected');
+                    removeSelectedBanca(bancaId);
+                } else {
+                    this.classList.add('selected');
+                    addSelectedBanca(bancaId);
+                }
+            });
+        });
+
+        function addSelectedBanca(bancaId) {
+            const option = document.createElement('option');
+            option.value = bancaId;
+            option.selected = true;
+            selectedBancaIds.appendChild(option);
+        }
+
+        function removeSelectedBanca(bancaId) {
+            const options = selectedBancaIds.options;
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value === bancaId) {
+                    selectedBancaIds.remove(i);
+                    break;
+                }
+            }
+        }
+    });
+</script>
+
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

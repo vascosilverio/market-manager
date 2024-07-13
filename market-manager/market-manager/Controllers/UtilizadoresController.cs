@@ -27,6 +27,7 @@ namespace market_manager.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Utilizadores.ToListAsync());
@@ -37,6 +38,7 @@ namespace market_manager.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Details(string? id)
         {
             // se o id estiver a null, retornar not found
@@ -64,6 +66,7 @@ namespace market_manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Create([Bind("Id,PrimeiroNome,UltimoNome,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC,Email,UserName")] Utilizadores utilizador)
         {
             if (ModelState.IsValid)
@@ -74,13 +77,14 @@ namespace market_manager.Controllers
             }
             return View(utilizador);
         }
-      
+
 
         /// <summary>
         /// Editar um utilizador
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Edit(string? id)
         {
             // se o id estiver a null, retornar not found
@@ -105,6 +109,7 @@ namespace market_manager.Controllers
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Edit(string id, [Bind("Id,NomeCompleto,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC,Email,UserName")] Utilizadores utilizador, String role)
         {
             // verificar se o ID vem a null
@@ -168,6 +173,7 @@ namespace market_manager.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Delete(string? id)
         {
             // se o ID view a null, devolver not found
@@ -191,6 +197,7 @@ namespace market_manager.Controllers
         /// <returns></returns>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             // verificar se existem utilizadores que podem ser removidos
