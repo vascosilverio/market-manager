@@ -142,12 +142,8 @@ namespace market_manager.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var isGestor = User.IsInRole("Gestor");
-
-            if (!isGestor)
-            {
-                reserva.UtilizadorId = user.Id;
-                reserva.EstadoActualReserva = Reservas.EstadoReserva.Pendente;
-            }
+            reserva.UtilizadorId = user.Id;
+            reserva.EstadoActualReserva = Reservas.EstadoReserva.Pendente;
 
             if (ModelState.IsValid)
             {

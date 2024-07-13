@@ -3,9 +3,20 @@
 @{
     ViewData["Title"] = "Index";
 }
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
 <h1>Lista de utilizadores</h1>
 <a asp-action="Create" class="btn btn-primary">Adicionar Reserva</a>
-<table class="table">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>

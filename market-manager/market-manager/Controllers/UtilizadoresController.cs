@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using market_manager.Data;
 using market_manager.Models;
 
+
 namespace market_manager.Controllers
 {
     /// <summary>
@@ -19,6 +20,7 @@ namespace market_manager.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utilizadores> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<Utilizadores> _signInManager;
 
         public UtilizadoresController(UserManager<Utilizadores> usermanager, ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
         {
@@ -55,7 +57,7 @@ namespace market_manager.Controllers
             return View(utilizadores);
         }
 
-        
+
         public IActionResult Create()
         {
             return View();
@@ -241,6 +243,96 @@ namespace market_manager.Controllers
         {
             return (_context.Utilizadores?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(Utilizadores model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                user.NomeCompleto = model.NomeCompleto;
+                // Update other user profile fields
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Erro ao atualizar o perfil do usuário.");
+                }
+            }
+
+            return View("Profile", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Profile");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Erro ao alterar a senha.");
+            }
+
+            return View("Profile", user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Delete user reservations
+            var reservas = await _context.Reservas.Where(r => r.UtilizadorId == user.Id).ToListAsync();
+            _context.Reservas.RemoveRange(reservas);
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                await _signInManager.SignOutAsync();
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Erro ao excluir a conta do usuário.");
+            }
+
+            return View("Profile", user);
+        }
+
 
     }
 }

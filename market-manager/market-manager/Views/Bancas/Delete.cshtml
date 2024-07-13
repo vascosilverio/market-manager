@@ -3,8 +3,6 @@
 @{
     ViewData["Title"] = "Bancas";
 }
-
-<h1>Apagar</h1>
 @if (!ViewData.ModelState.IsValid)
 {
     <div class="alert alert-danger">
@@ -16,6 +14,18 @@
         </ul>
     </div>
 }
+<nav class="navbar navbar-top">
+    <div class="container-fluid">
+        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="BancaId" />
+            <button type="submit" class="btn btn-danger">Apagar</button>
+        </form>
+    </div>
+</nav>
+
+<h1>Apagar</h1>
+
 <h3>Tem a certeza que quer apagar?</h3>
 <div>
     <h4>Bancas</h4>
@@ -66,10 +76,5 @@
 
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="BancaId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Voltar à Lista</a>
-    </form>
+
 </div>

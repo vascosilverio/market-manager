@@ -28,7 +28,7 @@ namespace market_manager.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<IActionResult> Index(string searchString, string currentFilter, string sortOrder, int? pageNumber, Bancas.CategoriaProdutos? categoria, Bancas.EstadoBanca? estado)
+        public async Task<IActionResult> Index(string searchString = "", string currentFilter = "", string sortOrder = "", int? pageNumber = null, Bancas.CategoriaProdutos? categoria = null, Bancas.EstadoBanca? estado = null)
         {
 
             ViewData["CurrentSort"] = sortOrder;
@@ -84,7 +84,6 @@ namespace market_manager.Controllers
 
             int pageSize = PageSize;
             return View(await PaginatedList<Bancas>.CreateAsync(bancas.AsNoTracking(), pageNumber ?? 1, pageSize));
-            return View(bancas); ;
         }
 
         
@@ -97,8 +96,9 @@ namespace market_manager.Controllers
             }
 
             var banca = await _context.Bancas
-                .Include(b => b.Reservas)
-                .FirstOrDefaultAsync(m => m.BancaId == id);
+        .Include(b => b.Reservas)
+            .ThenInclude(r => r.Utilizador)
+        .FirstOrDefaultAsync(m => m.BancaId == id);
 
             if (banca == null)
             {
@@ -110,6 +110,7 @@ namespace market_manager.Controllers
 
         public IActionResult Create()
         {
+
             return View();
         }
 
@@ -378,5 +379,23 @@ namespace market_manager.Controllers
             return _context.Bancas.Any(e => e.BancaId == id);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetBancasLocalizacoes()
+        {
+            var bancas = await _context.Bancas
+                .Select(b => new
+                {
+                    b.BancaId,
+                    b.LocalizacaoX,
+                    b.LocalizacaoY,
+                    b.EstadoAtualBanca
+                })
+                .ToListAsync();
+
+            return Json(bancas);
+        }
+
     }
+
+
 }
