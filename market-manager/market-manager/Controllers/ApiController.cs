@@ -122,7 +122,7 @@ namespace market_manager.Controllers
 
 
 			}
-			return Ok("ola");
+			return BadRequest("Erro ao autenticar usuário");
 
 		}
 

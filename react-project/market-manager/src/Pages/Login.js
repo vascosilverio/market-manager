@@ -21,13 +21,14 @@ const Login = () => {
             console.log('Iniciando requisição para:', url);
 
             const response = await axios.get(url);
-
+            
             console.log('Resposta recebida:', response);
 
             // Tentar analisar a resposta como JSON, caso contrário tratar como texto simples
             try {
                 const data = response.data;
                 setMessage(`Login bem-sucedido: ${JSON.stringify(data)}`);
+                localStorage.setItem('jwt', data);
                 console.log('Dados recebidos:', data);
 
                 // Verifique aqui se a resposta contém um token ou outra informação que indique um login bem-sucedido
@@ -44,6 +45,7 @@ const Login = () => {
         } finally {
             setLoading(false);
         }
+        window.location.reload();
     };
 
     return (
