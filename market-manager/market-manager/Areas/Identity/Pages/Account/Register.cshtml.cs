@@ -126,10 +126,6 @@ namespace market_manager.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
 
-            /*
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            */
-            
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -137,27 +133,24 @@ namespace market_manager.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
+                // Copiar os dados do Input.Utilizador para o user
+                user.NomeCompleto = Input.Utilizador.NomeCompleto;
+                user.DataNascimento = Input.Utilizador.DataNascimento;
+                user.Telemovel = Input.Utilizador.Telemovel;
+                user.Morada = Input.Utilizador.Morada;
+                user.CodigoPostal = Input.Utilizador.CodigoPostal;
+                user.Localidade = Input.Utilizador.Localidade;
+                user.NIF = Input.Utilizador.NIF;
+                user.CC = Input.Utilizador.CC;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    // Atribuir o papel de vendedor por padrão
                     await _userManager.AddToRoleAsync(user, "Vendedor");
-                    
-                    try
-                    {
-                        _context.Add(Input.Utilizador);
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (Exception ex)
-                    {
-
-                        _logger.LogInformation(ex.ToString());
-
-                        throw;
-                    }
-
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -168,8 +161,8 @@ namespace market_manager.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirme seu email",
+                        $"Por favor, confirme sua conta <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicando aqui</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

@@ -29,15 +29,10 @@
 }
 
 <div class="row">
- 
     <div class="col-md-6">
         <div class="card bg-dark text-white">
             <div class="card-body">
-                html
-
-                Copy
                 <div class="col-md-6">
-
                     <h5 class="card-title">@Html.DisplayFor(model => model.NomeIdentificadorBanca)</h5>
                     <p class="card-text"><strong>Categoria:</strong> @Html.DisplayFor(model => model.CategoriaBanca)</p>
                     <p class="card-text"><strong>Estado:</strong> @Html.DisplayFor(model => model.EstadoAtualBanca)</p>
@@ -70,22 +65,24 @@
             </div>
         </div>
     </div>
+
     <div class="mt-4">
         <h4>Reservas Associadas</h4>
         @await Html.PartialAsync("_ReservasPartial", Model.Reservas)
     </div>
+</div>
 
-    @section Scripts {
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const imageModal = document.getElementById('imageModal');
-                const fullscreenImage = document.getElementById('fullscreenImage');
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageModal = document.getElementById('imageModal');
+            const fullscreenImage = document.getElementById('fullscreenImage');
 
-                imageModal.addEventListener('show.bs.modal', function (event) {
-                    const imageLink = event.relatedTarget;
-                    const imageUrl = imageLink.getAttribute('data-image-url');
-                    fullscreenImage.setAttribute('src', imageUrl);
-                });
+            imageModal.addEventListener('show.bs.modal', function (event) {
+                const imageLink = event.relatedTarget;
+                const imageUrl = imageLink.getAttribute('data-image-url');
+                fullscreenImage.setAttribute('src', imageUrl);
             });
-        </script>
-    }
+        });
+    </script>
+}

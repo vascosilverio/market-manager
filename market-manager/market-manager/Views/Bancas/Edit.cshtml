@@ -1,7 +1,9 @@
 ﻿@model market_manager.Models.Bancas
+
 @{
     ViewData["Title"] = "Bancas";
 }
+
 @if (!ViewData.ModelState.IsValid)
 {
     <div class="alert alert-danger">
@@ -14,22 +16,20 @@
     </div>
 }
 
-        <form id="edit-form" asp-action="Edit"
-              enctype="multipart/form-data">
-            <nav class="navbar navbar-top">
-                <div class="container-fluid">
-                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-                    <button type="submit" form="edit-form" class="btn btn-primary">Guardar</button>
-                </div>
-            </nav>
+<form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
+    <nav class="navbar navbar-top">
+        <div class="container-fluid">
+            <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+            <button type="submit" form="edit-form" class="btn btn-primary">Guardar</button>
+        </div>
+    </nav>
 
-            <h1>Bancas</h1>
-            <h4>Editar Banca</h4>
-            <hr />
+    <h1>Bancas</h1>
+    <h4>Editar Banca</h4>
+    <hr />
 
     <div class="row">
         <div class="col-md-4">
-
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="BancaId" />
             <div class="form-group">
@@ -91,20 +91,16 @@
                             </div>
                         </div>
                     </div>
-
-
-
                 }
                 else
                 {
                     <span>Sem fotografia.</span>
                 }
             </div>
-        </form>
+        </div>
     </div>
-</div>
-<div>
-</div>
+</form>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -121,7 +117,5 @@
                 fullscreenImage.setAttribute('src', imageUrl);
             });
         });
-
     </script>
-
 }

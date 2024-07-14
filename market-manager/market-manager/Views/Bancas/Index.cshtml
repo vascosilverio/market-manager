@@ -7,6 +7,7 @@
     var user = await UserManager.GetUserAsync(User);
     var isVendedor = await UserManager.IsInRoleAsync(user, "Vendedor");
 }
+
 @if (!ViewData.ModelState.IsValid)
 {
     <div class="alert alert-danger">
@@ -18,7 +19,6 @@
         </ul>
     </div>
 }
-
 
 <h1>@ViewData["Title"]</h1>
 
@@ -75,7 +75,7 @@
             <th>Comprimento(m)</th>
             <th>Imagem</th>
             <th>Reservas</th>
-            <th>Actions</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -101,10 +101,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>  
-
-                     
-                    
+                        </div>
                     }
                     else
                     {
@@ -114,7 +111,7 @@
                 <td>
                     @await Html.PartialAsync("_ReservasPartial", item.Reservas)
                 </td>
-                    <td>
+                <td>
                     <div class="btn-group-vertical" role="group">
                         <a asp-action="Details" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-primary">Detalhes</a>
                         @if (!isVendedor)
@@ -122,17 +119,14 @@
                             <a asp-action="Edit" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-primary">Editar</a>
                             <a asp-action="Delete" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-danger">Apagar</a>
                         }
-                        
-                        </div>
-                    </td>  
+                    </div>
+                </td>
             </tr>
         }
     </tbody>
 </table>
 
 @{
-
-
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
@@ -147,7 +141,7 @@
                asp-route-categoria="@ViewData["CurrentCategoria"]"
                asp-route-estado="@ViewData["CurrentEstado"]"
                class="page-link">
-                Previous
+                Anterior
             </a>
         </li>
         <li class="page-item @nextDisabled">
@@ -158,7 +152,7 @@
                asp-route-categoria="@ViewData["CurrentCategoria"]"
                asp-route-estado="@ViewData["CurrentEstado"]"
                class="page-link">
-                Next
+                Próximo
             </a>
         </li>
     </ul>

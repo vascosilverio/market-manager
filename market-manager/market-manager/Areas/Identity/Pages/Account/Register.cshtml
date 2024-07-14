@@ -1,121 +1,76 @@
-﻿@page
-@model RegisterModel
+﻿@model RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Registar";
 }
 
-<h1>Registar novo utilizador</h1>
-<h2>Criar uma nova conta.</h2>
-<hr />
+<h1>@ViewData["Title"]</h1>
 
-<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h4>Criar uma nova conta.</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" class="form-control" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
+            <div class="form-group">
+                <label asp-for="Input.Password"></label>
+                <input asp-for="Input.Password" class="form-control" />
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword"></label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" />
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-
-        </div>
-        <div class="col-md-6 col-md-offset-2">
-
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.NomeCompleto" class="form-control" aria-required="true" />
+            <div class="form-group">
                 <label asp-for="Input.Utilizador.NomeCompleto"></label>
+                <input asp-for="Input.Utilizador.NomeCompleto" class="form-control" />
                 <span asp-validation-for="Input.Utilizador.NomeCompleto" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.DataNascimento" class="form-control" aria-required="true" />
+            <div class="form-group">
                 <label asp-for="Input.Utilizador.DataNascimento"></label>
+                <input asp-for="Input.Utilizador.DataNascimento" class="form-control" />
                 <span asp-validation-for="Input.Utilizador.DataNascimento" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.Telemovel" class="form-control" aria-required="true" />
+            <div class="form-group">
                 <label asp-for="Input.Utilizador.Telemovel"></label>
+                <input asp-for="Input.Utilizador.Telemovel" class="form-control" />
                 <span asp-validation-for="Input.Utilizador.Telemovel" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.Localidade" class="form-control" aria-required="true" />
-                <label asp-for="Input.Utilizador.Localidade"></label>
-                <span asp-validation-for="Input.Utilizador.Localidade" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.Morada" class="form-control" aria-required="true" />
+            <div class="form-group">
                 <label asp-for="Input.Utilizador.Morada"></label>
+                <input asp-for="Input.Utilizador.Morada" class="form-control" />
                 <span asp-validation-for="Input.Utilizador.Morada" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.CodigoPostal" class="form-control" aria-required="true" />
+            <div class="form-group">
                 <label asp-for="Input.Utilizador.CodigoPostal"></label>
+                <input asp-for="Input.Utilizador.CodigoPostal" class="form-control" />
                 <span asp-validation-for="Input.Utilizador.CodigoPostal" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.CC" class="form-control" aria-required="true" />
-                <label asp-for="Input.Utilizador.CC"></label>
-                <span asp-validation-for="Input.Utilizador.CC" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="Input.Utilizador.Localidade"></label>
+                <input asp-for="Input.Utilizador.Localidade" class="form-control" />
+                <span asp-validation-for="Input.Utilizador.Localidade" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Utilizador.NIF" class="form-control" aria-required="true" />
+            <div class="form-group">
                 <label asp-for="Input.Utilizador.NIF"></label>
+                <input asp-for="Input.Utilizador.NIF" class="form-control" />
                 <span asp-validation-for="Input.Utilizador.NIF" class="text-danger"></span>
             </div>
-        </div>
-        <div class="col-md-4">
-            <br />
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Registar</button>
-        </div>
+            <div class="form-group">
+                <label asp-for="Input.Utilizador.CC"></label>
+                <input asp-for="Input.Utilizador.CC" class="form-control" />
+                <span asp-validation-for="Input.Utilizador.CC" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Registar</button>
+        </form>
     </div>
-
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-
-@*
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>
-</div>
-*@

@@ -29,7 +29,7 @@ html {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem grey, 0 0 0 0.25rem #258cfb;
 }
 
 html {
@@ -64,7 +64,6 @@ body {
 .table-bordered {
     border: 1px solid #dee2e6;
 }
-
 
     .table-bordered tbody tr:nth-of-type(odd) {
         background-color: #273544;
@@ -104,7 +103,6 @@ body {
     font-weight: bold;
 }
 
-
 .btn-group .btn {
     margin-right: 5px;
 }
@@ -139,7 +137,6 @@ body {
 .container {
     padding-top: 20px;
 }
-
 /* Custom button styles */
 .btn-outline-primary, .btn-outline-info, .btn-outline-danger {
     color: #e0e0e0;
@@ -150,7 +147,6 @@ body {
         color: #121212;
         background-color: #e0e0e0;
     }
-
 /* Dropdown Styling */
 .form-control {
     padding: 8px 12px;
@@ -165,7 +161,6 @@ body {
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         border-color: #80bdff;
     }
-
 /* Pagination styles */
 .pagination .page-link {
     background-color: #2a2a2a;
@@ -184,9 +179,6 @@ body {
     border-color: #666;
     color: #ffffff;
 }
-
-
-
 
 .banca-card {
     background-color: #314e6c;
@@ -220,7 +212,7 @@ body {
 }
 
 input[type="file"] {
-    color: white;
+    color: lightslategrey;
 }
 
 .navbar-top {
@@ -251,7 +243,6 @@ input[type="file"] {
     }
 
 .btn-group-vertical {
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -317,3 +308,26 @@ input[type="file"] {
     .matrix-cell.estado-manutencao {
         background-color: #ffc107;
     }
+
+/* Estilo para os inputs */
+.form-floating input.form-control {
+    color: #000; /* Cor do texto digitado */
+}
+
+.form-floating label {
+    color: #495057; /* Cor do label */
+}
+
+/* Estilo para o placeholder */
+.form-floating input.form-control::placeholder {
+    color: #6c757d;
+}
+
+/* Estilo quando o input está focado */
+.form-floating input.form-control:focus {
+    color: #000;
+}
+
+.form-floating input.form-control:not(:placeholder-shown) {
+    color: #000;
+}

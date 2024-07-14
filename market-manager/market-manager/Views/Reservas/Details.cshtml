@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Reservas";
 }
+
 @if (!ViewData.ModelState.IsValid)
 {
     <div class="alert alert-danger">
@@ -21,33 +22,34 @@
     <h4>Reservas</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Utilizador)
         </dt>
-        <dd class = "col-sm-10">
-
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Utilizador.CC)
-
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DataInicio)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DataInicio)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DataFim)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DataFim)
         </dd>
-        <dd class = "col-sm-10">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DataCriacao)
+        </dt>
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DataCriacao)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.EstadoActualReserva)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.EstadoActualReserva)
         </dd>
         @if (User.IsInRole("Vendedor") && Model.EstadoActualReserva == Reservas.EstadoReserva.Aprovada)
@@ -57,6 +59,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.ReservaId">Editar</a> |
+    <a asp-action="Edit" asp-route-id="@Model.ReservaId">Editar</a> |
     <a asp-action="Index">Voltar à Listagem</a>
 </div>

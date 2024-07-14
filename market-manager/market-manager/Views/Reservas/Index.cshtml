@@ -7,6 +7,7 @@
     var user = await UserManager.GetUserAsync(User);
     var isGestor = await UserManager.IsInRoleAsync(user, "Gestor");
 }
+
 @if (!ViewData.ModelState.IsValid)
 {
     <div class="alert alert-danger">
@@ -20,30 +21,31 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-        <a asp-action="Create" class="btn btn-primary">Adicionar Reserva</a>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Adicionar Reserva</a>
+</p>
 
 <form asp-action="Index" method="get">
     <div class="row">
         <div class="col-md-6">
             <div class="input-group">
-                <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Search by name..." />
-                <button type="submit" class="btn btn-primary">Search</button>
+                <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Pesquisar por nome..." />
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
             </div>
         </div>
     </div>
     <div class="form-group">
         <label for="estadoBanca">Estado Banca:</label>
         <select name="estadoBanca" id="estadoBanca" class="form-control">
-            <option value="">All</option>
+            <option value="">Todos</option>
             @foreach (var estado in Enum.GetValues(typeof(Bancas.EstadoBanca)))
             {
                 <option value="@estado" selected="@(ViewData["EstadoBanca"]?.Equals(estado) ?? false)">@estado</option>
             }
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Filter</button>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
 </form>
-
 
 <table class="table table-bordered">
     <thead>
@@ -68,7 +70,8 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model) {
+        @foreach (var item in Model)
+        {
             string rowClass = "";
             if (item.EstadoActualReserva == Reservas.EstadoReserva.Aprovada)
             {
@@ -87,12 +90,12 @@
                 rowClass = "table-warning";
             }
             <tr class="@rowClass">
-            <td>@Html.DisplayFor(modelItem => item.DataInicio)</td>
-            <td>@Html.DisplayFor(modelItem => item.DataFim)</td>
-            @if (isGestor)
-            {
-                <td>@Html.DisplayFor(modelItem => item.Utilizador.NomeCompleto)</td>
-            }
+                <td>@Html.DisplayFor(modelItem => item.DataInicio)</td>
+                <td>@Html.DisplayFor(modelItem => item.DataFim)</td>
+                @if (isGestor)
+                {
+                    <td>@Html.DisplayFor(modelItem => item.Utilizador.NomeCompleto)</td>
+                }
                 <td>@Html.DisplayFor(modelItem => item.EstadoActualReserva)</td>
                 <td>
                     @string.Join(", ", item.ListaBancas.Select(b => b.NomeIdentificadorBanca))
@@ -107,19 +110,15 @@
                         }
                         @if (isGestor)
                         {
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Mudar Estado
-                                </button>
-                                <div class="dropdown-menu">
-                                    @foreach (var state in Enum.GetValues(typeof(Reservas.EstadoReserva)))
+                            <form asp-action="ChangeState" asp-route-id="@item.ReservaId" method="post">
+                                <select name="newState" onchange="this.form.submit()">
+                                    <option value="">Mudar Estado</option>
+                                    @foreach (Reservas.EstadoReserva estado in Enum.GetValues(typeof(Reservas.EstadoReserva)))
                                     {
-                                        <form asp-action="ChangeState" asp-route-id="@item.ReservaId" asp-route-newState="@state" method="post" style="display: inline;">
-                                            <button type="submit" class="dropdown-item">@state</button>
-                                        </form>
+                                        <option value="@((int)estado)">@estado.ToString()</option>
                                     }
-                                </div>
-                            </div>
+                                </select>
+                            </form>
                         }
                     </div>
                 </td>
@@ -141,7 +140,7 @@
                asp-route-pageNumber="@(Model.PageIndex - 1)"
                asp-route-currentFilter="@ViewData["CurrentFilter"]"
                class="page-link">
-                Previous
+                Anterior
             </a>
         </li>
         <li class="page-item @nextDisabled">
@@ -150,7 +149,7 @@
                asp-route-pageNumber="@(Model.PageIndex + 1)"
                asp-route-currentFilter="@ViewData["CurrentFilter"]"
                class="page-link">
-                Next
+                Próximo
             </a>
         </li>
     </ul>

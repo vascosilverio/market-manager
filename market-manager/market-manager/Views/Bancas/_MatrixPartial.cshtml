@@ -1,7 +1,6 @@
 ﻿@model market_manager.Models.MatrixModel
 
 <div id="matrix-container">
-
     <img id="blueprint-image" src="@Url.Content("~/images/blueprint.jpg")" alt="Blueprint" />
     @for (int y = 0; y < 20; y++)
     {
@@ -18,9 +17,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const matrixCells = document.querySelectorAll('.matrix-cell');
         const localizacaoXInput = document.getElementById('LocalizacaoX');
-        const localizacaoYInput = document.getElementById('LocalizacaoY');
-
-        fetch('/Bancas/GetBancasLocalizacoes')
+        const localizacaoYInput = document.getElementById('LocalizacaoY'); fetch('/Bancas/GetBancasLocalizacoes')
             .then(response => response.json())
             .then(data => {
                 data.forEach(banca => {
