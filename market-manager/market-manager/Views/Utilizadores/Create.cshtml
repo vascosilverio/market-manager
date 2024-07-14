@@ -1,12 +1,24 @@
 ﻿@model market_manager.Models.Utilizadores
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar";
 }
 
-<h1>Create</h1>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
 
-<h4>Utilizadores</h4>
+<h1>Criar</h1>
+
+<h4>Utilizador</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,6 +28,30 @@
                 <label asp-for="NomeCompleto" class="control-label"></label>
                 <input asp-for="NomeCompleto" class="form-control" />
                 <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Password" class="control-label">Senha</label>
+                <input type="password" name="Password" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="DataNascimento" class="control-label"></label>
+                <input asp-for="DataNascimento" class="form-control" type="date" />
+                <span asp-validation-for="DataNascimento" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Telemovel" class="control-label"></label>
+                <input asp-for="Telemovel" class="form-control" />
+                <span asp-validation-for="Telemovel" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Morada" class="control-label"></label>
@@ -28,16 +64,35 @@
                 <span asp-validation-for="CodigoPostal" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label asp-for="Localidade" class="control-label"></label>
+                <input asp-for="Localidade" class="form-control" />
+                <span asp-validation-for="Localidade" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NIF" class="control-label"></label>
+                <input asp-for="NIF" class="form-control" />
+                <span asp-validation-for="NIF" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Role" class="control-label">Função</label>
+                <select name="Role" class="form-control">
+                    <option value="Vendedor">Vendedor</option>
+                    <option value="Gestor">Gestor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Criar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Voltar à Lista</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

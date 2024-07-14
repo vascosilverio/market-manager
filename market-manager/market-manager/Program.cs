@@ -32,8 +32,6 @@ options.SignIn.RequireConfirmedEmail = false;
 }
 
 )
-
-
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddMemoryCache();
@@ -41,6 +39,18 @@ builder.Services.AddSession();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
+//Adicionar CORS
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder
+        .WithOrigins("http://localhost:3000") //URL do frontend
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials());
+});
 
 var app = builder.Build();
 
@@ -73,6 +83,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 };
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -1,123 +1,174 @@
-@model IEnumerable<market_manager.Models.Bancas>
+@model market_manager.Utils.PaginatedList<market_manager.Models.Bancas>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Utilizadores> UserManager
 
 @{
     ViewData["Title"] = "Bancas";
-    int matrixSize = ViewBag.MatrixSize;
-    int svgSize = 300; // Size of the SVG in pixels
-    int cellSize = svgSize / matrixSize;
+    var user = await UserManager.GetUserAsync(User);
+    var isVendedor = await UserManager.IsInRoleAsync(user, "Vendedor");
 }
 
-
-<h1>Index</h1>
-
-
-<h2>Matrix</h2>
-
-<div>
-    <label for="xCoord">X Coordinate:</label>
-    <input type="text" id="xCoord" readonly>
-    
-    <label for="yCoord">Y Coordinate:</label>
-    <input type="text" id="yCoord" readonly>
-</div>
-
-<div id="matrix"></div>
-
-<svg id="matrixGrid" width="@svgSize" height="@svgSize">
-    @for (int i = 0; i <= matrixSize; i++)
-    {
-        // Vertical lines
-        <line x1="@(i * cellSize)" y1="0" x2="@(i * cellSize)" y2="@svgSize" stroke="black" />
-        // Horizontal lines
-        <line x1="0" y1="@(i * cellSize)" x2="@svgSize" y2="@(i * cellSize)" stroke="black" />
-    }
-    @for (int y = 0; y < matrixSize; y++)
-    {
-        for (int x = 0; x < matrixSize; x++)
-        {
-            <circle cx="@(x * cellSize)" cy="@(y * cellSize)" r="4" fill="transparent"
-                    class="intersection-point" data-x="@x" data-y="@y" />
-        }
-    }
-</svg>
-
-@section Scripts {
-    <script src="~/js/matrix.js"></script>
-    <script>
-        // You can add any Bancas-specific JavaScript here
-    </script>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
 }
 
-<p>
-    <a asp-action="Create">Create New</a>
+<h1>@ViewData["Title"]</h1>
 
-</p>
-<table class="table">
+@if (!isVendedor)
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary mb-3">Adicionar Banca</a>
+    </p>
+}
+
+<form asp-action="Index" method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Pesquisar por nome..." />
+                <button type="submit" class="btn btn-primary">Pesquisa</button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select name="categoria" asp-items="ViewBag.Categorias" class="form-control">
+                <option value="">Todas as Categorias</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="estado" asp-items="ViewBag.Estados" class="form-control">
+                <option value="">Todos os estados de Reserva</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.NomeIdentificadorBanca)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                    Nome Identificador
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoriaBanca)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CategoriaSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                    Categoria
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Largura)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["EstadoSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                    Estado Atual
+                </a>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Comprimento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LocalizacaoX)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LocalizacaoY)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EstadoAtualBanca)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FotografiaBanca)
-            </th>
-            <th></th>
+            <th>Largura(m)</th>
+            <th>Comprimento(m)</th>
+            <th>Imagem</th>
+            <th>Reservas</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoriaBanca)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Largura)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Comprimento)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LocalizacaoX)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LocalizacaoY)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EstadoAtualBanca)
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)</td>
+                <td>@Html.DisplayFor(modelItem => item.CategoriaBanca)</td>
+                <td>@Html.DisplayFor(modelItem => item.EstadoAtualBanca)</td>
+                <td>@Html.DisplayFor(modelItem => item.Largura)</td>
+                <td>@Html.DisplayFor(modelItem => item.Comprimento)</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.FotografiaBanca))
+                    {
+                        <a href="#" class="banca-image-link" data-bs-toggle="modal" data-bs-target="#imageModal" data-image-url="@Url.Content($"~/FotosBancas/{item.FotografiaBanca}")">
+                            <img src="@Url.Content($"~/FotosBancas/{item.FotografiaBanca}")" alt="Foto da Banca" style="max-width: 100px; max-height: 100px;" />
+                        </a>
+                        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <img id="fullscreenImage" src="" alt="Fullscreen Banca Image" class="img-fluid">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <span>Sem fotografia.</span>
+                    }
                 </td>
                 <td>
-                    <img src="~/FotosBancas/@Html.DisplayFor(modelItem => item.FotografiaBanca)"
-                         alt="Fotografia da Banca @Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)"
-                         title="@Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)"
-                         width="100px" />
-            </td>
+                    @await Html.PartialAsync("_ReservasPartial", item.Reservas)
+                </td>
                 <td>
-                <a asp-action="Edit" asp-route-id="@item.BancaId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BancaId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BancaId">Delete</a>
-            </td>
-        </tr>
-}
+                    <div class="btn-group-vertical" role="group">
+                        <a asp-action="Details" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-primary">Detalhes</a>
+                        @if (!isVendedor)
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-primary">Editar</a>
+                            <a asp-action="Delete" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-danger">Apagar</a>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <li class="page-item @prevDisabled">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               asp-route-categoria="@ViewData["CurrentCategoria"]"
+               asp-route-estado="@ViewData["CurrentEstado"]"
+               class="page-link">
+                Anterior
+            </a>
+        </li>
+        <li class="page-item @nextDisabled">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               asp-route-categoria="@ViewData["CurrentCategoria"]"
+               asp-route-estado="@ViewData["CurrentEstado"]"
+               class="page-link">
+                Próximo
+            </a>
+        </li>
+    </ul>
+</nav>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageModal = document.getElementById('imageModal');
+            const fullscreenImage = document.getElementById('fullscreenImage');
+
+            imageModal.addEventListener('show.bs.modal', function (event) {
+                const imageLink = event.relatedTarget;
+                const imageUrl = imageLink.getAttribute('data-image-url');
+                fullscreenImage.setAttribute('src', imageUrl);
+            });
+        });
+    </script>
+}

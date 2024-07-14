@@ -13,7 +13,7 @@ namespace market_manager.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         [Display(Name = "Data de Nascimento")]
-        public DateOnly DataNascimento { get; set; }
+        public DateTime DataNascimento { get; set; }
 
         [Required(ErrorMessage = "Deve inserir o seu nome completo.")]
         [Display(Name = "Nome completo")]

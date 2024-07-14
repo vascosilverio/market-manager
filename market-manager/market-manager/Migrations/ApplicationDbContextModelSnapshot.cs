@@ -17,7 +17,7 @@ namespace market_manager.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -225,11 +225,11 @@ namespace market_manager.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("DataFim")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DataFim")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("DataInicio")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DataInicio")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("EstadoActualReserva")
                         .HasColumnType("int");
@@ -267,8 +267,8 @@ namespace market_manager.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly>("DataNascimento")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DataNascimento")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)

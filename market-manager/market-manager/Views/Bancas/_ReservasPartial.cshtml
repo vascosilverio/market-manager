@@ -1,0 +1,46 @@
+﻿@model IEnumerable<market_manager.Models.Reservas>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Data Início</th>
+            <th>Data Fim</th>
+            <th>Utilizador</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reserva in Model)
+        {
+            string rowClass = reserva.EstadoActualReserva switch
+            {
+                Reservas.EstadoReserva.Aprovada => "table-success",
+                Reservas.EstadoReserva.Pendente => "table-primary",
+                Reservas.EstadoReserva.Recusada => "table-danger",
+                _ => ""
+            };
+            <tr class="@rowClass">
+                <td>
+                    <a asp-controller="Reservas" asp-action="Details" asp-route-id="@reserva.ReservaId">
+                        @reserva.DataInicio.ToString("dd/MM/yyyy")
+                    </a>
+                </td>
+                <td>
+                    <a asp-controller="Reservas" asp-action="Details" asp-route-id="@reserva.ReservaId">
+                        @reserva.DataFim.ToString("dd/MM/yyyy")
+                    </a>
+                </td>
+                <td>
+                    <a asp-controller="Reservas" asp-action="Details" asp-route-id="@reserva.ReservaId">
+                        @reserva.Utilizador.NomeCompleto
+                    </a>
+                </td>
+                <td>
+                    <a asp-controller="Reservas" asp-action="Details" asp-route-id="@reserva.ReservaId">
+                        @reserva.EstadoActualReserva
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

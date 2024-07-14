@@ -109,7 +109,34 @@ namespace market_manager.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public Utilizadores Utilizador { get; set; }    
+            [Required]
+            [Display(Name = "Nome Completo")]
+            public string NomeCompleto { get; set; }
+
+            [Required]
+            [DataType(DataType.Date)]
+            [Display(Name = "Data de Nascimento")]
+            public DateTime DataNascimento { get; set; }
+
+            [Required]
+            [Display(Name = "Morada")]
+            public string Morada { get; set; }
+
+            [Required]
+            [Display(Name = "Código Postal")]
+            public string CodigoPostal { get; set; }
+
+            [Required]
+            [Display(Name = "Localidade")]
+            public string Localidade { get; set; }
+
+            [Required]
+            [Display(Name = "NIF")]
+            public string NIF { get; set; }
+
+            [Required]
+            [Display(Name = "Cartão de Cidadão")]
+            public string CC { get; set; }
 
         }
 
@@ -126,10 +153,6 @@ namespace market_manager.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
 
-            /*
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            */
-            
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -137,27 +160,23 @@ namespace market_manager.Areas.Identity.Pages.Account
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
+                // Copiar os dados do Input.Utilizador para o user
+                user.NomeCompleto = Input.NomeCompleto;
+                user.DataNascimento = Input.DataNascimento;
+                user.Morada = Input.Morada;
+                user.CodigoPostal = Input.CodigoPostal;
+                user.Localidade = Input.Localidade;
+                user.NIF = Input.NIF;
+                user.CC = Input.CC;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    // Atribuir o papel de vendedor por padrão
                     await _userManager.AddToRoleAsync(user, "Vendedor");
-                    
-                    try
-                    {
-                        _context.Add(Input.Utilizador);
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (Exception ex)
-                    {
-
-                        _logger.LogInformation(ex.ToString());
-
-                        throw;
-                    }
-
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -168,8 +187,8 @@ namespace market_manager.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirme seu email",
+                        $"Por favor, confirme sua conta <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicando aqui</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

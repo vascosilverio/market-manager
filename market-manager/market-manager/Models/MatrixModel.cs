@@ -1,10 +1,11 @@
-﻿namespace market_manager.Models
+﻿using System.Collections.Generic;
 
+namespace market_manager.Models
 {
     public class MatrixModel
     {
         public int X { get; set; }
         public int Y { get; set; }
-
+        public List<Bancas> Bancas { get; set; }
     }
 }

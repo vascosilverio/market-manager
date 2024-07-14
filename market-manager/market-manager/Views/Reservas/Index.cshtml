@@ -1,84 +1,156 @@
-﻿@model IEnumerable<market_manager.Models.Reservas>
+﻿@model market_manager.Utils.PaginatedList<market_manager.Models.Reservas>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Utilizadores> UserManager
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Reservas";
+    var user = await UserManager.GetUserAsync(User);
+    var isGestor = await UserManager.IsInRoleAsync(user, "Gestor");
 }
 
-<h1>Index</h1>
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
 
+<h1>@ViewData["Title"]</h1>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Adicionar Reserva</a>
 </p>
-<table class="table">
+
+<form asp-action="Index" method="get">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Pesquisar por nome..." />
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="estadoBanca">Estado Banca:</label>
+        <select name="estadoBanca" id="estadoBanca" class="form-control">
+            <option value="">Todos</option>
+            @foreach (var estado in Enum.GetValues(typeof(Bancas.EstadoBanca)))
+            {
+                <option value="@estado" selected="@(ViewData["EstadoBanca"]?.Equals(estado) ?? false)">@estado</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Utilizador)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                    Data Início
+                </a>
             </th>
+            <th>Data Fim</th>
+            @if (isGestor)
+            {
+                <th>Utilizador</th>
+            }
             <th>
-                @Html.DisplayNameFor(model => model.DataInicio)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["StateSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                    Estado
+                </a>
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataFim)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataCriacao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EstadoActualReserva)
-            </th>
-            <th>
-                Bancas
-            </th>
+            <th>Bancas</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-
-                    @Html.DisplayFor(modelItem => item.Utilizador.CC)
-
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataInicio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataFim)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataCriacao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EstadoActualReserva)
-            </td>
-            <td>
-                    @if (item.ListaBancas != null && item.ListaBancas.Any())
-                    {
-                        <ul>
-                            @foreach (var banca in item.ListaBancas)
-                            {
-                                <li>
-                                    @banca.NomeIdentificadorBanca
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <span>
-                            Sem bancas associadas.
-                        </span>
-                    }
+        @foreach (var item in Model)
+        {
+            string rowClass = "";
+            if (item.EstadoActualReserva == Reservas.EstadoReserva.Aprovada)
+            {
+                rowClass = "table-success";
+            }
+            else if (item.EstadoActualReserva == Reservas.EstadoReserva.Pendente)
+            {
+                rowClass = "table-primary";
+            }
+            else if (item.EstadoActualReserva == Reservas.EstadoReserva.Recusada)
+            {
+                rowClass = "table-danger";
+            }
+            else if (item.EstadoActualReserva == Reservas.EstadoReserva.Concluida)
+            {
+                rowClass = "table-warning";
+            }
+            <tr class="@rowClass">
+                <td>@Html.DisplayFor(modelItem => item.DataInicio)</td>
+                <td>@Html.DisplayFor(modelItem => item.DataFim)</td>
+                @if (isGestor)
+                {
+                    <td>@Html.DisplayFor(modelItem => item.Utilizador.NomeCompleto)</td>
+                }
+                <td>@Html.DisplayFor(modelItem => item.EstadoActualReserva)</td>
+                <td>
+                    @string.Join(", ", item.ListaBancas.Select(b => b.NomeIdentificadorBanca))
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ReservaId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ReservaId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ReservaId">Delete</a>
+                    <div class="btn-group" role="group">
+                        <a asp-action="Details" asp-route-id="@item.ReservaId" class="btn btn-sm btn-outline-info">Detalhes</a>
+                        @if (isGestor || item.UtilizadorId == user.Id)
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.ReservaId" class="btn btn-sm btn-outline-primary">Editar</a>
+                            <a asp-action="Delete" asp-route-id="@item.ReservaId" class="btn btn-sm btn-outline-danger">Apagar</a>
+                        }
+                        @if (isGestor)
+                        {
+                            <form asp-action="ChangeState" asp-route-id="@item.ReservaId" method="post">
+                                <select name="newState" onchange="this.form.submit()">
+                                    <option value="">Mudar Estado</option>
+                                    @foreach (Reservas.EstadoReserva estado in Enum.GetValues(typeof(Reservas.EstadoReserva)))
+                                    {
+                                        <option value="@((int)estado)">@estado.ToString()</option>
+                                    }
+                                </select>
+                            </form>
+                        }
+                    </div>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
 
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <li class="page-item @prevDisabled">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               class="page-link">
+                Anterior
+            </a>
+        </li>
+        <li class="page-item @nextDisabled">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-route-currentFilter="@ViewData["CurrentFilter"]"
+               class="page-link">
+                Próximo
+            </a>
+        </li>
+    </ul>
+</nav>

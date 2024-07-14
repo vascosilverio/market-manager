@@ -21,12 +21,13 @@ public class DataSeeder
         for (int i = 1; i <= 9; i++)
         {
             var role = i <= 5 ? "Vendedor" : "Gestor";
+            var nome = i <= 5 ? "Vendedor" : "Gestor";
             var user = new Utilizadores
             {
-                UserName = $"user{i}@example.com",
-                Email = $"user{i}@example.com",
+                UserName = $"{nome}{i}@example.com",
+                Email = $"{nome}{i}@example.com",
                 Role = role,
-                DataNascimento = new DateOnly(1980 + i, 1, 1),
+                DataNascimento = new DateTime(1980 + i, 1, 1),
                 NomeCompleto = $"NomeCompleto{i}",
                 Telemovel = $"91{i}000000",
                 Morada = $"Address {i}",
@@ -38,7 +39,7 @@ public class DataSeeder
 
             if (await userManager.FindByEmailAsync(user.Email) == null)
             {
-                await userManager.CreateAsync(user, "Password123!");
+                await userManager.CreateAsync(user, "123456qwe#");
                 await userManager.AddToRoleAsync(user, role);
                 utilizadores.Add(user);
             }
@@ -58,7 +59,7 @@ public class DataSeeder
                     EstadoAtualBanca = Bancas.EstadoBanca.Livre,
                     Largura = 2.5m,
                     Comprimento = 3.0m,
-                    FotografiaBanca = "banca.jpg"
+                    FotografiaBanca = "125e731d-90fa-44e9-8c6b-6cde729eead9.jpg"
                 });
             }
             await context.Bancas.AddRangeAsync(bancas);
@@ -78,8 +79,8 @@ public class DataSeeder
                     var reserva = new Reservas
                     {
                         UtilizadorId = vendedor.Id,
-                        DataInicio = DateOnly.FromDateTime(DateTime.Now.AddDays(random.Next(1, 30))),
-                        DataFim = DateOnly.FromDateTime(DateTime.Now.AddDays(random.Next(31, 60))),
+                        DataInicio = DateTime.Now.AddDays(random.Next(1, 30)),
+                        DataFim = DateTime.Now.AddDays(random.Next(31, 60)),
                         DataCriacao = DateTime.Now,
                         EstadoActualReserva = Reservas.EstadoReserva.Pendente,
                         ListaBancas = new List<Bancas> { bancas[random.Next(bancas.Count)], bancas[random.Next(bancas.Count)] }

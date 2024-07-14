@@ -11,31 +11,35 @@ namespace market_manager.Models
         [Key]
         public int ReservaId { get; set; }
 
+        [Required(ErrorMessage = "Introduza um utilizador.")]
+        [Display(Name = "Utilizador")]
         public string UtilizadorId { get; set; }
 
-        public Utilizadores Utilizador { get; set; }
+        public virtual Utilizadores Utilizador { get; set; }
 
         [Required(ErrorMessage ="Introduza a data de início da reserva.")]
         [DataType(DataType.Date)]
-        [Display(Name = "Data de início da Reserva.")]
+        [Display(Name = "Data de início da Reserva")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
-        public DateOnly DataInicio { get; set; }
+        public DateTime DataInicio { get; set; }
 
         [Required(ErrorMessage = "Introduza a data de fim da reserva.")]
         [DataType(DataType.Date)]
-        [Display(Name = "Data de fim da Reserva.")]
+        [Display(Name = "Data de fim da Reserva")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd-MM-yyyy}")]
-        public DateOnly DataFim { get; set; }
+        public DateTime DataFim { get; set; }
 
         [HiddenInput]
         [DataType(DataType.Date)]
+        [Display(Name = "Data de criação da Reserva")]
         public DateTime DataCriacao { get; set; } = DateTime.Now;
 
         [HiddenInput]
         [EnumDataType(typeof(EstadoReserva))]
+        [Display(Name = "Estado da Reserva")]
         public EstadoReserva EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
 
-        public ICollection<Bancas> ListaBancas { get; set; }
+        public virtual ICollection<Bancas> ListaBancas { get; set; }
 
         [NotMapped]
         public List<int> SelectedBancaIds { get; set; }
@@ -47,7 +51,8 @@ namespace market_manager.Models
             /// </summary>
             Aprovada,
             Recusada,
-            Pendente
+            Pendente,
+            Concluida
         }
 
     }

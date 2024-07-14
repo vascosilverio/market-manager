@@ -4,10 +4,11 @@ using market_manager.Models;
 using market_manager.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using market_manager.Models.DTOs;
 
 namespace market_manager.Controllers
 {
-	[Route("api/[controller]/[action]")]
+	[Route("api/[action]")]
 	[ApiController]
 	public class ApiController : Controller
 	{
@@ -17,7 +18,7 @@ namespace market_manager.Controllers
 		/// para fins de autenticação
 		/// o _userManager faz a pesquisa nas tabelas da base de dados
 		/// </summary>
-		private readonly UserManager<IdentityUser> _userManager;
+		private readonly UserManager<Utilizadores> _userManager;
 
 		/// <summary>
 		/// para fins de autenticação
@@ -25,12 +26,12 @@ namespace market_manager.Controllers
 		/// que x utilizador da base de dados está agora autenticado, podendo serem assim aceites
 		/// requests desse utilizador
 		/// </summary>
-		public SignInManager<IdentityUser> _signInManager;
+		public SignInManager<Utilizadores> _signInManager;
 
 		// Construtor que recebe o contexto da bd APIContext como uma dependência.
-		public ApiController(ApplicationDbContext context, 
-			SignInManager<IdentityUser> signInManager,
-			UserManager<IdentityUser> userManager)
+		public ApiController(ApplicationDbContext context,
+			SignInManager<Utilizadores> signInManager,
+			UserManager<Utilizadores> userManager)
 		{
 			// permitir o acesso ao contexto da bd dentro das ações do controlador, _ indica uma variável privada
 			_context = context;
@@ -46,19 +47,20 @@ namespace market_manager.Controllers
 
 		// criar user
 		[HttpPost]
-		[Route("createUser")]
-		public async Task<ActionResult> CreateUser() 
+		public async Task<ActionResult> CreateUser([FromQuery] string email, [FromQuery] string password)
 		{
-			IdentityUser identityUser = new IdentityUser();
-			identityUser.UserName = "mmb";
-			identityUser.Email = "mmb@teste.com";
-			identityUser.NormalizedUserName = identityUser.UserName.ToUpper();
-			identityUser.NormalizedEmail = identityUser.Email.ToUpper();
-			identityUser.PasswordHash = null;
-			identityUser.Id = Guid.NewGuid().ToString();
-			identityUser.PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(null, "passteste123");
+			Utilizadores user = new Utilizadores();
+			user.UserName = email;
+			user.Email = email;
+			user.NormalizedUserName = user.UserName.ToUpper();
+			user.NormalizedEmail = user.Email.ToUpper();
+			user.NomeCompleto = email;
+			user.PasswordHash = null;
+			user.Role = "Vendedor";
+			user.Id = Guid.NewGuid().ToString();
+			user.PasswordHash = new PasswordHasher<Utilizadores>().HashPassword(null, password);
 
-			var result = await _userManager.CreateAsync(identityUser);
+			var result = await _userManager.CreateAsync(user);
 			_context.SaveChanges();
 
 			if (result.Succeeded)
@@ -68,29 +70,28 @@ namespace market_manager.Controllers
 			else
 			{
 				return BadRequest("Erro ao criar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-			}   
+			}
 		}
 
 
 		// autenticar user
 		[HttpGet]
-		[Route("signInUser")]
 		// necessario o email e a password
-		public async Task<ActionResult> SignInUserAsync([FromQuery] string email, [FromQuery] string password) 
+		public async Task<ActionResult> SignInUserAsync([FromQuery] string email, [FromQuery] string password)
 		{
 
-			IdentityUser user = _userManager.FindByEmailAsync(email).Result; // .Result pois é um método assíncrono
-			// o resultado da tarefa acima vai ser um IdentityUser
+			Utilizadores user = _userManager.FindByEmailAsync(email).Result; // .Result pois é um método assíncrono
+																			 // o resultado da tarefa acima vai ser um IdentityUser
 
 			// se o user existir
 			if (user != null)
 			{
 				/// <summary>
-				/// Vertificação da password
+				/// Verificação da password
 				/// Recebe utilizador que esta na bd e recebe a password
 				/// vai fazer o hash da password, se for igual ao da bd, houve sucesso
 				/// </summary>
-				PasswordVerificationResult passWorks = new PasswordHasher<IdentityUser>().VerifyHashedPassword(null, user.PasswordHash, password);
+				PasswordVerificationResult passWorks = new PasswordHasher<Utilizadores>().VerifyHashedPassword(null, user.PasswordHash, password);
 				if (passWorks.Equals(PasswordVerificationResult.Success))
 				{
 					await _signInManager.SignInAsync(user, false);
@@ -105,7 +106,6 @@ namespace market_manager.Controllers
 
 		// logout user
 		[HttpPost]
-		[Route("logoutUser")]
 		public async Task<ActionResult> LogoutUser()
 		{
 			// aqui é removido da sessão o cookie de autenticação, revogando as autorizações de requests ao utilizador atual
@@ -115,50 +115,93 @@ namespace market_manager.Controllers
 
 
 		/// <summary>
-		/// operações CRUD da API sobre tabelas 
-		/// excluindo tudo o que tenha a ver com users
+		/// operações CRUD da API sobre bancas
 		/// </summary>
 
 		// Create/Edit
+		//[HttpPost]
+		//public JsonResult CreateUpdate(Bancas banca)
+		//{
+			//if (banca.BancaId == 0)
+			//{
+				//_context.Bancas.Add(banca);
+			//}
+			//else
+			//{
+				//var BancaNaDb = _context.Bancas.Find(banca.BancaId);
+
+				//if (BancaNaDb == null)
+					//return new JsonResult(NotFound());
+				//BancaNaDb = banca;
+			//}
+
+			//_context.SaveChanges();
+
+			//return new JsonResult(Ok(banca));
+		//}
+
+		// Create
 		[HttpPost]
-		public JsonResult CreateUpdate(Bancas banca)
+		public ActionResult<Bancas> CreateBanca([FromBody] BancasDTO dto)
 		{
-			if(banca.BancaId == 0)
-			{
-				_context.Bancas.Add(banca);
-			} else
-			{
-				var BancaNaDb = _context.Bancas.Find(banca.BancaId);
+			Bancas banca = new Bancas();
+			banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
+			banca.CategoriaBanca = dto.CategoriaBanca;
+			banca.Largura = dto.Largura;
+			banca.Comprimento = dto.Comprimento;
+			banca.LocalizacaoX = dto.LocalizacaoX;
+			banca.LocalizacaoY = dto.LocalizacaoY;
+			banca.EstadoAtualBanca = dto.EstadoAtualBanca;
+			banca.FotografiaBanca = dto.FotografiaBanca;
 
-				if (BancaNaDb == null)
-					return new JsonResult(NotFound());
-				BancaNaDb = banca;
-			}
-
+			_context.Bancas.Add(banca);
 			_context.SaveChanges();
 
-			return new JsonResult(Ok(banca));
+			return Ok("Banca criada com sucesso");
 		}
 
 		// Read
 		[HttpGet]
-		public JsonResult Read(int id)
+		public JsonResult ReadBanca(int id)
 		{
 			var result = _context.Bancas.Find(id);
-			               
-			if(result == null)
+
+			if (result == null)
 				return new JsonResult(NotFound());
-			
+
 			return new JsonResult(Ok(result));
+		}
+
+		// Update
+		[HttpPut]
+		public async Task<IActionResult> UpdateBancaEstado(int id, [FromBody] BancasDTO dto)
+		{
+			if (dto == null)
+			{
+				return BadRequest("Invalid data.");
+			}
+
+			var banca = _context.Bancas.Find(id);
+			if (banca == null)
+			{
+				return NotFound("Banca não encontrada");
+			}
+
+			banca.EstadoAtualBanca = dto.EstadoAtualBanca;
+
+			_context.Bancas.Update(banca);
+			await _context.SaveChangesAsync();
+
+			return Ok("Estado da Banca Atualizado com sucesso");
 		}
 
 		// Delete
 		[HttpDelete]
-		public JsonResult Delete(int id)
+		public JsonResult DeleteBanca(int id)
 		{
 			var result = _context.Bancas.Find(id);
 
-			if(result == null)
+			if (result == null)
 				return new JsonResult(NotFound());
 
 			_context.Bancas.Remove(result);
@@ -168,11 +211,92 @@ namespace market_manager.Controllers
 		}
 
 		// Get all
-		[Authorize]
 		[HttpGet()]
-		public JsonResult GetAll()
+		public JsonResult GetAllBancas()
 		{
 			var result = _context.Bancas.ToList();
+
+			return new JsonResult(Ok(result));
+		}
+
+
+		/// <summary>
+		/// operações CRUD da API sobre reservas
+		/// </summary>
+
+		// Create
+		[HttpPost]
+		public ActionResult<Reservas> CreateReserva([FromBody] ReservasDTO dto)
+		{
+			Reservas reserva = new Reservas();
+			reserva.DataInicio = dto.DataInicio;
+			reserva.DataFim = dto.DataFim;
+			reserva.UtilizadorId = dto.UtilizadorId;
+			reserva.EstadoActualReserva = dto.EstadoActualReserva;
+			_context.Reservas.Add(reserva);
+			_context.SaveChanges();
+
+			return Ok("Reserva criada com sucesso");
+		}
+
+		// Read
+		[HttpGet]
+		public JsonResult ReadReserva(int id)
+		{
+			var result = _context.Reservas.Find(id);
+
+			if (result == null)
+				return new JsonResult(NotFound());
+
+			return new JsonResult(Ok(result));
+		}
+
+		// Update
+		[HttpPut]
+		public async Task<IActionResult> UpdateReservaEstado(int id, [FromBody] ReservasDTO dto)
+		{
+			if (dto == null)
+			{
+				return BadRequest("Invalid data.");
+			}
+
+			var reserva = _context.Reservas.Find(id);
+			if (reserva == null)
+			{
+				return NotFound("Reserva não encontrada");
+			}
+
+			reserva.DataInicio = dto.DataInicio;
+			reserva.DataFim = dto.DataFim;
+			reserva.UtilizadorId = dto.UtilizadorId;
+			reserva.EstadoActualReserva = dto.EstadoActualReserva;
+
+			_context.Reservas.Update(reserva);
+			await _context.SaveChangesAsync();
+
+			return Ok("Estado da Reserva Atualizado com sucesso");
+		}
+
+		// Delete
+		[HttpDelete]
+		public JsonResult DeleteReserva(int id)
+		{
+			var result = _context.Reservas.Find(id);
+
+			if (result == null)
+				return new JsonResult(NotFound());
+
+			_context.Reservas.Remove(result);
+			_context.SaveChanges();
+
+			return new JsonResult(NoContent());
+		}
+
+		// Get all
+		[HttpGet()]
+		public JsonResult GetAllReservas()
+		{
+			var result = _context.Reservas.ToList();
 
 			return new JsonResult(Ok(result));
 		}
