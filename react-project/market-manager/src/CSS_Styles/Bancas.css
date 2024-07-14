@@ -26,6 +26,10 @@
   box-shadow: 0 10px 20px 0 rgba(0,0,0,0.1);
 }
 
+.Bancas div.footer {
+  opacity: 0.001;
+}
+
 .Banca h1 {
   text-align: center;
   margin-bottom: 20px;
@@ -45,6 +49,13 @@
 .BancaFoto {
   width: 200px;
   height: auto;
+  margin: 10px;
+}
+
+.BancaInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 2;
   margin: 10px;
 }
 
@@ -81,3 +92,56 @@
 .BancaButtons button:hover {
   background-color: #0056b3;
 }
+
+.Barra_delete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+}
+
+.Barra_delete h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.Barra_delete p {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.Barra_delete button {
+  padding: 10px 20px; /* Ajuste o padding conforme necessário */
+  margin: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  width: 150px; /* Defina um tamanho fixo para os botões */
+  text-align: center; /* Centraliza o texto dentro do botão */
+}
+
+.Barra_delete button:hover {
+  background-color: #0056b3;
+}
+
+.button_create_banca {
+  padding: 10px 20px; /* Ajuste o padding conforme necessário */
+  margin: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  width: auto; /* Largura automática para ajustar ao conteúdo */
+  min-width: 150px; /* Largura mínima para garantir espaço suficiente */
+  text-align: center; /* Centraliza o texto dentro do botão */
+  white-space: nowrap; /* Faz com que o texto não quebre para a próxima linha */
+}
+
+
+

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Axios from "axios";
 import "../CSS_Styles/Bancas.css";
 import BancaFoto from "../Content/Banca.jpg"
+import {Link} from "react-router-dom";
 
 function Bancas() {
   //varivel de estado que armazena o conteúdo da bd com as bancas
@@ -35,6 +36,9 @@ function Bancas() {
         placeholder="Pesquisar..."
         onChange={e => setSearch(e.target.value)}
       />
+        <Link to={`/criar_banca`}>
+          <button className='button_create_banca'> Criar Nova Banca </button>
+        </Link>
       {filteredBanca.length > 0 ? filteredBanca.map((banca, index) => (
         //dar display do conteúdo da bd no ecrã
         <div key={index}>
@@ -50,9 +54,18 @@ function Bancas() {
               {banca.estadoAtualBanca === 1 && <p>Estado Atual da Banca: Livre</p>}
               {banca.estadoAtualBanca === 2 && <p>Estado Atual da Banca: Em Manutenção</p>}
               <p>LocalizaoY: {banca.localizacaoY}</p>
-            </div>  
-          </div>
+            </div> 
+            <div className="BancaButtons">
+              <Link to={`/eliminar_banca/${banca.bancaId}`}>
+                <button className='button' > Eliminar </button>
+              </Link>  
+              <Link to={`/editar_banca/${banca.bancaId}`}> 
+                <button className='button'> Editar </button>
+              </Link> 
+            </div>
+        </div>    
       )) : <p>Loading...</p>}
+      <div id="footer" className='footer'></div> {/* Este elemento representa o footer */}
     </div>
   );
 }

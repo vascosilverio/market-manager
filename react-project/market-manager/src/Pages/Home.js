@@ -23,7 +23,7 @@ function Home() {
       <div className='headerContainer'>
         <h1> MarketManager </h1>
         <p> Gestão e Reserva de Bancas</p>
-        <Link to="/shared_trips">
+        <Link to="/bancas">
           <button id='HomeButton'> Bancas </button>
         </Link>
       </div>

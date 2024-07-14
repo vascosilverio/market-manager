@@ -20,7 +20,6 @@ function Navbar() {
             <Link to="/bancas"> Bancas </Link>
             <Link to="/reservas"> Reservas </Link>
             <Link to="/vendedores"> Vendedores </Link>
-            <Link to="/gestores"> Gestores </Link>
             <Link to="/registo"> Registo </Link>
             <Link to="/login"> Login </Link>
           </div>
@@ -30,7 +29,6 @@ function Navbar() {
             <Link to="/bancas"> Bancas </Link>
             <Link to="/reservas"> Reservas </Link>
             <Link to="/vendedores"> Vendedores </Link>
-            <Link to="/gestores"> Gestores </Link>
             <Link to="/registo"> Registo </Link>
             <Link to="/login"> Login </Link>
             <button onClick={NavbarToggle}>  

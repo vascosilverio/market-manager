@@ -1,0 +1,65 @@
+.BancaCriar {
+    max-width: 800px; /* Aumente a largura máxima para acomodar melhor os campos */
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .BancaCriar h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .BancaCriar form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Garante que os itens dentro do form ocupem toda a largura */
+  }
+  
+  .BancaCriar label {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  
+  .BancaCriar input[type="text"],
+  .BancaCriar input[type="number"],
+  .BancaCriar select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box; /* Evita que o padding afete a largura total */
+  }
+  
+  .BancaCriar select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>');
+    background-repeat: no-repeat;
+    background-position-x: calc(100% - 10px);
+    background-position-y: center;
+    padding-right: 30px;
+  }
+  
+  .BancaCriar button{
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%; /* Ocupa toda a largura disponível */
+  }
+  
+  .BancaCriar button:hover {
+    background-color: #0056b3;
+  }
+  
