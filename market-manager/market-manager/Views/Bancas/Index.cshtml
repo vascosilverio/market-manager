@@ -8,12 +8,24 @@
     var isVendedor = await UserManager.IsInRoleAsync(user, "Vendedor");
 }
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
 <h1>@ViewData["Title"]</h1>
 
 @if (!isVendedor)
 {
     <p>
-        <a asp-action="Create" class="btn btn-primary">Adicionar Banca</a>
+        <a asp-action="Create" class="btn btn-primary mb-3">Adicionar Banca</a>
     </p>
 }
 
@@ -41,7 +53,7 @@
     </div>
 </form>
 
-<table class="table table-striped">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>
@@ -54,18 +66,16 @@
                     Categoria
                 </a>
             </th>
-            <th>LocalizacaoX</th>
-            <th>LocalizacaoY</th>
             <th>
                 <a asp-action="Index" asp-route-sortOrder="@ViewData["EstadoSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
                     Estado Atual
                 </a>
             </th>
-            <th>Largura</th>
-            <th>Comprimento</th>
+            <th>Largura(m)</th>
+            <th>Comprimento(m)</th>
             <th>Imagem</th>
             <th>Reservas</th>
-            <th>Actions</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -74,64 +84,43 @@
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.NomeIdentificadorBanca)</td>
                 <td>@Html.DisplayFor(modelItem => item.CategoriaBanca)</td>
-                <td>@Html.DisplayFor(modelItem => item.LocalizacaoX)</td>
-                <td>@Html.DisplayFor(modelItem => item.LocalizacaoY)</td>
                 <td>@Html.DisplayFor(modelItem => item.EstadoAtualBanca)</td>
                 <td>@Html.DisplayFor(modelItem => item.Largura)</td>
                 <td>@Html.DisplayFor(modelItem => item.Comprimento)</td>
                 <td>
                     @if (!string.IsNullOrEmpty(item.FotografiaBanca))
                     {
-                        <img src="~/FotosBancas/@item.FotografiaBanca" alt="Foto da Banca" style="max-width: 100px; max-height: 100px;" />
+                        <a href="#" class="banca-image-link" data-bs-toggle="modal" data-bs-target="#imageModal" data-image-url="@Url.Content($"~/FotosBancas/{item.FotografiaBanca}")">
+                            <img src="@Url.Content($"~/FotosBancas/{item.FotografiaBanca}")" alt="Foto da Banca" style="max-width: 100px; max-height: 100px;" />
+                        </a>
                         <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="imageModalLabel">Banca Image</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
                                     <div class="modal-body">
                                         <img id="fullscreenImage" src="" alt="Fullscreen Banca Image" class="img-fluid">
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const imageLinks = document.querySelectorAll('.banca-image-link');
-                                const fullscreenImage = document.getElementById('fullscreenImage');
-
-                                imageLinks.forEach(link => {
-                                    link.addEventListener('click', function (event) {
-                                        event.preventDefault();
-                                        const imageSrc = this.querySelector('img').getAttribute('src');
-                                        fullscreenImage.setAttribute('src', imageSrc);
-                                    });
-                                });
-                            });
-                        </script>
-                    
                     }
                     else
                     {
-                        <span>No image</span>
+                        <span>Sem fotografia.</span>
                     }
                 </td>
                 <td>
                     @await Html.PartialAsync("_ReservasPartial", item.Reservas)
                 </td>
-                    <td>
-                        <div class="btn-group" role="group">
+                <td>
+                    <div class="btn-group-vertical" role="group">
                         <a asp-action="Details" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-primary">Detalhes</a>
                         @if (!isVendedor)
                         {
                             <a asp-action="Edit" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-primary">Editar</a>
                             <a asp-action="Delete" asp-route-id="@item.BancaId" class="btn btn-sm btn-outline-danger">Apagar</a>
                         }
-                        
-                        </div>
-                    </td>  
+                    </div>
+                </td>
             </tr>
         }
     </tbody>
@@ -152,7 +141,7 @@
                asp-route-categoria="@ViewData["CurrentCategoria"]"
                asp-route-estado="@ViewData["CurrentEstado"]"
                class="page-link">
-                Previous
+                Anterior
             </a>
         </li>
         <li class="page-item @nextDisabled">
@@ -163,8 +152,23 @@
                asp-route-categoria="@ViewData["CurrentCategoria"]"
                asp-route-estado="@ViewData["CurrentEstado"]"
                class="page-link">
-                Next
+                Próximo
             </a>
         </li>
     </ul>
 </nav>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageModal = document.getElementById('imageModal');
+            const fullscreenImage = document.getElementById('fullscreenImage');
+
+            imageModal.addEventListener('show.bs.modal', function (event) {
+                const imageLink = event.relatedTarget;
+                const imageUrl = imageLink.getAttribute('data-image-url');
+                fullscreenImage.setAttribute('src', imageUrl);
+            });
+        });
+    </script>
+}

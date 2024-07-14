@@ -1,229 +1,309 @@
-﻿using market_manager.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Identity;
 using market_manager.Data;
 using market_manager.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace market_manager.Controllers
 {
-    /// <summary>
-    /// Controler dos utilizador
-    /// </summary>
-    [Authorize]
     public class UtilizadoresController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utilizadores> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UtilizadoresController(UserManager<Utilizadores> usermanager, ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
+        public UtilizadoresController(ApplicationDbContext context, UserManager<Utilizadores> userManager)
         {
-            _userManager = usermanager;
-            _roleManager = roleManager;
             _context = context;
-        }
-
-        [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Utilizadores.ToListAsync());
+            _userManager = userManager;
         }
 
         /// <summary>
-        /// Detalhes de um utilizador
+        /// Lista os utilizadores
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Details(string? id)
+        /// <returns>View com a lista de utilizadores</returns>
+        public async Task<IActionResult> Index()
         {
-            // se o id estiver a null, retornar not found
-            if (id == null)
+            return _context.Utilizadores != null ?
+                        View(await _context.Utilizadores.ToListAsync()) :
+                        Problem("Entity set 'ApplicationDbContext.Utilizadores'  is null.");
+        }
+
+        /// <summary>
+        /// Mostra os detalhes de um utilizador
+        /// </summary>
+        /// <param name="id">ID do utilizador</param>
+        /// <returns>View com os detalhes do utilizador</returns>
+        public async Task<IActionResult> Details(string id)
+        {
+            if (id == null || _context.Utilizadores == null)
             {
                 return NotFound();
             }
 
-            // ir bsucar à base de dados esse utilizador
             var utilizadores = await _context.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
+            if (utilizadores == null)
+            {
+                return NotFound();
+            }
 
-            // retornar para a view o utilizador
             return View(utilizadores);
         }
 
-        
+        /// <summary>
+        /// Mostra o formulário para criar um novo utilizador
+        /// </summary>
+        /// <returns>View com o formulário de criação de utilizador</returns>
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Utilizadores/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// Cria um novo utilizador
+        /// </summary>
+        /// <param name="utilizadores">Dados do utilizador</param>
+        /// <returns>Redirecionamento para a lista de utilizadores</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Create([Bind("Id,PrimeiroNome,UltimoNome,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC,Email,UserName")] Utilizadores utilizador)
+        public async Task<IActionResult> Create([Bind("Id,NomeCompleto,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,Email,UserName")] Utilizadores utilizadores, string password, string role)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(utilizador);
+                utilizadores.Id = Guid.NewGuid().ToString();
+                utilizadores.EmailConfirmed = true;
+                utilizadores.Role = role;
+                await _userManager.CreateAsync(utilizadores, password);
+                await _userManager.AddToRoleAsync(utilizadores, role);
+
+                _context.Add(utilizadores);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Utilizador criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-            return View(utilizador);
+            return View(utilizadores);
         }
 
-
         /// <summary>
-        /// Editar um utilizador
+        /// Mostra o formulário para editar um utilizador
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Edit(string? id)
+        /// <param name="id">ID do utilizador</param>
+        /// <returns>View com o formulário de edição de utilizador</returns>
+        public async Task<IActionResult> Edit(string id)
         {
-            // se o id estiver a null, retornar not found
-            if (id == null)
+            if (id == null || _context.Utilizadores == null)
             {
                 return NotFound();
             }
 
-            // ir buscar à base de dados esse utilizador
-            var utilizador = await _context.Utilizadores.FindAsync(id);
-
-            // retornar para a view o utilizador
-            return View(utilizador);
+            var utilizadores = await _context.Utilizadores.FindAsync(id);
+            if (utilizadores == null)
+            {
+                return NotFound();
+            }
+            return View(utilizadores);
         }
 
         /// <summary>
-        /// Editar um utilizador
+        /// Edita um utilizador
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="utilizador"></param>
-        /// <param name="role"></param>
-        /// <returns></returns>
+        /// <param name="id">ID do utilizador</param>
+        /// <param name="utilizadores">Dados atualizados do utilizador</param>
+        /// <returns>Redirecionamento para a lista de utilizadores</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,NomeCompleto,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,CC,Email,UserName")] Utilizadores utilizador, String role)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,NomeCompleto,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,Email,UserName")] Utilizadores utilizadores)
         {
-            // verificar se o ID vem a null
-            if (utilizador is null)
+            if (id != utilizadores.Id)
             {
                 return NotFound();
             }
 
-            // verificar se o ModelState é válido
             if (ModelState.IsValid)
             {
-                // se for, tentar editar o utilizador
                 try
                 {
-                    // Ober o utilizador com o _userManager
-                    var utilizadorAtualizado = await _userManager.FindByIdAsync(id);
-                    if (utilizadorAtualizado == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // Atribuir ao utilizador os novos dados que vieram da View
-                    utilizadorAtualizado.NomeCompleto = utilizador.NomeCompleto;
-                    utilizadorAtualizado.UserName = utilizador.UserName;
-                    utilizadorAtualizado.Email = utilizador.Email;
-                    utilizadorAtualizado.Morada = utilizador.Morada;
-                    utilizadorAtualizado.CodigoPostal = utilizador.CodigoPostal;
-
-                    // Atualizar o utilizador com os novos dados e verificar se teve sucesso
-                    var resultado = await _userManager.UpdateAsync(utilizadorAtualizado);
-
-                    // Se a atualização dos dados do utilizador tiveram sucesso, alterar a Role
-                    if (resultado.Succeeded)
-                    {
-                        if (role != null)
-                        {
-                            var roleAntiga = await _userManager.GetRolesAsync(utilizadorAtualizado);
-                            await _userManager.RemoveFromRolesAsync(utilizadorAtualizado, roleAntiga);
-                            await _userManager.AddToRoleAsync(utilizadorAtualizado, role);
-                        }
-
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        // se não, devolver erro para o ModelState
-                        ModelState.AddModelError("", "Erro ao tentar atualizar o utilizador.");
-                    }
+                    _context.Update(utilizadores);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Utilizador atualizado com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!UtilizadoresExists(utilizadores.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
+                return RedirectToAction(nameof(Index));
             }
-            // retornar para a view o utilizador
-            return View(utilizador);
+            return View(utilizadores);
         }
 
         /// <summary>
-        /// Remover um utilizador
+        /// Mostra a página de confirmação de exclusão de um utilizador
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Delete(string? id)
+        /// <param name="id">ID do utilizador</param>
+        /// <returns>View com a confirmação de exclusão de utilizador</returns>
+        public async Task<IActionResult> Delete(string id)
         {
-            // se o ID view a null, devolver not found
-            if (id == null)
+            if (id == null || _context.Utilizadores == null)
             {
                 return NotFound();
             }
 
-            // ir buscar à base de dados o utilizador
-            var utilizador = await _context.Utilizadores
+            var utilizadores = await _context.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
+            if (utilizadores == null)
+            {
+                return NotFound();
+            }
 
-            // retornar para a view o utilizador
-            return View(utilizador);
+            return View(utilizadores);
         }
 
         /// <summary>
-        /// Remoção de um utilizador
+        /// Exclui um utilizador
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">ID do utilizador</param>
+        /// <returns>Redirecionamento para a lista de utilizadores</returns>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            // verificar se existem utilizadores que podem ser removidos
             if (_context.Utilizadores == null)
             {
-                return Problem("Entity set 'market_manager.Utilizadores'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.Utilizadores'  is null.");
             }
 
-            // ir buscar à base de dados o utilizador
             var utilizadores = await _context.Utilizadores.FindAsync(id);
-
             if (utilizadores != null)
             {
-                // remover o utilizador da base de dados
-                _context.Utilizadores.Remove(utilizadores);
+                try
+                {
+                    var reservas = _context.Reservas.Where(r => r.UtilizadorId == id);
+                    _context.Reservas.RemoveRange(reservas);
+                    _context.Utilizadores.Remove(utilizadores);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Utilizador apagado com sucesso!";
+                }
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "Não é possível apagar o utilizador porque existem reservas associadas a ele.";
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
-            // guardar as alterações da base de dados
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// Verifica se um utilizador existe
+        /// </summary>
+        /// <param name="id">ID do utilizador</param>
+        /// <returns>True se o utilizador existe, false caso contrário</returns>
         private bool UtilizadoresExists(string id)
         {
             return (_context.Utilizadores?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
+        /// <summary>
+        /// Mostra a página de perfil do utilizador autenticado
+        /// </summary>
+        /// <returns>View com os detalhes do perfil do utilizador</returns>
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return View(user);
+        }
+
+        /// <summary>
+        /// Atualiza o perfil do utilizador autenticado
+        /// </summary>
+        /// <param name="utilizadores">Dados atualizados do utilizador</param>
+        /// <returns>Redirecionamento para a página de perfil</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile([Bind("Id,NomeCompleto,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,Email")] Utilizadores utilizadores)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    user.NomeCompleto = utilizadores.NomeCompleto;
+                    user.DataNascimento = utilizadores.DataNascimento;
+                    user.Telemovel = utilizadores.Telemovel;
+                    user.Morada = utilizadores.Morada;
+                    user.CodigoPostal = utilizadores.CodigoPostal;
+                    user.Localidade = utilizadores.Localidade;
+                    user.NIF = utilizadores.NIF;
+                    user.Email = utilizadores.Email;
+
+                    await _userManager.UpdateAsync(user);
+                    TempData["SuccessMessage"] = "Perfil atualizado com sucesso!";
+                    return RedirectToAction(nameof(Profile));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UtilizadoresExists(user.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            return View(utilizadores);
+        }
+
+        /// <summary>
+        /// Exclui a conta do utilizador autenticado
+        /// </summary>
+        /// <returns>Redirecionamento para a página inicial</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var reservas = _context.Reservas.Where(r => r.UtilizadorId == user.Id);
+                _context.Reservas.RemoveRange(reservas);
+                await _userManager.DeleteAsync(user);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Conta apagada com sucesso!";
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Não é possível apagar a conta porque existem reservas associadas a ela.";
+                return RedirectToAction(nameof(Profile));
+            }
+        }
     }
 }

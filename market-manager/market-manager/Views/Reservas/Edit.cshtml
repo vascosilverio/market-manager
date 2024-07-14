@@ -1,7 +1,19 @@
 ﻿@model market_manager.Models.Reservas
 
 @{
-    ViewData["Title"] = "Bancas";
+    ViewData["Title"] = "Reservas";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
 }
 
 <h1>Editar</h1>
@@ -13,11 +25,18 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ReservaId" />
-            <div class="form-group">
-                <label asp-for="Utilizador" class="control-label"></label>
-                <select asp-for="Utilizador" class="form-control" asp-items="ViewBag.VendedorId"></select>
-                <span asp-validation-for="Utilizador" class="text-danger"></span>
-            </div>
+            @if (User.IsInRole("Gestor"))
+            {
+                <div class="form-group">
+                    <label asp-for="UtilizadorId" class="control-label"></label>
+                    <select asp-for="UtilizadorId" class="form-control" asp-items="ViewBag.UtilizadorId"></select>
+                    <span asp-validation-for="UtilizadorId" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="UtilizadorId" value="@ViewData["UtilizadorId"]" />
+            }
             <div class="form-group">
                 <label asp-for="DataInicio" class="control-label"></label>
                 <input asp-for="DataInicio" class="form-control" />
@@ -28,27 +47,72 @@
                 <input asp-for="DataFim" class="form-control" />
                 <span asp-validation-for="DataFim" class="text-danger"></span>
             </div>
+            @if (User.IsInRole("Gestor"))
+            {
+                <div class="form-group">
+                    <label asp-for="EstadoActualReserva" class="control-label"></label>
+                    <select asp-for="EstadoActualReserva" class="form-control" asp-items="ViewBag.EstadoEstadoActualReserva"></select>
+                    <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
+                </div>
+            }
             <div class="form-group">
-                <label asp-for="DataCriacao" class="control-label"></label>
-                <input asp-for="DataCriacao" class="form-control" />
-                <span asp-validation-for="DataCriacao" class="text-danger"></span>
+                <label class="control-label">Bancas</label>
+                <div class="col-md-4">
+                    <div class="banca-card-container">
+                        @foreach (var banca in ViewData["Bancas"] as List<market_manager.Models.Bancas>)
+                        {
+                            <div class="banca-card" data-banca-id="@banca.BancaId">
+                                <img src="~/FotosBancas/@banca.FotografiaBanca" alt="Banca Image">
+                                <h5>@banca.NomeIdentificadorBanca</h5>
+                                <p>Categoria: @banca.CategoriaBanca</p>
+                                <p>Localizacao: (@banca.LocalizacaoX, @banca.LocalizacaoY)</p>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
             <div class="form-group">
-                <label asp-for="EstadoActualReserva" class="control-label"></label>
-                <input asp-for="EstadoActualReserva" class="form-control" />
-                <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Guardar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-
 <div>
     <a asp-action="Index">Voltar à Listagem</a>
 </div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bancaCards = document.querySelectorAll('.banca-card');
+            const selectedBancasText = document.getElementById('selected-bancas-text'); bancaCards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const bancaId = this.getAttribute('data-banca-id');
+                    const isSelected = this.classList.contains('selected');
+
+                    if (isSelected) {
+                        this.classList.remove('selected');
+                        removeSelectedBanca(bancaId);
+                    } else {
+                        this.classList.add('selected');
+                        addSelectedBanca(bancaId);
+                    }
+                });
+            });
+
+            function addSelectedBanca(bancaId) {
+                const selectedBancas = document.querySelectorAll('.banca-card.selected');
+                const selectedBancaNames = Array.from(selectedBancas).map(card => card.querySelector('h5').textContent);
+                selectedBancasText.textContent = selectedBancaNames.join(', ');
+            }
+
+            function removeSelectedBanca(bancaId) {
+                const selectedBancas = document.querySelectorAll('.banca-card.selected');
+                const selectedBancaNames = Array.from(selectedBancas).map(card => card.querySelector('h5').textContent);
+                selectedBancasText.textContent = selectedBancaNames.join(', ');
+            }
+        });
+    </script>
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
 }

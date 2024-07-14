@@ -27,9 +27,18 @@ namespace market_manager.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<IActionResult> Index(string searchString, string currentFilter, string sortOrder, int? pageNumber, Bancas.CategoriaProdutos? categoria, Bancas.EstadoBanca? estado)
+        /// <summary>
+        /// Lista as bancas, com opções de pesquisa, filtros e paginação
+        /// </summary>
+        /// <param name="searchString">Termo de pesquisa</param>
+        /// <param name="currentFilter">Filtro atual</param>
+        /// <param name="sortOrder">Ordem de ordenação</param>
+        /// <param name="pageNumber">Número da página</param>
+        /// <param name="categoria">Filtro de categoria</param>
+        /// <param name="estado">Filtro de estado</param>
+        /// <returns>View com a lista de bancas</returns>
+        public async Task<IActionResult> Index(string searchString = "", string currentFilter = "", string sortOrder = "", int? pageNumber = null, Bancas.CategoriaProdutos? categoria = null, Bancas.EstadoBanca? estado = null)
         {
-
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["CategoriaSortParm"] = sortOrder == "Categoria" ? "categoria_desc" : "Categoria";
@@ -83,11 +92,13 @@ namespace market_manager.Controllers
 
             int pageSize = PageSize;
             return View(await PaginatedList<Bancas>.CreateAsync(bancas.AsNoTracking(), pageNumber ?? 1, pageSize));
-            return View(bancas); ;
         }
 
-        
-
+        /// <summary>
+        /// Mostra os detalhes de uma banca
+        /// </summary>
+        /// <param name="id">ID da banca</param>
+        /// <returns>View com os detalhes da banca</returns>
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -97,6 +108,7 @@ namespace market_manager.Controllers
 
             var banca = await _context.Bancas
                 .Include(b => b.Reservas)
+                    .ThenInclude(r => r.Utilizador)
                 .FirstOrDefaultAsync(m => m.BancaId == id);
 
             if (banca == null)
@@ -107,17 +119,26 @@ namespace market_manager.Controllers
             return View(banca);
         }
 
+        /// <summary>
+        /// Mostra o formulário para criar uma nova banca
+        /// </summary>
+        /// <returns>View com o formulário de criação de banca</returns>
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// Cria uma nova banca
+        /// </summary>
+        /// <param name="banca">Dados da banca</param>
+        /// <param name="FotografiaBanca">Arquivo de imagem da banca</param>
+        /// <returns>Redirecionamento para a lista de bancas</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Create([Bind("NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas banca, IFormFile FotografiaBanca)
+        public async Task<IActionResult> Create([Bind("NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoAtualBanca")] Bancas banca, IFormFile FotografiaBanca)
         {
-
             if (await _context.Bancas.AnyAsync(b => b.NomeIdentificadorBanca == banca.NomeIdentificadorBanca))
             {
                 ModelState.AddModelError("NomeIdentificadorBanca", "Já existe uma banca com este identificador.");
@@ -145,64 +166,51 @@ namespace market_manager.Controllers
 
                     Guid g = Guid.NewGuid();
                     nomeFotoBanca = g.ToString();
-                    //obter a extensão
                     string extensao = Path.GetExtension(FotografiaBanca.FileName);
 
                     nomeFotoBanca += extensao;
-                    //adicionar o nome do ficheiro ao objeto que vem do browser
                     banca.FotografiaBanca = nomeFotoBanca;
                     ModelState.Remove("FotografiaBanca");
                 }
             }
-
-            // avalia se os dados que chegam da view estão de acordo com o model
             if (ModelState.IsValid)
             {
-                //transferir o valor de ComprimentoAux e LarguraAux para Comprimento e Largura
                 banca.Largura = Convert.ToDecimal(banca.LarguraAux.Replace('.', ','));
                 banca.Comprimento = Convert.ToDecimal(banca.ComprimentoAux.Replace('.', ','));
 
-                // adiciona os dados vindos da View à BD
                 _context.Add(banca);
-                //faz o commit na BD
                 await _context.SaveChangesAsync();
 
-                // se há ficheiro de imagem, vamos guardar no disco rígido do servidor.
                 if (haFotoBanca)
                 {
                     try
                     {
                         string nomePastaOndeGuardarImagem = _webHostEnvironment.WebRootPath;
-                        //adicionar pasta imagens
                         nomePastaOndeGuardarImagem = Path.Combine(nomePastaOndeGuardarImagem, "FotosBancas");
-                        // e, existe a pasta imagens?
                         if (!Directory.Exists(nomePastaOndeGuardarImagem))
                         {
-                            // se nao existe, cria-se
                             Directory.CreateDirectory(nomePastaOndeGuardarImagem);
                         }
-                        // juntar o nome do ficheiro à sua localização
                         string nomeFinalFotografiaBanca = Path.Combine(nomePastaOndeGuardarImagem, nomeFotoBanca);
-                        // guardar a imagem no disco rigido
                         using var streamFotografiaBanca = new FileStream(nomeFinalFotografiaBanca, FileMode.CreateNew);
                         await FotografiaBanca.CopyToAsync(streamFotografiaBanca);
                     }
                     catch (Exception ex)
                     {
-                        // Tratar a exceção de forma adequada
-                        // Por exemplo, registrar o erro em um log e exibir uma mensagem de erro para o usuário
                         ModelState.AddModelError("", "Ocorreu um erro ao salvar o arquivo: " + ex.Message);
                         return View(banca);
                     }
                 }
-                // redireciona o user para a página index
                 return RedirectToAction(nameof(Index));
             }
-            //se cheguei aqui é porque alguma coisa correu mal :'(
-            //volta à View com os dados fornecidos pela View
             return View(banca);
         }
 
+        /// <summary>
+        /// Mostra o formulário para editar uma banca
+        /// </summary>
+        /// <param name="id">ID da banca</param>
+        /// <returns>View com o formulário de edição de banca</returns>
         [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -218,15 +226,23 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            banca.LarguraAux = banca.Largura.ToString("0.00").Replace(",", ".");
+            banca.ComprimentoAux = banca.Comprimento.ToString("0.00").Replace(",", ".");
             ViewData["FotografiaBanca"] = banca.FotografiaBanca;
 
             return View(banca);
         }
 
+        /// <summary>
+        /// Edita uma banca
+        /// </summary>
+        /// <param name="id">ID da banca</param>
+        /// <param name="banca">Dados atualizados da banca</param>
+        /// <returns>Redirecionamento para a lista de bancas</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Gestor")]
-        public async Task<IActionResult> Edit(int id, [Bind("BancaId,NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoActualBanca")] Bancas banca)
+        public async Task<IActionResult> Edit(int id, [Bind("BancaId,NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoAtualBanca")] Bancas banca)
         {
             if (id != banca.BancaId)
             {
@@ -245,14 +261,11 @@ namespace market_manager.Controllers
             {
                 try
                 {
-                    //transferir o valor de ComprimentoAux e LarguraAux para Comprimento e Largura
                     banca.Largura = Convert.ToDecimal(banca.LarguraAux.Replace('.', ','));
                     banca.Comprimento = Convert.ToDecimal(banca.ComprimentoAux.Replace('.', ','));
 
-                    // Retrieve the existing banca entity from the database
                     var existingBanca = await _context.Bancas.AsNoTracking().FirstOrDefaultAsync(b => b.BancaId == id);
 
-                    // Handle image file upload
                     var fotografiaBancaInput = Request.Form.Files["FotografiaBancaInput"];
                     if (fotografiaBancaInput != null && fotografiaBancaInput.Length > 0)
                     {
@@ -269,7 +282,6 @@ namespace market_manager.Controllers
                         string nomeFotoBanca = $"{g}{extensao}";
                         string nomeFinalFotografiaBanca = Path.Combine(nomePastaOndeGuardarImagem, nomeFotoBanca);
 
-                        // apagar a imagem antiga
                         if (existingBanca != null && !string.IsNullOrEmpty(existingBanca.FotografiaBanca))
                         {
                             var oldFilePath = Path.Combine(nomePastaOndeGuardarImagem, existingBanca.FotografiaBanca);
@@ -279,7 +291,6 @@ namespace market_manager.Controllers
                             }
                         }
 
-                        // guardar a imagem no disco rigido
                         using var streamFotografiaBanca = new FileStream(nomeFinalFotografiaBanca, FileMode.Create);
                         await fotografiaBancaInput.CopyToAsync(streamFotografiaBanca);
 
@@ -312,6 +323,11 @@ namespace market_manager.Controllers
             return View(banca);
         }
 
+        /// <summary>
+        /// Mostra a página de confirmação de exclusão de uma banca
+        /// </summary>
+        /// <param name="id">ID da banca</param>
+        /// <returns>View com a confirmação de exclusão de banca</returns>
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -330,6 +346,11 @@ namespace market_manager.Controllers
             return View(banca);
         }
 
+        /// <summary>
+        /// Exclui uma banca
+        /// </summary>
+        /// <param name="id">ID da banca</param>
+        /// <returns>Redirecionamento para a lista de bancas</returns>
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Gestor")]
@@ -354,7 +375,6 @@ namespace market_manager.Controllers
                 return View(banca);
             }
 
-            // Delete the image file
             if (!string.IsNullOrEmpty(banca.FotografiaBanca))
             {
                 var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "FotosBancas", banca.FotografiaBanca);
@@ -370,10 +390,34 @@ namespace market_manager.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// Verifica se uma banca existe
+        /// </summary>
+        /// <param name="id">ID da banca</param>
+        /// <returns>True se a banca existe, false caso contrário</returns>
         private bool BancasExists(int id)
         {
             return _context.Bancas.Any(e => e.BancaId == id);
         }
 
+        /// <summary>
+        /// Obtém as localizações das bancas
+        /// </summary>
+        /// <returns>JSON com as localizações das bancas</returns>
+        [HttpGet]
+        public async Task<IActionResult> GetBancasLocalizacoes()
+        {
+            var bancas = await _context.Bancas
+                .Select(b => new
+                {
+                    b.BancaId,
+                    b.LocalizacaoX,
+                    b.LocalizacaoY,
+                    b.EstadoAtualBanca
+                })
+                .ToListAsync();
+
+            return Json(bancas);
+        }
     }
 }

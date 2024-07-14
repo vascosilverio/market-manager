@@ -1,0 +1,51 @@
+﻿@model market_manager.Models.MatrixModel
+
+<div id="matrix-container">
+    <img id="blueprint-image" src="@Url.Content("~/images/blueprint.jpg")" alt="Blueprint" />
+    @for (int y = 0; y < 20; y++)
+    {
+        <div class="matrix-row">
+            @for (int x = 0; x < 20; x++)
+            {
+                <div class="matrix-cell" data-x="@x" data-y="@y"></div>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const matrixCells = document.querySelectorAll('.matrix-cell');
+        const localizacaoXInput = document.getElementById('LocalizacaoX');
+        const localizacaoYInput = document.getElementById('LocalizacaoY'); fetch('/Bancas/GetBancasLocalizacoes')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(banca => {
+                    const cell = document.querySelector(`.matrix-cell[data-x="${banca.localizacaoX}"][data-y="${banca.localizacaoY}"]`);
+                    if (cell) {
+                        cell.classList.add('occupied');
+                        cell.classList.add(`estado-${banca.estadoAtualBanca}`);
+                        cell.setAttribute('data-banca-id', banca.bancaId);
+                    }
+                });
+            });
+
+        matrixCells.forEach(cell => {
+            const x = cell.getAttribute('data-x');
+            const y = cell.getAttribute('data-y');
+
+            cell.addEventListener('click', function () {
+                if (!cell.classList.contains('occupied')) {
+                    localizacaoXInput.value = x;
+                    localizacaoYInput.value = y;
+                    highlightSelectedCell(cell);
+                }
+            });
+        });
+
+        function highlightSelectedCell(cell) {
+            matrixCells.forEach(c => c.classList.remove('selected'));
+            cell.classList.add('selected');
+        }
+    });
+</script>
