@@ -5,6 +5,10 @@ using market_manager.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using market_manager.Models.DTOs;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace market_manager.Controllers
 {
@@ -28,17 +32,24 @@ namespace market_manager.Controllers
 		/// </summary>
 		public SignInManager<Utilizadores> _signInManager;
 
+		// 
+		private IConfiguration _config;
+
 		// Construtor que recebe o contexto da bd APIContext como uma dependência.
 		public ApiController(ApplicationDbContext context,
 			SignInManager<Utilizadores> signInManager,
-			UserManager<Utilizadores> userManager)
+			UserManager<Utilizadores> userManager,
+			IConfiguration config)
 		{
 			// permitir o acesso ao contexto da bd dentro das ações do controlador, _ indica uma variável privada
 			_context = context;
 			_signInManager = signInManager;
 			_userManager = userManager;
+			_config = config;
 		}
 
+		
+		
 
 		/// <summary>
 		/// operações da API que
@@ -94,10 +105,22 @@ namespace market_manager.Controllers
 				PasswordVerificationResult passWorks = new PasswordHasher<Utilizadores>().VerifyHashedPassword(null, user.PasswordHash, password);
 				if (passWorks.Equals(PasswordVerificationResult.Success))
 				{
-					await _signInManager.SignInAsync(user, false);
-					return Ok("Sign in com sucesso");
 					// aqui é adicionado à sessão o cookie de autenticação que irá permitir que o user autenticado faça requests
+					var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+					var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+					var Sectoken = new JwtSecurityToken(_config["Jwt:Issuer"],
+					  _config["Jwt:Issuer"],
+					  null,
+					  expires: DateTime.Now.AddMinutes(120),
+					  signingCredentials: credentials);
+
+					var token = new JwtSecurityTokenHandler().WriteToken(Sectoken);
+
+					return Ok(token);
 				}
+
+
 			}
 			return Ok("ola");
 
@@ -174,7 +197,7 @@ namespace market_manager.Controllers
 
 		// Update
 		[HttpPut]
-		public async Task<IActionResult> UpdateBancaEstado(int id, [FromBody] BancasDTO dto)
+		public async Task<IActionResult> UpdateBanca(int id, [FromBody] BancasDTO dto)
 		{
 			if (dto == null)
 			{
@@ -187,7 +210,14 @@ namespace market_manager.Controllers
 				return NotFound("Banca não encontrada");
 			}
 
+			banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
+			banca.CategoriaBanca = dto.CategoriaBanca;
+			banca.Largura = dto.Largura;
+			banca.Comprimento = dto.Comprimento;
+			banca.LocalizacaoX = dto.LocalizacaoX;
+			banca.LocalizacaoY = dto.LocalizacaoY;
 			banca.EstadoAtualBanca = dto.EstadoAtualBanca;
+			banca.FotografiaBanca = dto.FotografiaBanca;
 
 			_context.Bancas.Update(banca);
 			await _context.SaveChangesAsync();
