@@ -31,10 +31,10 @@ namespace market_manager.Controllers
         /// <param name="searchString">Termo de pesquisa</param>
         /// <param name="pageNumber">Número da página</param>
         /// <returns>View com a lista de reservas</returns>
-        public async Task<IActionResult> Index(string searchString = "", string currentFilter = "", string sortOrder = "", int? pageNumber = null)
+        public async Task<IActionResult> Index(string searchString = "", string currentFilter = "", string sortOrder = "", int? pageNumber = 1)
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["DateSortParm"] = String.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
+            ViewData["DateSortParm"] = string.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
             ViewData["CurrentFilter"] = searchString;
 
             if (searchString != null)
@@ -46,28 +46,27 @@ namespace market_manager.Controllers
                 searchString = currentFilter;
             }
 
-            var reservas = from r in _context.Reservas
-                           .Include(r => r.Utilizador)
-                           .Include(r => r.ListaBancas)
-                           select r;
+            var reservas = _context.Reservas
+                .Include(r => r.Utilizador)
+                .Include(r => r.ListaBancas)
+                .AsQueryable();
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
-                reservas = reservas.Where(s => s.Utilizador.NomeCompleto.Contains(searchString));
+                reservas = reservas.Where(r => r.Utilizador.NomeCompleto.Contains(searchString));
             }
 
             switch (sortOrder)
             {
                 case "date_desc":
-                    reservas = reservas.OrderByDescending(s => s.DataInicio);
+                    reservas = reservas.OrderByDescending(r => r.DataInicio);
                     break;
                 default:
-                    reservas = reservas.OrderBy(s => s.DataInicio);
+                    reservas = reservas.OrderBy(r => r.DataInicio);
                     break;
             }
 
             int pageSize = 3;
-
             return View(await PaginatedList<Reservas>.CreateAsync(reservas.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
@@ -99,17 +98,23 @@ namespace market_manager.Controllers
         /// Mostra o formulário para criar uma nova reserva
         /// </summary>
         /// <returns>View com o formulário de criação de reserva</returns>
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Não foi possível carregar o user com ID '{_userManager.GetUserId(User)}'.");
-            }
+            var user = _userManager.GetUserAsync(User).Result;
+            var isGestor = User.IsInRole("Gestor");
 
-            ViewData["Bancas"] = new SelectList(_context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre), "BancaId", "NomeIdentificadorBanca");
-            ViewData["Utilizadores"] = new SelectList(_context.Users, "Id", "NomeCompleto");
-          
+            if (isGestor)
+            {
+                ViewData["UtilizadorId"] = new SelectList(_context.Utilizadores, "Id", "NomeCompleto");
+                ViewData["EstadoActualReserva"] = new SelectList(Enum.GetValues(typeof(Reservas.EstadoReserva)));
+            }
+            else
+            {
+                ViewData["UtilizadorId"] = user.Id;
+            }
+            ViewData["UtilizadorId"] = user.Id;
+            var bancas = _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToList();
+            ViewData["Bancas"] = bancas;
             return View();
         }
 
@@ -120,30 +125,28 @@ namespace market_manager.Controllers
         /// <returns>Redirecionamento para a lista de reservas</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReservaId,DataInicio,DataFim,SelectedBancaIds")] Reservas reserva)
+        public async Task<IActionResult> Create([Bind("DataInicio,DataFim,SelectedBancaIds")] Reservas reserva)
         {
             var user = await _userManager.GetUserAsync(User);
             reserva.UtilizadorId = user.Id;
             reserva.EstadoActualReserva = Reservas.EstadoReserva.Pendente;
-            reserva.Utilizador = user;
-            reserva.ListaBancas = await _context.Bancas.Where(b => reserva.SelectedBancaIds.Contains(b.BancaId)).ToListAsync();
-
             if (ModelState.IsValid)
             {
-                
+                reserva.ListaBancas = await _context.Bancas.Where(b => reserva.SelectedBancaIds.Contains(b.BancaId)).ToListAsync();
 
                 foreach (var banca in reserva.ListaBancas)
                 {
                     banca.EstadoAtualBanca = Bancas.EstadoBanca.Ocupada;
                 }
 
+                reserva.Utilizador = user;
                 _context.Add(reserva);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Reserva criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-             ViewData["Bancas"] = new SelectList(_context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre), "BancaId", "NomeIdentificadorBanca", reserva.SelectedBancaIds);
-            ViewData["Utilizadores"] = new SelectList(_context.Users, "Id", "NomeCompleto", reserva.UtilizadorId);
+
+            ViewData["UtilizadorId"] = new SelectList(_context.Users, "Id", "NomeCompleto", reserva.UtilizadorId);
+            ViewData["Bancas"] = await _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToListAsync();
             return View(reserva);
         }
 
@@ -154,22 +157,23 @@ namespace market_manager.Controllers
         /// <returns>View com o formulário de edição de reserva</returns>
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Reservas == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
             var reserva = await _context.Reservas
-                .Include(r => r.Utilizador)
                 .Include(r => r.ListaBancas)
+                .Include(r => r.Utilizador)
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
+
             if (reserva == null)
             {
                 return NotFound();
             }
-            var todasBancas = await _context.Bancas.ToListAsync();
-            ViewData["Bancas"] = todasBancas;
-            ViewData["BancasDisponiveis"] = new MultiSelectList(_context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre || reserva.ListaBancas.Contains(b)), "BancaId", "NomeIdentificadorBanca", reserva.ListaBancas.Select(b => b.BancaId));
+
+            ViewData["UtilizadorId"] = new SelectList(_context.Users, "Id", "NomeCompleto", reserva.UtilizadorId);
+            ViewData["Bancas"] = await _context.Bancas.ToListAsync();
             return View(reserva);
         }
 

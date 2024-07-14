@@ -15,7 +15,7 @@ namespace market_manager.Models
         [Display(Name = "Utilizador")]
         public string UtilizadorId { get; set; }
 
-        public Utilizadores Utilizador { get; set; }
+        public virtual Utilizadores Utilizador { get; set; }
 
         [Required(ErrorMessage ="Introduza a data de início da reserva.")]
         [DataType(DataType.Date)]
@@ -39,7 +39,7 @@ namespace market_manager.Models
         [Display(Name = "Estado da Reserva")]
         public EstadoReserva EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
 
-        public ICollection<Bancas> ListaBancas { get; set; }
+        public virtual ICollection<Bancas> ListaBancas { get; set; }
 
         [NotMapped]
         public List<int> SelectedBancaIds { get; set; }

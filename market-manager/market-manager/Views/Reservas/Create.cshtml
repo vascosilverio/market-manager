@@ -4,42 +4,13 @@
     ViewData["Title"] = "Reservas";
 }
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger">
-        <ul>
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <li>@error.ErrorMessage</li>
-            }
-        </ul>
-    </div>
-}
-
 <h1>Adicionar</h1>
-
 <h4>Reservas</h4>
 <hr />
 <div class="row">
     <div class="col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @if (User.IsInRole("Gestor"))
-            {
-                <div class="form-group">
-                    <label asp-for="UtilizadorId" class="control-label"></label>
-                    <select asp-for="UtilizadorId" class="form-control" asp-items="ViewBag.UtilizadorId"></select>
-                </div>
-                <div class="form-group">
-                    <label asp-for="EstadoActualReserva" class="control-label"></label>
-                    <select asp-for="EstadoActualReserva" class="form-control" asp-items="ViewBag.EstadoActualReserva"></select>
-                    <span asp-validation-for="EstadoActualReserva" class="text-danger"></span>
-                </div>
-            }
-            else
-            {
-                <input type="hidden" asp-for="UtilizadorId" value="@ViewData["UtilizadorId"]" />
-            }
             <div class="form-group">
                 <label asp-for="DataInicio" class="control-label"></label>
                 <input asp-for="DataInicio" class="form-control" />
@@ -61,7 +32,7 @@
                                 <h5>@banca.NomeIdentificadorBanca</h5>
                                 <p>Categoria: @banca.CategoriaBanca</p>
                                 <p>Localizacao: (@banca.LocalizacaoX, @banca.LocalizacaoY)</p>
-                                <input type="checkbox" name="SelectedBancaIds" value="@banca.BancaId" style="display: none;" />
+                                <input type="checkbox" name="SelectedBancaIds" value="@banca.BancaId" />
                             </div>
                         }
                     </div>
@@ -73,7 +44,6 @@
         </form>
     </div>
 </div>
-
 <div>
     <a asp-action="Index">Voltar à Listagem</a>
 </div>
@@ -82,7 +52,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const bancaCards = document.querySelectorAll('.banca-card');
-
             bancaCards.forEach(card => {
                 card.addEventListener('click', function () {
                     const checkbox = this.querySelector('input[type="checkbox"]');

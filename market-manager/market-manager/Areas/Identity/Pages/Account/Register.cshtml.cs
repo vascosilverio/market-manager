@@ -109,7 +109,34 @@ namespace market_manager.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public Utilizadores Utilizador { get; set; }    
+            [Required]
+            [Display(Name = "Nome Completo")]
+            public string NomeCompleto { get; set; }
+
+            [Required]
+            [DataType(DataType.Date)]
+            [Display(Name = "Data de Nascimento")]
+            public DateTime DataNascimento { get; set; }
+
+            [Required]
+            [Display(Name = "Morada")]
+            public string Morada { get; set; }
+
+            [Required]
+            [Display(Name = "Código Postal")]
+            public string CodigoPostal { get; set; }
+
+            [Required]
+            [Display(Name = "Localidade")]
+            public string Localidade { get; set; }
+
+            [Required]
+            [Display(Name = "NIF")]
+            public string NIF { get; set; }
+
+            [Required]
+            [Display(Name = "Cartão de Cidadão")]
+            public string CC { get; set; }
 
         }
 
@@ -134,14 +161,13 @@ namespace market_manager.Areas.Identity.Pages.Account
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
                 // Copiar os dados do Input.Utilizador para o user
-                user.NomeCompleto = Input.Utilizador.NomeCompleto;
-                user.DataNascimento = Input.Utilizador.DataNascimento;
-                user.Telemovel = Input.Utilizador.Telemovel;
-                user.Morada = Input.Utilizador.Morada;
-                user.CodigoPostal = Input.Utilizador.CodigoPostal;
-                user.Localidade = Input.Utilizador.Localidade;
-                user.NIF = Input.Utilizador.NIF;
-                user.CC = Input.Utilizador.CC;
+                user.NomeCompleto = Input.NomeCompleto;
+                user.DataNascimento = Input.DataNascimento;
+                user.Morada = Input.Morada;
+                user.CodigoPostal = Input.CodigoPostal;
+                user.Localidade = Input.Localidade;
+                user.NIF = Input.NIF;
+                user.CC = Input.CC;
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
