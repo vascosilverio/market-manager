@@ -1,0 +1,20 @@
+﻿@model market_manager.Models.Utilizadores
+
+<h3>Atualizar Perfil</h3>
+
+<form asp-action="UpdateProfile" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="NomeCompleto" class="control-label"></label>
+        <input asp-for="NomeCompleto" class="form-control" />
+        <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+    </div>
+
+    <!-- Restante dos campos do formulário -->
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Atualizar</button>
+        <a asp-action="Profile" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>

@@ -168,15 +168,17 @@ namespace market_manager.Areas.Identity.Pages.Account
                 user.Localidade = Input.Localidade;
                 user.NIF = Input.NIF;
                 user.CC = Input.CC;
-
+                user.Role = "Vendedor";
+                user.Telemovel = "123123123";
                 var result = await _userManager.CreateAsync(user, Input.Password);
+                // Atribuir o papel de vendedor por padrão
+                await _userManager.AddToRoleAsync(user, "Vendedor");
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Atribuir o papel de vendedor por padrão
-                    await _userManager.AddToRoleAsync(user, "Vendedor");
+                    
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

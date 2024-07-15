@@ -47,13 +47,14 @@ namespace market_manager.Controllers
             }
 
             var reservas = _context.Reservas
-                .Include(r => r.Utilizador)
-                .Include(r => r.ListaBancas)
-                .AsQueryable();
+            .Include(r => r.Utilizador)
+            .Include(r => r.ListaBancas)
+            .AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchString))
+            var user = await _userManager.GetUserAsync(User);
+            if (!User.IsInRole("Gestor"))
             {
-                reservas = reservas.Where(r => r.Utilizador.NomeCompleto.Contains(searchString));
+                reservas = reservas.Where(r => r.UtilizadorId == user.Id);
             }
 
             switch (sortOrder)
@@ -127,25 +128,27 @@ namespace market_manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DataInicio,DataFim,SelectedBancaIds")] Reservas reserva)
         {
+            // Obtém o utilizador atual
             var user = await _userManager.GetUserAsync(User);
             reserva.UtilizadorId = user.Id;
+            reserva.Utilizador = user;
             reserva.EstadoActualReserva = Reservas.EstadoReserva.Pendente;
+            ModelState.Remove("UtilizadorId");
+            ModelState.Remove("Utilizador");
+            ModelState.Remove("ListaBancas");
+
             if (ModelState.IsValid)
             {
+                // Obtém as bancas selecionadas
                 reserva.ListaBancas = await _context.Bancas.Where(b => reserva.SelectedBancaIds.Contains(b.BancaId)).ToListAsync();
 
-                foreach (var banca in reserva.ListaBancas)
-                {
-                    banca.EstadoAtualBanca = Bancas.EstadoBanca.Ocupada;
-                }
-
-                reserva.Utilizador = user;
                 _context.Add(reserva);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Reserva criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["UtilizadorId"] = new SelectList(_context.Users, "Id", "NomeCompleto", reserva.UtilizadorId);
             ViewData["Bancas"] = await _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToListAsync();
             return View(reserva);
         }
