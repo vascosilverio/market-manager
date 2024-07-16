@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace market_manager.Models
 {
+    // Classe que representa o modelo de uma reserva
     public class Reservas
     {
+        // Propriedades da reserva com as anotações de validação
 
         [Key]
         public int ReservaId { get; set; }
@@ -39,11 +41,14 @@ namespace market_manager.Models
         [Display(Name = "Estado da Reserva")]
         public EstadoReserva EstadoActualReserva { get; set; } = EstadoReserva.Pendente;
 
+        // Coleção de bancas associadas a uma reserva
         public virtual ICollection<Bancas> ListaBancas { get; set; }
 
         [NotMapped]
+        // Lista de bancas selecionadas
         public List<int> SelectedBancaIds { get; set; }
 
+        // Enumerações permitidas para o estado de uma reserva
         public enum EstadoReserva
         {
             /// <summary>

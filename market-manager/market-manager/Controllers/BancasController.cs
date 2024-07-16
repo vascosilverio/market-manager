@@ -17,10 +17,14 @@ namespace market_manager.Controllers
     [Authorize]
     public class BancasController : Controller
     {
+        // variável que guarda o contexto da base de dados
         private readonly ApplicationDbContext _context;
+        // variável que guarda o ambiente de hospedagem
         private readonly IWebHostEnvironment _webHostEnvironment;
+        // variável que guarda o número de bancas por página
         private readonly int PageSize = 5;
 
+        // Construtor que recebe o contexto da bd ApplicationDbContext como uma dependência.
         public BancasController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -58,10 +62,14 @@ namespace market_manager.Controllers
             ViewData["CurrentEstado"] = estado;
 
             var bancas = _context.Bancas
+                // Incluir as reservas associadas a cada banca
                 .Include(b => b.Reservas)
+                // Incluir os utilizadores associados a cada reserva
                     .ThenInclude(r => r.Utilizador)
+                    // Converter para IQueryable
                 .AsQueryable();
 
+            // Filtrar por termo de pesquisa
             if (!String.IsNullOrEmpty(searchString))
             {
                 bancas = bancas.Where(s => s.NomeIdentificadorBanca.Contains(searchString));
@@ -77,6 +85,7 @@ namespace market_manager.Controllers
                 bancas = bancas.Where(b => b.EstadoAtualBanca == estado.Value);
             }
 
+            // Opções de ordenação
             bancas = sortOrder switch
             {
                 "name_desc" => bancas.OrderByDescending(s => s.NomeIdentificadorBanca),
@@ -106,6 +115,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            // Obter a banca com as reservas associadas
             var banca = await _context.Bancas
                 .Include(b => b.Reservas)
                     .ThenInclude(r => r.Utilizador)
@@ -139,6 +149,7 @@ namespace market_manager.Controllers
         [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> Create([Bind("NomeIdentificadorBanca,CategoriaBanca,LarguraAux,ComprimentoAux,LocalizacaoX,LocalizacaoY,EstadoAtualBanca")] Bancas banca, IFormFile FotografiaBanca)
         {
+            // parâmetros de validação
             if (await _context.Bancas.AnyAsync(b => b.NomeIdentificadorBanca == banca.NomeIdentificadorBanca))
             {
                 ModelState.AddModelError("NomeIdentificadorBanca", "Já existe uma banca com este identificador.");
@@ -148,6 +159,7 @@ namespace market_manager.Controllers
             string nomeFotoBanca = "";
             bool haFotoBanca = false;
 
+            // validação da fotografia da banca
             if (FotografiaBanca == null)
             {
                 ModelState.AddModelError("", "Fornecimento de uma fotografia da banca é obrigatório.");
@@ -155,6 +167,7 @@ namespace market_manager.Controllers
             }
             else
             {
+                // validação do formato da fotografia
                 if (!(FotografiaBanca.ContentType == "image/png" || FotografiaBanca.ContentType == "image/jpeg"))
                 {
                     ModelState.AddModelError("", "Insira a fotografia no formato png ou jpeg.");
@@ -173,6 +186,7 @@ namespace market_manager.Controllers
                     ModelState.Remove("FotografiaBanca");
                 }
             }
+            // validação dos dados da banca
             if (ModelState.IsValid)
             {
                 banca.Largura = Convert.ToDecimal(banca.LarguraAux.Replace('.', ','));
@@ -181,6 +195,7 @@ namespace market_manager.Controllers
                 _context.Add(banca);
                 await _context.SaveChangesAsync();
 
+                // guardar a fotografia da banca
                 if (haFotoBanca)
                 {
                     try
@@ -264,6 +279,7 @@ namespace market_manager.Controllers
                     banca.Largura = Convert.ToDecimal(banca.LarguraAux.Replace('.', ','));
                     banca.Comprimento = Convert.ToDecimal(banca.ComprimentoAux.Replace('.', ','));
 
+                    // Obter a banca existente
                     var existingBanca = await _context.Bancas.AsNoTracking().FirstOrDefaultAsync(b => b.BancaId == id);
 
                     var fotografiaBancaInput = Request.Form.Files["FotografiaBancaInput"];
@@ -276,12 +292,14 @@ namespace market_manager.Controllers
                         {
                             Directory.CreateDirectory(nomePastaOndeGuardarImagem);
                         }
-
+               
+                        // Guardar a nova fotografia da banca se for fornecida
                         Guid g = Guid.NewGuid();
                         string extensao = Path.GetExtension(fotografiaBancaInput.FileName);
                         string nomeFotoBanca = $"{g}{extensao}";
                         string nomeFinalFotografiaBanca = Path.Combine(nomePastaOndeGuardarImagem, nomeFotoBanca);
 
+                        // Apagar a fotografia antiga se existir
                         if (existingBanca != null && !string.IsNullOrEmpty(existingBanca.FotografiaBanca))
                         {
                             var oldFilePath = Path.Combine(nomePastaOndeGuardarImagem, existingBanca.FotografiaBanca);
@@ -298,6 +316,7 @@ namespace market_manager.Controllers
                     }
                     else
                     {
+                        // Manter a fotografia antiga se não for fornecida uma nova
                         if (existingBanca != null)
                         {
                             banca.FotografiaBanca = existingBanca.FotografiaBanca;
@@ -309,6 +328,7 @@ namespace market_manager.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
+                    // Verificar se a banca ainda existe
                     if (!BancasExists(banca.BancaId))
                     {
                         return NotFound();

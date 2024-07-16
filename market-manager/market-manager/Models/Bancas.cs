@@ -4,9 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace market_manager.Models
 {
+    // classe que representa as bancas 
     public class Bancas
     {
-
+        // Propriedades da classe Bancas com as respetivas anotações de validação
         [Key]
         public int BancaId { get; set; }
 
@@ -51,9 +52,10 @@ namespace market_manager.Models
         [Display(Name = "Fotografia da Banca.")]
         public string? FotografiaBanca { get; set; }
 
+        // Coleção de Reservas associadas a uma banca
         public ICollection<Reservas>? Reservas { get; set; }
 
-        
+        // Enumerações permitidas para o estado de uma banca
         public enum EstadoBanca
         {
             /// <summary>
@@ -64,6 +66,7 @@ namespace market_manager.Models
             Manutenção
         }
 
+        // Enumerações permitidas para as categorias de produtos de uma banca
         public enum CategoriaProdutos
         {
             /// <summary>

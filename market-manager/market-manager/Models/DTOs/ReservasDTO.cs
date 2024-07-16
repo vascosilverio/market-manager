@@ -5,6 +5,8 @@ using static market_manager.Models.Reservas;
 
 namespace market_manager.Models.DTOs
 {
+	// Classe que representa o DTO de Reservas com os atributos necessários para a criação de uma reserva
+	// Contem também as anotações de validação dos atributos
 	public class ReservasDTO
 	{
 		[Required(ErrorMessage = "Introduza a data de início da reserva.")]

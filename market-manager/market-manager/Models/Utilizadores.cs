@@ -4,9 +4,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace market_manager.Models
 {
+    // Classe que representa o modelo de utilizadores
     public class Utilizadores : IdentityUser
     {
     
+        // Propriedades da classe
         public string Role { get; set; }
 
         [Required(ErrorMessage = "Deve inserir a sua data de nascimento.")]
@@ -48,6 +50,7 @@ namespace market_manager.Models
         [StringLength(9, MinimumLength = 8, ErrorMessage = "O número de identificação civil deve ter pelo menos 8 caracteres..")]
         public string CC { get; set; }
 
+        // Enumerações permitidas para o estado de um registo de vendedor
         public enum EstadoRegisto
         {
             /// <summary>
@@ -58,6 +61,7 @@ namespace market_manager.Models
             Pendente
         }
 
+        // Lista de reservas associadas a um utilizador
         public ICollection<Reservas> ListaReservas { get; set; }
 
     }

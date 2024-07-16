@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace market_manager.Models.DTOs
 {
+	// Classe que representa o DTO de Bancas com os atributos necessários para a criação de uma banca
+	// Contem também as anotações de validação dos atributos
 	public class BancasDTO
 	{
 		[Required(ErrorMessage = "Introduza o nome de localização da banca.")]

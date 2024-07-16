@@ -7,16 +7,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+// Classe que representa o seeder de dados
 public class DataSeeder
 {
+    // Método que semeia os dados na base de dados com utilizadores, bancas e reservas
     public static async Task SeedData(UserManager<Utilizadores> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
     {
-
+        // Verifica se existem roles e cria as roles de Vendedor e Gestor
         if (!await roleManager.RoleExistsAsync("Vendedor"))
             await roleManager.CreateAsync(new IdentityRole("Vendedor"));
         if (!await roleManager.RoleExistsAsync("Gestor"))
             await roleManager.CreateAsync(new IdentityRole("Gestor"));
 
+        // Cria uma lista de utilizadores com 9 utilizadores e atribui-lhes uma role e informação pessoal
         var utilizadores = new List<Utilizadores>();
         for (int i = 1; i <= 9; i++)
         {
@@ -37,6 +40,7 @@ public class DataSeeder
                 CC = $"1000000{i}"
             };
 
+            // Verifica se o utilizador já existe e cria-o
             if (await userManager.FindByEmailAsync(user.Email) == null)
             {
                 await userManager.CreateAsync(user, "123456qwe#");
@@ -45,6 +49,7 @@ public class DataSeeder
             }
         }
 
+        // Verifica se existem bancas e cria 9 bancas
         if (!context.Bancas.Any())
         {
             var bancas = new List<Bancas>();
@@ -62,16 +67,20 @@ public class DataSeeder
                     FotografiaBanca = "125e731d-90fa-44e9-8c6b-6cde729eead9.jpg"
                 });
             }
+            // Adiciona as bancas à base de dados
             await context.Bancas.AddRangeAsync(bancas);
             await context.SaveChangesAsync();
         }
 
+        // Verifica se existem reservas e cria 2 reservas para cada vendedor
         if (!context.Reservas.Any())
         {
             var random = new Random();
+            // Filtra os vendedores
             var vendedores = utilizadores.Where(u => u.Role == "Vendedor").ToList();
             var bancas = await context.Bancas.ToListAsync();
 
+            // Cria 2 reservas para cada vendedor
             foreach (var vendedor in vendedores)
             {
                 for (int i = 1; i <= 2; i++)

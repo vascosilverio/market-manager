@@ -29,6 +29,7 @@ namespace market_manager.Controllers
 		public SignInManager<Utilizadores> _signInManager;
 
 		// Construtor que recebe o contexto da bd APIContext como uma dependência.
+		// O contexto é usado para interagir com a base de dados.
 		public ApiController(ApplicationDbContext context,
 			SignInManager<Utilizadores> signInManager,
 			UserManager<Utilizadores> userManager)
@@ -47,6 +48,7 @@ namespace market_manager.Controllers
 
 		// criar user
 		[HttpPost]
+		// necessario o email e a password
 		public async Task<ActionResult> CreateUser([FromQuery] string email, [FromQuery] string password)
 		{
 			Utilizadores user = new Utilizadores();
@@ -77,6 +79,7 @@ namespace market_manager.Controllers
 		// autenticar user
 		[HttpGet]
 		// necessario o email e a password
+		// o [FromQuery] indica que os valores vêm na query string
 		public async Task<ActionResult> SignInUserAsync([FromQuery] string email, [FromQuery] string password)
 		{
 
@@ -142,8 +145,10 @@ namespace market_manager.Controllers
 
 		// Create
 		[HttpPost]
+		// [FromBody] indica que o objeto vem no corpo do pedido e BancasDTO dto é o objeto que vem no corpo do pedido
 		public ActionResult<Bancas> CreateBanca([FromBody] BancasDTO dto)
 		{
+			// Criar um objeto Banca com os dados recebidos
 			Bancas banca = new Bancas();
 			banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
 			banca.CategoriaBanca = dto.CategoriaBanca;
@@ -164,6 +169,7 @@ namespace market_manager.Controllers
 		[HttpGet]
 		public JsonResult ReadBanca(int id)
 		{
+			// Find é um método da Entity Framework que procura um objeto na base de dados com base na chave primária
 			var result = _context.Bancas.Find(id);
 
 			if (result == null)
@@ -174,6 +180,7 @@ namespace market_manager.Controllers
 
 		// Update
 		[HttpPut]
+		// [FromBody] indica que o objeto vem no corpo do pedido e BancasDTO dto é o objeto que vem no corpo do pedido
 		public async Task<IActionResult> UpdateBancaEstado(int id, [FromBody] BancasDTO dto)
 		{
 			if (dto == null)
@@ -181,14 +188,17 @@ namespace market_manager.Controllers
 				return BadRequest("Invalid data.");
 			}
 
+			// Find é um método da Entity Framework que procura um objeto na base de dados com base na chave primária
 			var banca = _context.Bancas.Find(id);
 			if (banca == null)
 			{
 				return NotFound("Banca não encontrada");
 			}
 
+			// Atualizar os campos da banca
 			banca.EstadoAtualBanca = dto.EstadoAtualBanca;
 
+			// Atualizar a banca na base de dados
 			_context.Bancas.Update(banca);
 			await _context.SaveChangesAsync();
 
@@ -214,6 +224,7 @@ namespace market_manager.Controllers
 		[HttpGet()]
 		public JsonResult GetAllBancas()
 		{
+			// ToList é um método da Entity Framework que transforma um objeto IQueryable numa lista
 			var result = _context.Bancas.ToList();
 
 			return new JsonResult(Ok(result));
@@ -226,8 +237,10 @@ namespace market_manager.Controllers
 
 		// Create
 		[HttpPost]
+		// [FromBody] indica que o objeto vem no corpo do pedido e ReservasDTO dto é o objeto que vem no corpo do pedido
 		public ActionResult<Reservas> CreateReserva([FromBody] ReservasDTO dto)
 		{
+			// Criar um objeto Reservas com os dados recebidos
 			Reservas reserva = new Reservas();
 			reserva.DataInicio = dto.DataInicio;
 			reserva.DataFim = dto.DataFim;
@@ -253,6 +266,7 @@ namespace market_manager.Controllers
 
 		// Update
 		[HttpPut]
+		// [FromBody] indica que o objeto vem no corpo do pedido e ReservasDTO dto é o objeto que vem no corpo do pedido
 		public async Task<IActionResult> UpdateReservaEstado(int id, [FromBody] ReservasDTO dto)
 		{
 			if (dto == null)
@@ -266,6 +280,7 @@ namespace market_manager.Controllers
 				return NotFound("Reserva não encontrada");
 			}
 
+			// Atualizar os campos da reserva
 			reserva.DataInicio = dto.DataInicio;
 			reserva.DataFim = dto.DataFim;
 			reserva.UtilizadorId = dto.UtilizadorId;
@@ -296,6 +311,7 @@ namespace market_manager.Controllers
 		[HttpGet()]
 		public JsonResult GetAllReservas()
 		{
+			// ToList é um método da Entity Framework que transforma um objeto IQueryable numa lista
 			var result = _context.Reservas.ToList();
 
 			return new JsonResult(Ok(result));

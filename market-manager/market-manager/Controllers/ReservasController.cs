@@ -17,6 +17,7 @@ namespace market_manager.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utilizadores> _userManager;
 
+        // Construtor que recebe o contexto da aplicação e o gestor de utilizadores como parâmetros
         public ReservasController(ApplicationDbContext context, UserManager<Utilizadores> userManager)
         {
             _context = context;
@@ -46,6 +47,7 @@ namespace market_manager.Controllers
                 searchString = currentFilter;
             }
 
+            // Obter as reservas
             var reservas = _context.Reservas
             .Include(r => r.Utilizador)
             .Include(r => r.ListaBancas)
@@ -67,6 +69,7 @@ namespace market_manager.Controllers
                     break;
             }
 
+            // Paginação das reserva
             int pageSize = 3;
             return View(await PaginatedList<Reservas>.CreateAsync(reservas.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
@@ -83,6 +86,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            // Obter a reserva com as bancas associadas
             var reserva = await _context.Reservas
                 .Include(r => r.Utilizador)
                 .Include(r => r.ListaBancas)
@@ -113,6 +117,7 @@ namespace market_manager.Controllers
             {
                 ViewData["UtilizadorId"] = user.Id;
             }
+            // bancas disponíveis
             ViewData["UtilizadorId"] = user.Id;
             var bancas = _context.Bancas.Where(b => b.EstadoAtualBanca == Bancas.EstadoBanca.Livre).ToList();
             ViewData["Bancas"] = bancas;
@@ -199,7 +204,9 @@ namespace market_manager.Controllers
             {
                 try
                 {
+                    // Obter a reserva atual
                     var reserva = await _context.Reservas
+                        // Incluir as bancas associadas
                         .Include(r => r.ListaBancas)
                         .FirstOrDefaultAsync(m => m.ReservaId == id);
 
@@ -208,25 +215,30 @@ namespace market_manager.Controllers
                         return NotFound();
                     }
 
+                    // Atualizar os dados da reserva
                     reserva.DataInicio = reservaAtualizada.DataInicio;
                     reserva.DataFim = reservaAtualizada.DataFim;
                     reserva.EstadoActualReserva = reservaAtualizada.EstadoActualReserva;
 
+                    // Obter as bancas atuais e as bancas selecionadas
                     var bancasAtuais = reserva.ListaBancas.ToList();
                     var bancasSelecionadas = await _context.Bancas.Where(b => reservaAtualizada.SelectedBancaIds.Contains(b.BancaId)).ToListAsync();
 
+                    // Remover as bancas que foram desselecionadas
                     foreach (var banca in bancasAtuais.Except(bancasSelecionadas))
                     {
                         reserva.ListaBancas.Remove(banca);
                         banca.EstadoAtualBanca = Bancas.EstadoBanca.Livre;
                     }
 
+                    // Adicionar as bancas que foram selecionadas
                     foreach (var banca in bancasSelecionadas.Except(bancasAtuais))
                     {
                         reserva.ListaBancas.Add(banca);
                         banca.EstadoAtualBanca = Bancas.EstadoBanca.Ocupada;
                     }
 
+                    // Atualizar a reserva se o estado for diferente
                     if (reserva.EstadoActualReserva == Reservas.EstadoReserva.Aprovada)
                     {
                         foreach (var banca in reserva.ListaBancas)
@@ -234,6 +246,8 @@ namespace market_manager.Controllers
                             banca.EstadoAtualBanca = Bancas.EstadoBanca.Ocupada;
                         }
                     }
+
+                    // Atualizar o estado das bancas se a reserva for concluída
                     else if (reserva.EstadoActualReserva == Reservas.EstadoReserva.Concluida)
                     {
                         foreach (var banca in reserva.ListaBancas)
@@ -242,6 +256,7 @@ namespace market_manager.Controllers
                         }
                     }
 
+                    // Atualizar a reserva
                     _context.Update(reserva);
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "Reserva atualizada com sucesso!";
@@ -276,6 +291,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            // Obter a reserva com as bancas associadas
             var reserva = await _context.Reservas
                 .Include(r => r.Utilizador)
                 .Include(r => r.ListaBancas)
@@ -306,6 +322,7 @@ namespace market_manager.Controllers
                 .FirstOrDefaultAsync(m => m.ReservaId == id);
             if (reserva != null)
             {
+                // Atualizar o estado das bancas
                 foreach (var banca in reserva.ListaBancas)
                 {
                     banca.EstadoAtualBanca = Bancas.EstadoBanca.Livre;

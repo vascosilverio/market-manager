@@ -15,6 +15,7 @@ namespace market_manager.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utilizadores> _userManager;
 
+        // Construtor que recebe o contexto da aplicação e o gestor de utilizadores como parâmetros
         public UtilizadoresController(ApplicationDbContext context, UserManager<Utilizadores> userManager)
         {
             _context = context;
@@ -44,6 +45,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            // Utiliza o método FirstOrDefaultAsync para obter o primeiro utilizador cujo ID corresponde ao ID fornecido
             var utilizadores = await _context.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (utilizadores == null)
@@ -74,9 +76,11 @@ namespace market_manager.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Atribui um ID único ao utilizador
                 utilizadores.Id = Guid.NewGuid().ToString();
                 utilizadores.EmailConfirmed = true;
                 utilizadores.Role = role;
+                // Cria o utilizador na base de dados e atribui-lhe a função especificada
                 await _userManager.CreateAsync(utilizadores, password);
                 await _userManager.AddToRoleAsync(utilizadores, role);
 
@@ -100,6 +104,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            // Utiliza o método FindAsync para obter o utilizador cujo ID corresponde ao ID fornecido
             var utilizadores = await _context.Utilizadores.FindAsync(id);
             if (utilizadores == null)
             {
@@ -118,6 +123,7 @@ namespace market_manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Id,NomeCompleto,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,Email,UserName")] Utilizadores utilizadores)
         {
+            // Verifica se o ID fornecido corresponde ao ID do utilizador
             if (id != utilizadores.Id)
             {
                 return NotFound();
@@ -133,6 +139,7 @@ namespace market_manager.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
+                    // Verifica se o utilizador existe
                     if (!UtilizadoresExists(utilizadores.Id))
                     {
                         return NotFound();
@@ -159,6 +166,7 @@ namespace market_manager.Controllers
                 return NotFound();
             }
 
+            // Utiliza o método FirstOrDefaultAsync para obter o primeiro utilizador cujo ID corresponde ao ID fornecido
             var utilizadores = await _context.Utilizadores
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (utilizadores == null)
@@ -183,11 +191,13 @@ namespace market_manager.Controllers
                 return Problem("Entity set 'ApplicationDbContext.Utilizadores'  is null.");
             }
 
+            // Utiliza o método FindAsync para obter o utilizador cujo ID corresponde ao ID fornecido
             var utilizadores = await _context.Utilizadores.FindAsync(id);
             if (utilizadores != null)
             {
                 try
                 {
+                    // Remove todas as reservas associadas ao utilizador
                     var reservas = _context.Reservas.Where(r => r.UtilizadorId == id);
                     _context.Reservas.RemoveRange(reservas);
                     _context.Utilizadores.Remove(utilizadores);
@@ -235,6 +245,7 @@ namespace market_manager.Controllers
         /// <returns>Redirecionamento para a página de perfil</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
+        // utiliza o objeto Utilizadores para receber os dados do utilizador
         public async Task<IActionResult> UpdateProfile([Bind("Id,NomeCompleto,DataNascimento,Telemovel,Morada,CodigoPostal,Localidade,NIF,Email")] Utilizadores utilizadores)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -292,6 +303,7 @@ namespace market_manager.Controllers
 
             try
             {
+                // Remove todas as reservas associadas ao utilizador
                 var reservas = _context.Reservas.Where(r => r.UtilizadorId == user.Id);
                 _context.Reservas.RemoveRange(reservas);
                 await _userManager.DeleteAsync(user);
