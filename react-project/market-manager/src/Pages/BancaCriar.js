@@ -42,14 +42,27 @@ function BancaCriar(props) {
           required
         />
         <label>Categoria:</label>
-        <input
+        <select
           type="number"
           value={bancaData.categoriaBanca}
-          onChange={(e) =>
+          onChange={(e) =>{
             setBancaData({ ...bancaData, categoriaBanca: parseInt(e.target.value, 10) })
+            console.log(e.target.value);
+          }
+            
           }
           required
-        />
+        >
+          <option>Escolha uma opção</option>
+          <option value={0}>Congelados</option>
+          <option value={1}>Refrigerados</option>
+          <option value={2}>Frescos</option>
+          <option value={3}>Secos</option>
+          <option value={4}>Peixe</option>
+          <option value={5}>Carne</option>
+
+
+        </select>
         <label>Largura:</label>
         <input
           type="number"

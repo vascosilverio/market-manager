@@ -46,7 +46,12 @@ function Bancas() {
             <div className="BancaDetails">
               <p>ID da Banca: {banca.bancaId}</p>
               <p>Comprimento: {banca.comprimento}</p>
-              <p>Categoria da Banca: {banca.categoriaBanca}</p>
+              {banca.categoriaBanca === 0 && <p>Categoria da Banca: Congelados</p>}
+              {banca.categoriaBanca === 1 && <p>Categoria da Banca: Refrigerados</p>}
+              {banca.categoriaBanca === 2 && <p>Categoria da Banca: Frescos</p>}
+              {banca.categoriaBanca === 3 && <p>Categoria da Banca: Secos</p>}
+              {banca.categoriaBanca === 4 && <p>Categoria da Banca: Peixe</p>}
+              {banca.categoriaBanca === 5 && <p>Categoria da Banca: Carne</p>}
               <p>Largura: {banca.largura}</p>
               <p className="identificador">Nome Identificador da Banca: {banca.nomeIdentificadorBanca}</p>
               <p>LocalizaoX: {banca.localizacaoX}</p>

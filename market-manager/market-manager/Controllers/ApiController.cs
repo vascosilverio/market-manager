@@ -5,6 +5,10 @@ using market_manager.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using market_manager.Models.DTOs;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace market_manager.Controllers
 {
@@ -296,9 +300,14 @@ namespace market_manager.Controllers
 		[HttpGet()]
 		public JsonResult GetAllReservas()
 		{
-			var result = _context.Reservas.ToList();
+			var result = _context.Reservas.Include(r => r.ListaBancas).ToList();
 
-			return new JsonResult(Ok(result));
+			var options = new JsonSerializerOptions
+			{
+				ReferenceHandler = ReferenceHandler.Preserve
+			};
+			return new JsonResult(new { sucess = true , data = result , message="Sucesss" }, options);
+			
 		}
 	}
 }

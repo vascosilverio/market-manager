@@ -49,7 +49,7 @@ function Reservas() {
               {reserva.estadoActualReserva === 1 && <p>Estado Atual da Reserva: Recusada</p>}
               {reserva.estadoActualReserva === 2 && <p>Estado Atual da Reserva: Pendente</p>}
               {reserva.estadoActualReserva === 3 && <p>Estado Atual da Reserva: Concluída</p>}
-              <p>Reservas: {reserva.selectedReservaIds}</p>
+              <p>Reservas: {reserva.ListaBancas.$id}</p>
             </div>
             <div className="ReservaButtons">
               <Link to={`/eliminar_reserva/${reserva.reservaId}`}>
