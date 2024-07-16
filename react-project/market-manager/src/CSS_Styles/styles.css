@@ -1,0 +1,296 @@
+/* App.css */
+.App {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+/* Bancas.css */
+.Bancas {
+  padding: 20px;
+}
+
+.Bancas h1 {
+  margin-bottom: 20px;
+}
+
+.Bancas .form-control {
+  max-width: 400px;
+}
+
+.Bancas .Table {
+  margin-top: 20px;
+}
+
+.Bancas .no-results {
+  margin-top: 20px;
+  font-style: italic;
+}
+
+.Bancas .error {
+  color: red;
+  margin-top: 20px;
+}
+
+/* CriarReserva.css */
+.CriarReserva {
+  padding: 20px;
+}
+
+.CriarReserva h2 {
+  margin-bottom: 20px;
+}
+
+.CriarReserva .Form {
+  max-width: 500px;
+}
+
+.CriarReserva .banca-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 20px;
+  margin-top: 20px;
+}
+
+.CriarReserva .text-danger {
+  margin-top: 10px;
+}
+
+.CriarReserva .text-success {
+  margin-top: 10px;
+  color: green;
+}
+
+/* EditarReserva.css */
+.EditarReserva {
+  padding: 20px;  
+}
+
+.EditarReserva h2 {
+  margin-bottom: 20px;
+}
+
+.EditarReserva .Form {
+  max-width: 500px;
+}
+
+.EditarReserva .text-danger {
+  margin-top: 10px;  
+}
+
+.EditarReserva .text-success {
+  margin-top: 10px;
+  color: green;
+}
+
+/* Footer.css */
+body {
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 200px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 200px;
+  background-color: #2f3a42;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 0px;
+}
+
+.socialMedia svg {
+  color: white;
+  margin: 20px;
+  font-size: 70px;
+  cursor: pointer;
+}
+
+.footer p {
+  color: white;
+}
+
+.footer a{
+  color: white;
+} 
+
+.FooterLogos {
+  height: 70px;
+  vertical-align: auto;
+  margin: 20px;
+  font-size: 70px;
+  cursor: pointer;
+}
+
+/* Home.css */
+.headerContainer {
+   margin:auto;
+   text-align:center;
+   font-size: 50px;
+   color: rgb(255, 255, 255);
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   height: 50vh;
+   width: auto;
+  }
+
+.headerContainer h1 {
+  justify-content: center;
+  align-items: center;
+  font-size: 90px;
+  height: 5px;
+  font-weight: 50;
+  color: rgb(255, 255, 255);
+}
+
+.headerContainer p {
+  padding: 0;
+  font-size: 30px;
+  font-weight: lighter;
+  color: rgb(255, 255, 255);
+}
+
+.headerContainer button {
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  justify-content: center;
+  background-color: #ffffff;
+  height: 50px;
+  width: 180px;
+  text-decoration: none;
+  font-size: 20px;
+  margin:auto;
+  text-align:center;
+}
+
+.headerContainer button:hover {
+  background-color: #2f3a42;
+  cursor: pointer;
+  color:white;
+  transition: 0.3s ease-in;
+  filter: brightness(100%);
+  box-shadow: 10px 10px 10px #000;
+}
+
+.headerContainer button:active {
+  box-shadow: inset 2px 2px 10px #000;
+}
+
+/* Login.css */
+.Login {
+  padding: 20px;
+}
+
+.Login h2 {
+  margin-bottom: 20px;
+}
+
+.Login .Form {
+  max-width: 400px;
+}
+
+.Login .text-danger {
+  margin-top: 10px;
+}
+
+/* Navbar.css */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: white;
+  padding: 20px;
+}
+
+.navbar .leftSide {
+  display: flex;
+  align-items: center;
+}
+
+.navbar .user-role {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.navbar .rightSide a,
+.navbar .hiddenLinks a {
+  color: white;
+  text-decoration: none;
+  margin-left: 20px;
+}
+
+.navbar .rightSide button {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar .rightSide a {
+    display: none;
+  }
+  
+  .navbar .rightSide button {
+    display: block;
+  }
+  
+  .navbar .hiddenLinks {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    padding: 20px;
+  }
+  
+  .navbar .hiddenLinks a {
+    margin: 10px 0;
+  }
+  
+  .navbar #open .hiddenLinks {
+    display: flex;
+  }
+}
+
+/* Reservas.css */
+.Reservas {
+  padding: 20px;
+}
+
+.Reservas h1 {
+  margin-bottom: 20px;
+}
+
+.Reservas .form-control {
+  max-width: 400px;
+}
+
+.Reservas .Table {
+  margin-top: 20px;
+}
+
+.Reservas .no-results {
+  margin-top: 20px;
+  font-style: italic;
+}
+
+.Reservas .error {
+  color: red;
+  margin-top: 20px;  
+}

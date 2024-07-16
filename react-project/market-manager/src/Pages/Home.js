@@ -1,33 +1,28 @@
 import React from 'react';
-import {Link} from "react-router-dom";
-import HomeVideo from "../Content/HomeVideo.mp4"
-import "../CSS_Styles/Home.css";
+import { Link } from 'react-router-dom';
+import '../CSS_Styles/Home.css';
 
 function Home() {
+  const userRole = localStorage.getItem('userRole');
+
   return (
-    //vídeo de fundo
-    <div className="home">
-      <video autoPlay loop muted
-        style={{
-          position: "absolute",
-          width: "100%",
-          left: "50%",
-          top: "50%",
-          height: "100%",
-          objectFit: "cover",
-          transform: "translate(-50%, -50%)",
-          zIndex: "-1"
-        }}>
-        <source src={HomeVideo} type="video/mp4" />
-      </video>
-      <div className='headerContainer'>
-        <h1> MarketManager </h1>
-        <p> Gestão e Reserva de Bancas</p>
-        <Link to="/bancas">
-          <button id='HomeButton'> Bancas </button>
-        </Link>
+    <>
+      <div className="home">
+        <div className="headerContainer">
+          <h1 className="display-4">Bem Vindo ao Market Manager</h1>
+          <h2>Gestor de reservas em bancas de mercado local.</h2>
+          <p>Desenvolvido pelos alunos</p>
+          <p>Vasco Silvério: Nº22350</p>
+          <p>Miguel Brazão: Nº25260</p>
+          {userRole && (
+            <div>
+              <Link to="/bancas" className="btn btn-primary me-2">Bancas</Link>
+              <Link to="/reservas" className="btn btn-primary">Reservas</Link>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

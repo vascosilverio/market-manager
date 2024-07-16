@@ -8,327 +8,396 @@ using market_manager.Models.DTOs;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR.Protocol;
+using Microsoft.Extensions.Logging;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace market_manager.Controllers
 {
-	[Route("api/[action]")]
-	[ApiController]
-	public class ApiController : Controller
-	{
-		private readonly ApplicationDbContext _context;
+    [Route("api")]
+    [ApiController]
+    public class ApiController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<Utilizadores> _userManager;
+        public SignInManager<Utilizadores> _signInManager;
+        private IConfiguration _config;
+        private readonly ILogger<ApiController> _logger;
 
-		/// <summary>
-		/// para fins de autenticação
-		/// o _userManager faz a pesquisa nas tabelas da base de dados
-		/// </summary>
-		private readonly UserManager<Utilizadores> _userManager;
+        public ApiController(ApplicationDbContext context,
+            SignInManager<Utilizadores> signInManager,
+            UserManager<Utilizadores> userManager,
+            IConfiguration config,
+            ILogger<ApiController> logger)
+        {
+            _context = context;
+            _signInManager = signInManager;
+            _userManager = userManager;
+            _config = config;
+            _logger = logger;
+        }
 
-		/// <summary>
-		/// para fins de autenticação
-		/// o _signInManager é quem gere a autenticação em si, é quem diz ao servidor
-		/// que x utilizador da base de dados está agora autenticado, podendo serem assim aceites
-		/// requests desse utilizador
-		/// </summary>
-		public SignInManager<Utilizadores> _signInManager;
+        [HttpPost("registo")]
+        public async Task<ActionResult> CreateUser([FromBody] RegisterDTO dto)
+        {
+            Utilizadores user = new Utilizadores();
+            user.UserName = dto.Email;
+            user.Email = dto.Email;
+            user.NormalizedUserName = user.UserName.ToUpper();
+            user.NormalizedEmail = user.Email.ToUpper();
+            user.NomeCompleto = dto.NomeCompleto;
+            user.DataNascimento = dto.DataNascimento;
+            user.Telemovel = dto.Telemovel;
+            user.Morada = dto.Morada;
+            user.CodigoPostal = dto.CodigoPostal;
+            user.Localidade = dto.Localidade;
+            user.CC = dto.CC;
+            user.NIF = dto.NIF;
+            user.Role = "Vendedor";
+            user.Id = Guid.NewGuid().ToString();
+            user.PasswordHash = null;
+            user.PasswordHash = new PasswordHasher<Utilizadores>().HashPassword(null, dto.Password);
 
-		// 
-		private IConfiguration _config;
+            var result = await _userManager.CreateAsync(user);
+            _context.SaveChanges();
 
-		// Construtor que recebe o contexto da bd APIContext como uma dependência.
-		public ApiController(ApplicationDbContext context,
-			SignInManager<Utilizadores> signInManager,
-			UserManager<Utilizadores> userManager,
-			IConfiguration config)
-		{
-			// permitir o acesso ao contexto da bd dentro das ações do controlador, _ indica uma variável privada
-			_context = context;
-			_signInManager = signInManager;
-			_userManager = userManager;
-			_config = config;
-		}
+            if (result.Succeeded)
+            {
+                return Ok("Usuário criado com sucesso");
+            }
+            else
+            {
+                return BadRequest("Erro ao criar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+        }
 
-		
-		
+        [HttpPost("login")]
+        public async Task<ActionResult> SignInUserAsync([FromBody] LoginDTO dto)
+        {
+            _logger.LogInformation($"Login attempt for email: {dto.Email}");
 
-		/// <summary>
-		/// operações da API que
-		/// têm a ver com users
-		/// </summary>
+            if (dto == null || string.IsNullOrEmpty(dto.Email) || string.IsNullOrEmpty(dto.Password))
+            {
+                return BadRequest("Invalid login data");
+            }
 
-		// criar user
-		[HttpPost]
-		public async Task<ActionResult> CreateUser([FromQuery] string email, [FromQuery] string password)
-		{
-			Utilizadores user = new Utilizadores();
-			user.UserName = email;
-			user.Email = email;
-			user.NormalizedUserName = user.UserName.ToUpper();
-			user.NormalizedEmail = user.Email.ToUpper();
-			user.NomeCompleto = email;
-			user.PasswordHash = null;
-			user.Role = "Vendedor";
-			user.Id = Guid.NewGuid().ToString();
-			user.PasswordHash = new PasswordHasher<Utilizadores>().HashPassword(null, password);
+            var user = await _userManager.FindByEmailAsync(dto.Email);
 
-			var result = await _userManager.CreateAsync(user);
-			_context.SaveChanges();
+            if (user == null)
+            {
+                return BadRequest("Invalid email or password");
+            }
 
-			if (result.Succeeded)
-			{
-				return Ok("Usuário criado com sucesso");
-			}
-			else
-			{
-				return BadRequest("Erro ao criar usuário: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-			}
-		}
+            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
 
+            if (result.Succeeded)
+            {
+                var token = await GenerateJwtToken(user);
+                return Ok(new { Token = token, UserRole = user.Role, UserId = user.Id });
+            }
 
-		// autenticar user
-		[HttpGet]
-		// necessario o email e a password
-		public async Task<ActionResult> SignInUserAsync([FromQuery] string email, [FromQuery] string password)
-		{
+            return BadRequest("Invalid email or password");
+        }
 
-			Utilizadores user = _userManager.FindByEmailAsync(email).Result; // .Result pois é um método assíncrono
-																			 // o resultado da tarefa acima vai ser um IdentityUser
+        private async Task<string> GenerateJwtToken(Utilizadores user)
+        {
+            var jwtKey = _config["Jwt:Key"];
+            var jwtIssuer = _config["Jwt:Issuer"];
 
-			// se o user existir
-			if (user != null)
-			{
-				/// <summary>
-				/// Verificação da password
-				/// Recebe utilizador que esta na bd e recebe a password
-				/// vai fazer o hash da password, se for igual ao da bd, houve sucesso
-				/// </summary>
-				PasswordVerificationResult passWorks = new PasswordHasher<Utilizadores>().VerifyHashedPassword(null, user.PasswordHash, password);
-				if (passWorks.Equals(PasswordVerificationResult.Success))
-				{
-					// aqui é adicionado à sessão o cookie de autenticação que irá permitir que o user autenticado faça requests
-					var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-					var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer))
+            {
+                _logger.LogError("JWT configuration is missing or invalid");
+                throw new InvalidOperationException("JWT configuration is invalid");
+            }
 
-					var Sectoken = new JwtSecurityToken(_config["Jwt:Issuer"],
-					  _config["Jwt:Issuer"],
-					  null,
-					  expires: DateTime.Now.AddMinutes(120),
-					  signingCredentials: credentials);
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
 
-					var token = new JwtSecurityTokenHandler().WriteToken(Sectoken);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddMinutes(120);
 
-					return Ok(token);
-				}
+            var token = new JwtSecurityToken(
+                jwtIssuer,
+                jwtIssuer,
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
 
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
 
-			}
-			return BadRequest("Erro ao autenticar usuário");
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult> LogoutUser()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok("Logout com sucesso");
+        }
 
-		}
+        [HttpPost]
+        [Authorize(Roles = "Gestor")]
+        public ActionResult<Bancas> CreateBanca([FromBody] BancasDTO dto)
+        {
+            Bancas banca = new Bancas();
+            banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
+            banca.CategoriaBanca = dto.CategoriaBanca;
+            banca.Largura = dto.Largura;
+            banca.Comprimento = dto.Comprimento;
+            banca.LocalizacaoX = dto.LocalizacaoX;
+            banca.LocalizacaoY = dto.LocalizacaoY;
+            banca.EstadoAtualBanca = dto.EstadoAtualBanca;
+            banca.FotografiaBanca = dto.FotografiaBanca;
 
+            _context.Bancas.Add(banca);
+            _context.SaveChanges();
 
-		// logout user
-		[HttpPost]
-		public async Task<ActionResult> LogoutUser()
-		{
-			// aqui é removido da sessão o cookie de autenticação, revogando as autorizações de requests ao utilizador atual
-			await _signInManager.SignOutAsync();
-			return Ok("Logout com sucesso");
-		}
+            return CreatedAtAction(nameof(ReadBanca), new { id = banca.BancaId }, banca);
+        }
 
+        [HttpGet("bancas/{id}")]
+        [Authorize]
+        public ActionResult<Bancas> ReadBanca(int id)
+        {
+            var result = _context.Bancas.Find(id);
 
-		/// <summary>
-		/// operações CRUD da API sobre bancas
-		/// </summary>
+            if (result == null)
+                return NotFound();
 
-		// Create/Edit
-		//[HttpPost]
-		//public JsonResult CreateUpdate(Bancas banca)
-		//{
-			//if (banca.BancaId == 0)
-			//{
-				//_context.Bancas.Add(banca);
-			//}
-			//else
-			//{
-				//var BancaNaDb = _context.Bancas.Find(banca.BancaId);
+            return Ok(result);
+        }
 
-				//if (BancaNaDb == null)
-					//return new JsonResult(NotFound());
-				//BancaNaDb = banca;
-			//}
+        [HttpPut("bancas/{id}")]
+        [Authorize(Roles = "Gestor")]
+        public async Task<IActionResult> UpdateBanca(int id, [FromBody] BancasDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+            var banca = _context.Bancas.Find(id);
+            if (banca == null)
+            {
+                return NotFound("Banca não encontrada");
+            }
 
-			//_context.SaveChanges();
+            banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
+            banca.CategoriaBanca = dto.CategoriaBanca;
+            banca.Largura = dto.Largura;
+            banca.Comprimento = dto.Comprimento;
+            banca.LocalizacaoX = dto.LocalizacaoX;
+            banca.LocalizacaoY = dto.LocalizacaoY;
+            banca.EstadoAtualBanca = dto.EstadoAtualBanca;
+            banca.FotografiaBanca = "foto.jpg";
 
-			//return new JsonResult(Ok(banca));
-		//}
+            _context.Bancas.Update(banca);
+            await _context.SaveChangesAsync();
 
-		// Create
-		[HttpPost]
-		public ActionResult<Bancas> CreateBanca([FromBody] BancasDTO dto)
-		{
-			Bancas banca = new Bancas();
-			banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
-			banca.CategoriaBanca = dto.CategoriaBanca;
-			banca.Largura = dto.Largura;
-			banca.Comprimento = dto.Comprimento;
-			banca.LocalizacaoX = dto.LocalizacaoX;
-			banca.LocalizacaoY = dto.LocalizacaoY;
-			banca.EstadoAtualBanca = dto.EstadoAtualBanca;
-			banca.FotografiaBanca = dto.FotografiaBanca;
+            return NoContent();
+        }
 
-			_context.Bancas.Add(banca);
-			_context.SaveChanges();
+        [HttpDelete("bancas/{id}")]
+        [Authorize(Roles = "Gestor")]
+        public async Task<IActionResult> DeleteBanca(int id)
+        {
+            var banca = await _context.Bancas.FindAsync(id); 
+            if (banca == null)
+                return NotFound();
 
-			return Ok("Banca criada com sucesso");
-		}
+            if (await _context.Reservas.AnyAsync(r => r.ListaBancas.Contains(banca)))
+                return Conflict("Cannot delete banca with associated reservas");
 
-		// Read
-		[HttpGet]
-		public JsonResult ReadBanca(int id)
-		{
-			var result = _context.Bancas.Find(id);
+            _context.Bancas.Remove(banca);
+            await _context.SaveChangesAsync();
 
-			if (result == null)
-				return new JsonResult(NotFound());
+            return NoContent();
+        }
 
-			return new JsonResult(Ok(result));
-		}
+        [HttpGet("bancas")]
+        [Authorize]
+        public async Task<JsonResult> GetAllBancas()
+        {
+            _logger.LogInformation("GetAllBancas called");
+            try
+            {
+                var user = HttpContext.User;
+                if (user == null || !user.Identity.IsAuthenticated)
+                {
+                    _logger.LogWarning("Unauthorized access attempt to GetAllBancas");
+                    return new JsonResult(new { success = false, message = "User is not authenticated" }) { StatusCode = 401 };
+                }
 
-		// Update
-		[HttpPut]
-		public async Task<IActionResult> UpdateBanca(int id, [FromBody] BancasDTO dto)
-		{
-			if (dto == null)
-			{
-				return BadRequest("Invalid data.");
-			}
+                _logger.LogInformation($"User {user.Identity.Name} authorized for GetAllBancas");
+                var bancas = await _context.Bancas.Include(b => b.Reservas).ToListAsync();
 
-			var banca = _context.Bancas.Find(id);
-			if (banca == null)
-			{
-				return NotFound("Banca não encontrada");
-			}
+                var options = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                };
 
-			banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
-			banca.CategoriaBanca = dto.CategoriaBanca;
-			banca.Largura = dto.Largura;
-			banca.Comprimento = dto.Comprimento;
-			banca.LocalizacaoX = dto.LocalizacaoX;
-			banca.LocalizacaoY = dto.LocalizacaoY;
-			banca.EstadoAtualBanca = dto.EstadoAtualBanca;
-			banca.FotografiaBanca = dto.FotografiaBanca;
-
-			_context.Bancas.Update(banca);
-			await _context.SaveChangesAsync();
-
-			return Ok("Estado da Banca Atualizado com sucesso");
-		}
-
-		// Delete
-		[HttpDelete]
-		public JsonResult DeleteBanca(int id)
-		{
-			var result = _context.Bancas.Find(id);
-
-			if (result == null)
-				return new JsonResult(NotFound());
-
-			_context.Bancas.Remove(result);
-			_context.SaveChanges();
-
-			return new JsonResult(NoContent());
-		}
-
-		// Get all
-		[HttpGet()]
-		public JsonResult GetAllBancas()
-		{
-			var result = _context.Bancas.ToList();
-
-			return new JsonResult(Ok(result));
-		}
+                return new JsonResult(new { success = true, data = bancas, message = "Bancas retrieved successfully" }, options);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching bancas");
+                return new JsonResult(new { success = false, message = "An error occurred while processing your request." }) { StatusCode = 500 };
+            }
+        }
 
 
-		/// <summary>
-		/// operações CRUD da API sobre reservas
-		/// </summary>
 
-		// Create
-		[HttpPost]
-		public ActionResult<Reservas> CreateReserva([FromBody] ReservasDTO dto)
-		{
-			Reservas reserva = new Reservas();
-			reserva.DataInicio = dto.DataInicio;
-			reserva.DataFim = dto.DataFim;
-			reserva.UtilizadorId = dto.UtilizadorId;
-			reserva.EstadoActualReserva = dto.EstadoActualReserva;
-			_context.Reservas.Add(reserva);
-			_context.SaveChanges();
+        [HttpPost]
+        [Authorize]
+        public ActionResult<Reservas> CreateReserva([FromBody] ReservasDTO dto)
+        {
+            Reservas reserva = new Reservas();
+            reserva.DataInicio = dto.DataInicio;
+            reserva.DataFim = dto.DataFim;
+            reserva.UtilizadorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            reserva.EstadoActualReserva = dto.EstadoActualReserva;
+            reserva.ListaBancas = _context.Bancas.Where(b => dto.SelectedBancaIds.Contains(b.BancaId)).ToList();
+            _context.Reservas.Add(reserva);
+            _context.SaveChanges();
 
-			return Ok("Reserva criada com sucesso");
-		}
+            return CreatedAtAction(nameof(ReadReserva), new { id = reserva.ReservaId }, reserva);
+        }
 
-		// Read
-		[HttpGet]
-		public JsonResult ReadReserva(int id)
-		{
-			var result = _context.Reservas.Find(id);
+        [HttpGet("reservas/{id}")]
+        [Authorize]
+        public ActionResult<Reservas> ReadReserva(int id)
+        {
+            var result = _context.Reservas.Include(r => r.ListaBancas).FirstOrDefault(r => r.ReservaId == id);
+            if (result == null)
+                return NotFound();
 
-			if (result == null)
-				return new JsonResult(NotFound());
+            return Ok(result);
+        }
 
-			return new JsonResult(Ok(result));
-		}
+        [HttpPut("reservas/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateReserva(int id, [FromBody] ReservasDTO dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest("Invalid data.");
+            }
 
-		// Update
-		[HttpPut]
-		public async Task<IActionResult> UpdateReservaEstado(int id, [FromBody] ReservasDTO dto)
-		{
-			if (dto == null)
-			{
-				return BadRequest("Invalid data.");
-			}
+            var reserva = _context.Reservas.Include(r => r.ListaBancas).FirstOrDefault(r => r.ReservaId == id);
+            if (reserva == null)
+            {
+                return NotFound("Reserva não encontrada");
+            }
 
-			var reserva = _context.Reservas.Find(id);
-			if (reserva == null)
-			{
-				return NotFound("Reserva não encontrada");
-			}
+            if (reserva.UtilizadorId != User.FindFirst(ClaimTypes.NameIdentifier).Value && !User.IsInRole("Gestor"))
+                return Forbid();
 
-			reserva.DataInicio = dto.DataInicio;
-			reserva.DataFim = dto.DataFim;
-			reserva.UtilizadorId = dto.UtilizadorId;
-			reserva.EstadoActualReserva = dto.EstadoActualReserva;
+            reserva.DataInicio = dto.DataInicio;
+            reserva.DataFim = dto.DataFim;
+            reserva.EstadoActualReserva = User.IsInRole("Gestor") ? dto.EstadoActualReserva : reserva.EstadoActualReserva;
+            reserva.ListaBancas = _context.Bancas.Where(b => dto.SelectedBancaIds.Contains(b.BancaId)).ToList();
 
-			_context.Reservas.Update(reserva);
-			await _context.SaveChangesAsync();
+            _context.Reservas.Update(reserva);
+            await _context.SaveChangesAsync();
 
-			return Ok("Estado da Reserva Atualizado com sucesso");
-		}
+            return NoContent();
+        }
 
-		// Delete
-		[HttpDelete]
-		public JsonResult DeleteReserva(int id)
-		{
-			var result = _context.Reservas.Find(id);
+        [HttpDelete("reservas/{id}")]
+        [Authorize]
+        public ActionResult<Reservas> DeleteReserva(int id)
+        {
+            var result = _context.Reservas.Find(id);
 
-			if (result == null)
-				return new JsonResult(NotFound());
+            if (result == null)
+                return NotFound();
 
-			_context.Reservas.Remove(result);
-			_context.SaveChanges();
+            if (result.UtilizadorId != User.FindFirst(ClaimTypes.NameIdentifier).Value && !User.IsInRole("Gestor"))
+                return Forbid();
 
-			return new JsonResult(NoContent());
-		}
+            _context.Reservas.Remove(result);
+            _context.SaveChanges();
 
-		// Get all
-		[HttpGet()]
-		public JsonResult GetAllReservas()
-		{
-			var result = _context.Reservas.ToList();
+            return NoContent();
+        }
 
-			return new JsonResult(Ok(result));
-		}
-	}
+        [HttpPost]
+        [Route("bancas/{bancaId}/reservas")]
+        [Authorize(Roles = "Gestor")]
+        public async Task<IActionResult> CreateReservaForBanca(int bancaId, [FromBody] ReservasDTO dto)
+        {
+            var banca = await _context.Bancas.FindAsync(bancaId);
+
+            if (banca == null)
+            {
+                return NotFound("Banca não encontrada");
+            }
+
+            var reserva = new Reservas
+            {
+                DataInicio = dto.DataInicio,
+                DataFim = dto.DataFim,
+                UtilizadorId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
+                EstadoActualReserva = dto.EstadoActualReserva,
+                ListaBancas = new List<Bancas> { banca }
+            };
+
+            _context.Reservas.Add(reserva);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(ReadReserva), new { id = reserva.ReservaId }, reserva);
+        }
+
+        [HttpGet("reservas")]
+        [Authorize]
+        public async Task<JsonResult> GetAllReservas()
+        {
+            _logger.LogInformation("GetAllReservas called");
+            try
+            {
+                var user = HttpContext.User;
+                if (user == null || !user.Identity.IsAuthenticated)
+                {
+                    _logger.LogWarning("Unauthorized access attempt to GetAllReservas");
+                    return new JsonResult(new { success = false, message = "User is not authenticated" }) { StatusCode = 401 };
+                }
+
+                var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                _logger.LogInformation($"User {userId} authorized for GetAllReservas");
+
+                List<Reservas> reservas;
+                if (user.IsInRole("Gestor"))
+                {
+                    reservas = await _context.Reservas.Include(r => r.ListaBancas).ToListAsync();
+                }
+                else
+                {
+                    reservas = await _context.Reservas
+                        .Include(r => r.ListaBancas)
+                        .Where(r => r.UtilizadorId == userId)
+                        .ToListAsync();
+                }
+
+                var options = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                };
+
+                return new JsonResult(new { success = true, data = reservas, message = "Reservas retrieved successfully" }, options);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching reservas");
+                return new JsonResult(new { success = false, message = "An error occurred while processing your request." }) { StatusCode = 500 };
+            }
+        }
+    }
 }

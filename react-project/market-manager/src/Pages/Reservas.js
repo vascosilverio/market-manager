@@ -1,75 +1,137 @@
 import React, { useEffect, useState } from 'react';
-import Axios from "axios";
-import "../CSS_Styles/Reservas.css";
-import {Link} from "react-router-dom";
-import ReservaFoto from '../Content/Banca.jpg';
+import axios from 'axios';
+import { Link, useHistory } from 'react-router-dom';
+import { Table, Button } from 'react-bootstrap';
 
 function Reservas() {
-  //varivel de estado que armazena o conteúdo da bd com as Reservas
-  //useState é um hook e Reserva é a variável de estado atual, sendo que set_reserva é a função que a atualiza
-  const [reserva, set_reserva] = useState([]);
+  const [reservas, setReservas] = useState([]);
   const [search, setSearch] = useState("");
-  const apiURL = "https://localhost:7172/api";
+  const [error, setError] = useState('');
+  const history = useHistory();
+  const userRole = localStorage.getItem('userRole');
+  const userId = localStorage.getItem('userId');
 
   useEffect(() => {
-    Axios.get(`${apiURL}/GetAllReservas`).then((response) => {
-      console.log(response.data); // Verifique os dados recebidos
-      const data = response.data.value; // Acesse o campo "value"
-      set_reserva(Array.isArray(data) ? data : []); // Garante que os dados são um array
-    }).catch((error) => {
-      console.error("Erro ao buscar dados da API:", error);
-      set_reserva([]); // Define um array vazio em caso de erro
-    });
-  }, []);
-  
-  const filteredReserva = Array.isArray(reserva) ? reserva.filter(reserva =>
-    reserva.reservaId.toString().toLowerCase().includes(search.toLowerCase()) ||
-    reserva.utilizador.toLowerCase().includes(search.toLowerCase())
-  ) : [];
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      history.push('/login');
+    } else {
+      const fetchReservas = async () => {
+        try {
+          const response = await axios.get('https://localhost:7172/api/reservas', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          console.log('API Response:', response.data);
+          if (response.data.success) {
+            if (userRole === 'Gestor') {
+              setReservas(response.data.data.$values);
+            } else {
+              setReservas(response.data.data.$values.filter(r => r.UtilizadorId === userId));
+            }
+          } else {
+            setError(response.data.message || 'Failed to fetch reservas');
+          }
+        } catch (error) {
+          console.error('Error fetching reservas:', error.response || error);
+          setError(error.response?.data?.message || 'An error occurred while fetching reservas');
+          if (error.response?.status === 401) {
+            history.push('/login');
+          }
+        }
+      };
+
+      fetchReservas();
+    }
+  }, [history, userRole, userId]);
+
+  const filteredReservas = reservas.filter(reserva => {
+    const searchLower = search.toLowerCase();
+    return reserva.ReservaId && reserva.ReservaId.toString().toLowerCase().includes(searchLower);
+  });
+
+  const getReservaEstadoString = (estadoId) => {
+    switch (estadoId) {
+      case 0: return 'Aprovada';
+      case 1: return 'Recusada';
+      case 2: return 'Pendente';
+      case 3: return 'Concluída';
+      default: return 'Desconhecido';
+    }
+  };
+
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
 
   return (
-    //funcionalidade de pesquisa
-    <div className='Reservas'>
-      <h1 className=''></h1>
-      <input
-        type="text"
-        placeholder="Pesquisar..."
-        onChange={e => setSearch(e.target.value)}
-      />
-      {filteredReserva.length > 0 ? filteredReserva.map((reserva, index) => (
-        //dar display do conteúdo da bd no ecrã
-        <div key={index}>
-          <img className='ReservaFoto' src={ReservaFoto} />
-            <div className="ReservaDetails">
-              <p>ID da Reserva: {reserva.reservaId}</p>
-              <p>Data Início: {reserva.dataInicio}</p>
-              <p>Data Fim: {reserva.dataFim}</p>
-              <p>Utilizador: {reserva.utilizadorId}</p>
-              {reserva.estadoActualReserva === 0 && <p>Estado Atual da Reserva: Aprovada</p>}
-              {reserva.estadoActualReserva === 1 && <p>Estado Atual da Reserva: Recusada</p>}
-              {reserva.estadoActualReserva === 2 && <p>Estado Atual da Reserva: Pendente</p>}
-              {reserva.estadoActualReserva === 3 && <p>Estado Atual da Reserva: Concluída</p>}
-              <p>Reservas: {reserva.selectedReservaIds}</p>
-            </div>
-            <div className="ReservaButtons">
-              <Link to={`/eliminar_reserva/${reserva.reservaId}`}>
-                <button className='button' > Eliminar </button>
-              </Link>  
-            </div> 
-        </div>    
-      )) : <p>Loading...</p>}
-      <div id="footer" className='footer'></div> {/* Este elemento representa o footer */}
+    <div className="Reservas">
+      <h1>Reservas</h1>
+      <div className="mb-3">
+        <input
+          type="text"
+          placeholder="Pesquisar..."
+          className="form-control"
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
+      {(userRole === 'Vendedor' || userRole === 'Gestor') && (
+        <Button as={Link} to="/criar_reserva" variant="primary" className="mb-3">
+          Criar Nova Reserva
+        </Button>
+      )}
+      {filteredReservas.length > 0 ? (
+        <Table striped bordered responsive>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Data Início</th>
+              <th>Data Fim</th>
+              <th>Estado Atual</th>
+              <th>Utilizador ID</th>
+              <th>Bancas</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredReservas.map((reserva) => (
+              <tr key={reserva.ReservaId}>
+                <td>{reserva.ReservaId}</td>
+                <td>{reserva.DataInicio && new Date(reserva.DataInicio).toLocaleDateString()}</td>
+                <td>{reserva.DataFim && new Date(reserva.DataFim).toLocaleDateString()}</td>
+                <td>{reserva.EstadoActualReserva !== undefined && getReservaEstadoString(reserva.EstadoActualReserva)}</td>
+                <td>{reserva.UtilizadorId}</td>
+                <td>
+                  {reserva.ListaBancas && reserva.ListaBancas.$values && reserva.ListaBancas.$values.map(banca => (
+                    <div key={banca.BancaId}>
+                      <Link to={`/detalhes_banca/${banca.BancaId}`}>
+                        Banca ID: {banca.BancaId}
+                      </Link>
+                    </div>
+                  ))}
+                </td>
+                <td>
+                  <Button as={Link} to={`/detalhes_reserva/${reserva.ReservaId}`} size="sm" variant="info" className="me-2">
+                    Detalhes
+                  </Button>
+                  {(userRole === 'Gestor' || reserva.UtilizadorId === userId) && (
+                    <>
+                      <Button as={Link} to={`/editar_reserva/${reserva.ReservaId}`} size="sm" variant="warning" className="me-2">
+                        Editar
+                      </Button>
+                      <Button as={Link} to={`/apagar_reserva/${reserva.ReservaId}`} size="sm" variant="danger">
+                        Apagar
+                      </Button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : <p className="no-results">Nenhuma reserva encontrada.</p>}
     </div>
   );
 }
-
-// <div key={index}>
-// Esta linha começa a definição de um elemento div para cada Reserva. 
-// A propriedade key é usada para dar a cada div uma chave única. 
-// É necessária ao criar listas de elementos em React.
-// Reserva.map((Reserva, index) , Reserva vai ser o conteúdo da linha da bd
-// por isso é que fazemos Reserva.Nome e etc
-// <p>Loading...</p> é para caso não haja conteúdo (ou ainda esteja a ser carregado) ou aconteça alguma
-// coisa vá impedir o display do conteúdo, caso isto aconteça, é mostrado "Loading..."
 
 export default Reservas;

@@ -1,82 +1,152 @@
 import React, { useEffect, useState } from 'react';
-import Axios from "axios";
-import "../CSS_Styles/Bancas.css";
-import BancaFoto from "../Content/Banca.jpg"
-import {Link} from "react-router-dom";
+import axios from 'axios';
+import { Link, useHistory } from 'react-router-dom';
+import { Table, Button } from 'react-bootstrap';
 
 function Bancas() {
-  //varivel de estado que armazena o conteúdo da bd com as bancas
-  //useState é um hook e banca é a variável de estado atual, sendo que set_banca é a função que a atualiza
-  const [banca, set_banca] = useState([]);
+  const [bancas, setBancas] = useState([]);
   const [search, setSearch] = useState("");
-  const apiURL = "https://localhost:7172/api";
+  const [error, setError] = useState('');
+  const history = useHistory();
+  const userRole = localStorage.getItem('userRole');
 
   useEffect(() => {
-    Axios.get(`${apiURL}/GetAllBancas`).then((response) => {
-      console.log(response.data); // Verifique os dados recebidos
-      const data = response.data.value; // Acesse o campo "value"
-      set_banca(Array.isArray(data) ? data : []); // Garante que os dados são um array
-    }).catch((error) => {
-      console.error("Erro ao buscar dados da API:", error);
-      set_banca([]); // Define um array vazio em caso de erro
-    });
-  }, []);
-  
-  const filteredBanca = Array.isArray(banca) ? banca.filter(banca =>
-    banca.bancaId.toString().toLowerCase().includes(search.toLowerCase()) ||
-    banca.nomeIdentificadorBanca.toLowerCase().includes(search.toLowerCase())
-  ) : [];
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      history.push('/login');
+    } else {
+      const fetchBancas = async () => {
+        try {
+          const response = await axios.get('https://localhost:7172/api/bancas', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          console.log('API Response:', response.data);
+          if (response.data.success) {
+            setBancas(response.data.data.$values);
+          } else {
+            setError(response.data.message || 'Failed to fetch bancas');
+          }
+        } catch (error) {
+          console.error('Error fetching bancas:', error.response || error);
+          setError(error.response?.data?.message || 'An error occurred while fetching bancas');
+          if (error.response?.status === 401) {
+            history.push('/login');
+          }
+        }
+      };
+
+      fetchBancas();
+    }
+  }, [history]);
+
+  const filteredBancas = bancas.filter(banca => {
+    const searchLower = search.toLowerCase();
+    return (
+      (banca.BancaId && banca.BancaId.toString().toLowerCase().includes(searchLower)) ||
+      (banca.NomeIdentificadorBanca && banca.NomeIdentificadorBanca.toLowerCase().includes(searchLower))
+    );
+  });
+
+  const getBancaEstadoString = (estadoId) => {
+    switch (estadoId) {
+      case 0: return 'Ocupada';
+      case 1: return 'Livre';
+      case 2: return 'Manutenção';
+      default: return 'Desconhecido';
+    }
+  };
+
+  const getBancaCategoriaString = (categoriaId) => {
+    switch (categoriaId) {
+      case 0: return 'Congelados';
+      case 1: return 'Refrigerados';
+      case 2: return 'Frescos';
+      case 3: return 'Secos';
+      case 4: return 'Peixe';
+      case 5: return 'Carne';
+      default: return 'Desconhecido';
+    }
+  };
+
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
 
   return (
-    //funcionalidade de pesquisa
-    <div className='Bancas'>
-      <h1 className=''></h1>
-      <input
-        type="text"
-        placeholder="Pesquisar..."
-        onChange={e => setSearch(e.target.value)}
-      />
-        <Link to={`/criar_banca`}>
-          <button className='button_create_banca'> Criar Nova Banca </button>
-        </Link>
-      {filteredBanca.length > 0 ? filteredBanca.map((banca, index) => (
-        //dar display do conteúdo da bd no ecrã
-        <div key={index}>
-          <img className='BancaFoto' src={BancaFoto} />
-            <div className="BancaDetails">
-              <p>ID da Banca: {banca.bancaId}</p>
-              <p>Comprimento: {banca.comprimento}</p>
-              <p>Categoria da Banca: {banca.categoriaBanca}</p>
-              <p>Largura: {banca.largura}</p>
-              <p className="identificador">Nome Identificador da Banca: {banca.nomeIdentificadorBanca}</p>
-              <p>LocalizaoX: {banca.localizacaoX}</p>
-              {banca.estadoAtualBanca === 0 && <p>Estado Atual da Banca: Ocupada</p>}
-              {banca.estadoAtualBanca === 1 && <p>Estado Atual da Banca: Livre</p>}
-              {banca.estadoAtualBanca === 2 && <p>Estado Atual da Banca: Em Manutenção</p>}
-              <p>LocalizaoY: {banca.localizacaoY}</p>
-            </div> 
-            <div className="BancaButtons">
-              <Link to={`/eliminar_banca/${banca.bancaId}`}>
-                <button className='button' > Eliminar </button>
-              </Link>  
-              <Link to={`/editar_banca/${banca.bancaId}`}> 
-                <button className='button'> Editar </button>
-              </Link> 
-            </div>
-        </div>    
-      )) : <p>Loading...</p>}
-      <div id="footer" className='footer'></div> {/* Este elemento representa o footer */}
+    <div className="Bancas">
+      <h1>Bancas</h1>
+      <div className="mb-3">
+        <input
+          type="text"
+          placeholder="Pesquisar..."
+          className="form-control"
+          onChange={e => setSearch(e.target.value)}
+        />
+      </div>
+      {userRole === 'Gestor' && (
+        <Button as={Link} to="/criar_banca" variant="primary" className="mb-3">
+          Criar Nova Banca
+        </Button>
+      )}
+      {filteredBancas.length > 0 ? (
+        <Table striped bordered responsive>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome Identificador</th>
+              <th>Categoria</th>
+              <th>Estado Atual</th>
+              <th>Localização X</th>
+              <th>Localização Y</th>
+              <th>Largura</th>
+              <th>Comprimento</th>
+              <th>Reservas</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredBancas.map((banca) => (
+              <tr key={banca.BancaId}>
+                <td>{banca.BancaId}</td>
+                <td>{banca.NomeIdentificadorBanca}</td>
+                <td>{banca.CategoriaBanca !== undefined && getBancaCategoriaString(banca.CategoriaBanca)}</td>
+                <td>{banca.EstadoAtualBanca !== undefined && getBancaEstadoString(banca.EstadoAtualBanca)}</td>
+                <td>{banca.LocalizacaoX}</td>
+                <td>{banca.LocalizacaoY}</td>
+                <td>{banca.Largura}</td>
+                <td>{banca.Comprimento}</td>
+                <td>
+                  {banca.Reservas && banca.Reservas.$values && banca.Reservas.$values.map(reserva => (
+                    <div key={reserva.ReservaId}>
+                      <Link to={`/detalhes_reserva/${reserva.ReservaId}`}>
+                        Reserva ID: {reserva.ReservaId}
+                      </Link>
+                    </div>
+                  ))}
+                </td>
+                <td>
+                  <Button as={Link} to={`/detalhes_banca/${banca.BancaId}`} size="sm" variant="info" className="me-2">
+                    Detalhes
+                  </Button>
+                  {userRole === 'Gestor' && (
+                    <>
+                      <Button as={Link} to={`/editar_banca/${banca.BancaId}`} size="sm" variant="warning" className="me-2">
+                        Editar
+                      </Button>
+                      <Button as={Link} to={`/apagar_banca/${banca.BancaId}`} size="sm" variant="danger">
+                        Apagar
+                      </Button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : <p className="no-results">Nenhuma banca encontrada.</p>}
     </div>
   );
 }
-
-// <div key={index}>
-// Esta linha começa a definição de um elemento div para cada banca. 
-// A propriedade key é usada para dar a cada div uma chave única. 
-// É necessária ao criar listas de elementos em React.
-// banca.map((banca, index) , banca vai ser o conteúdo da linha da bd
-// por isso é que fazemos banca.Nome e etc
-// <p>Loading...</p> é para caso não haja conteúdo (ou ainda esteja a ser carregado) ou aconteça alguma
-// coisa vá impedir o display do conteúdo, caso isto aconteça, é mostrado "Loading..."
 
 export default Bancas;

@@ -1,0 +1,20 @@
+.EditarReserva {
+  padding: 20px;  
+}
+
+.EditarReserva h2 {
+  margin-bottom: 20px;
+}
+
+.EditarReserva .Form {
+  max-width: 500px;
+}
+
+.EditarReserva .text-danger {
+  margin-top: 10px;  
+}
+
+.EditarReserva .text-success {
+  margin-top: 10px;
+  color: green;
+}
