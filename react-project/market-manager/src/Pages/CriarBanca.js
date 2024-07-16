@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
-import { useAuth } from '../AuthContext';
 
 function CriarBanca() {
   const [nomeIdentificador, setNomeIdentificador] = useState('');
@@ -13,7 +12,6 @@ function CriarBanca() {
   const [comprimento, setComprimento] = useState('');
   const [error, setError] = useState('');
   const history = useHistory();
-  const { currentUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

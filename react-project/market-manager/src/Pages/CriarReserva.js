@@ -31,22 +31,27 @@ function CriarReserva() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://localhost:7172/api/reservas', {
+      const token = localStorage.getItem('token');
+      console.log('Token being sent:', token);
+      
+      const response = await axios.post('https://localhost:7172/api/reservas', {
         dataInicio,
         dataFim,
-        utilizadorId: userId,
         selectedBancaIds: selectedBancas,
         estadoActualReserva: 2 // Pendente
       }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
+      
+      console.log('Response:', response.data);
+      
       setSuccess(true);
       setTimeout(() => {
         history.push('/reservas');
       }, 2000);
     } catch (error) {
-      console.error('Error creating reserva:', error);
-      setError('Failed to create reserva');
+      console.error('Error creating reserva:', error.response?.data || error.message);
+      setError('Failed to create reserva: ' + (error.response?.data || error.message));
     }
   };
 

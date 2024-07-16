@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Card, Button } from 'react-bootstrap';
 import axios from 'axios';
-import { useAuth } from '../AuthContext';
 
 function ApagarBanca() {
   const { id } = useParams();

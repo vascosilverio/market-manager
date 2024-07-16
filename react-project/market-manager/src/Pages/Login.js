@@ -21,10 +21,10 @@ const Login = () => {
         password
       });
   
-      const { token, userRole, userId } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('userRole', userRole);
-      localStorage.setItem('userId', userId);
+      const { Token, UserRole, UserId } = response.data;
+      localStorage.setItem('token', Token);
+      localStorage.setItem('userRole', UserRole);
+      localStorage.setItem('userId', UserId);
   
       history.push('/home');
     } catch (error) {

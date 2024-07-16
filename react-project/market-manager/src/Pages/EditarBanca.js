@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
-import { useAuth } from '../AuthContext';
 
 function EditarBanca() {
   const { id } = useParams();
@@ -15,7 +14,6 @@ function EditarBanca() {
   const [estadoAtual, setEstadoAtual] = useState('');
   const [error, setError] = useState('');
   const history = useHistory();
-  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchBanca = async () => {

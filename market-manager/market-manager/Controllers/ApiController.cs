@@ -114,12 +114,12 @@ namespace market_manager.Controllers
             }
 
             var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Role, user.Role)
+    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -136,7 +136,7 @@ namespace market_manager.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        [HttpPost]
+        [HttpPost("logout")]
         [Authorize]
         public async Task<ActionResult> LogoutUser()
         {
@@ -144,22 +144,24 @@ namespace market_manager.Controllers
             return Ok("Logout com sucesso");
         }
 
-        [HttpPost]
+        [HttpPost("bancas")]
         [Authorize(Roles = "Gestor")]
-        public ActionResult<Bancas> CreateBanca([FromBody] BancasDTO dto)
+        public async Task<ActionResult<Bancas>> CreateBanca([FromBody] BancasDTO dto)
         {
-            Bancas banca = new Bancas();
-            banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
-            banca.CategoriaBanca = dto.CategoriaBanca;
-            banca.Largura = dto.Largura;
-            banca.Comprimento = dto.Comprimento;
-            banca.LocalizacaoX = dto.LocalizacaoX;
-            banca.LocalizacaoY = dto.LocalizacaoY;
-            banca.EstadoAtualBanca = dto.EstadoAtualBanca;
-            banca.FotografiaBanca = dto.FotografiaBanca;
+            var banca = new Bancas
+            {
+                NomeIdentificadorBanca = dto.NomeIdentificadorBanca,
+                CategoriaBanca = dto.CategoriaBanca,
+                Largura = dto.Largura,
+                Comprimento = dto.Comprimento,
+                LocalizacaoX = dto.LocalizacaoX,
+                LocalizacaoY = dto.LocalizacaoY,
+                EstadoAtualBanca = dto.EstadoAtualBanca,
+                FotografiaBanca = dto.FotografiaBanca ?? "default.jpg"
+            };
 
             _context.Bancas.Add(banca);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(ReadBanca), new { id = banca.BancaId }, banca);
         }
@@ -180,14 +182,10 @@ namespace market_manager.Controllers
         [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> UpdateBanca(int id, [FromBody] BancasDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Invalid data.");
-            }
-            var banca = _context.Bancas.Find(id);
+            var banca = await _context.Bancas.FindAsync(id);
             if (banca == null)
             {
-                return NotFound("Banca não encontrada");
+                return NotFound();
             }
 
             banca.NomeIdentificadorBanca = dto.NomeIdentificadorBanca;
@@ -197,9 +195,8 @@ namespace market_manager.Controllers
             banca.LocalizacaoX = dto.LocalizacaoX;
             banca.LocalizacaoY = dto.LocalizacaoY;
             banca.EstadoAtualBanca = dto.EstadoAtualBanca;
-            banca.FotografiaBanca = "foto.jpg";
+            banca.FotografiaBanca = dto.FotografiaBanca ?? banca.FotografiaBanca;
 
-            _context.Bancas.Update(banca);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -209,12 +206,11 @@ namespace market_manager.Controllers
         [Authorize(Roles = "Gestor")]
         public async Task<IActionResult> DeleteBanca(int id)
         {
-            var banca = await _context.Bancas.FindAsync(id); 
+            var banca = await _context.Bancas.FindAsync(id);
             if (banca == null)
+            {
                 return NotFound();
-
-            if (await _context.Reservas.AnyAsync(r => r.ListaBancas.Contains(banca)))
-                return Conflict("Cannot delete banca with associated reservas");
+            }
 
             _context.Bancas.Remove(banca);
             await _context.SaveChangesAsync();
@@ -255,18 +251,49 @@ namespace market_manager.Controllers
 
 
 
-        [HttpPost]
+        [HttpPost("reservas")]
         [Authorize]
-        public ActionResult<Reservas> CreateReserva([FromBody] ReservasDTO dto)
+        public async Task<ActionResult<Reservas>> CreateReserva([FromBody] ReservasDTO dto)
         {
-            Reservas reserva = new Reservas();
-            reserva.DataInicio = dto.DataInicio;
-            reserva.DataFim = dto.DataFim;
-            reserva.UtilizadorId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            reserva.EstadoActualReserva = dto.EstadoActualReserva;
-            reserva.ListaBancas = _context.Bancas.Where(b => dto.SelectedBancaIds.Contains(b.BancaId)).ToList();
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            _logger.LogInformation($"Attempting to create reservation for user ID: {userId}");
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.LogWarning("User ID not found in claims");
+                return BadRequest("User ID not found in claims");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                _logger.LogWarning($"User not found in database for ID: {userId}");
+                return BadRequest("User not found in database");
+            }
+
+            _logger.LogInformation($"User found: {user.UserName}");
+
+            var reserva = new Reservas
+            {
+                DataInicio = dto.DataInicio,
+                DataFim = dto.DataFim,
+                UtilizadorId = userId,
+                EstadoActualReserva = dto.EstadoActualReserva,
+                ListaBancas = await _context.Bancas.Where(b => dto.SelectedBancaIds.Contains(b.BancaId)).ToListAsync()
+            };
+
             _context.Reservas.Add(reserva);
-            _context.SaveChanges();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"Reservation created successfully for user {userId}");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, $"Error saving reservation for user {userId}");
+                return BadRequest("Error creating reservation. Please try again.");
+            }
 
             return CreatedAtAction(nameof(ReadReserva), new { id = reserva.ReservaId }, reserva);
         }
@@ -286,26 +313,22 @@ namespace market_manager.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateReserva(int id, [FromBody] ReservasDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Invalid data.");
-            }
-
-            var reserva = _context.Reservas.Include(r => r.ListaBancas).FirstOrDefault(r => r.ReservaId == id);
+            var reserva = await _context.Reservas.Include(r => r.ListaBancas).FirstOrDefaultAsync(r => r.ReservaId == id);
             if (reserva == null)
             {
-                return NotFound("Reserva não encontrada");
+                return NotFound();
             }
 
             if (reserva.UtilizadorId != User.FindFirst(ClaimTypes.NameIdentifier).Value && !User.IsInRole("Gestor"))
+            {
                 return Forbid();
+            }
 
             reserva.DataInicio = dto.DataInicio;
             reserva.DataFim = dto.DataFim;
             reserva.EstadoActualReserva = User.IsInRole("Gestor") ? dto.EstadoActualReserva : reserva.EstadoActualReserva;
-            reserva.ListaBancas = _context.Bancas.Where(b => dto.SelectedBancaIds.Contains(b.BancaId)).ToList();
+            reserva.ListaBancas = await _context.Bancas.Where(b => dto.SelectedBancaIds.Contains(b.BancaId)).ToListAsync();
 
-            _context.Reservas.Update(reserva);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -313,18 +336,21 @@ namespace market_manager.Controllers
 
         [HttpDelete("reservas/{id}")]
         [Authorize]
-        public ActionResult<Reservas> DeleteReserva(int id)
+        public async Task<IActionResult> DeleteReserva(int id)
         {
-            var result = _context.Reservas.Find(id);
-
-            if (result == null)
+            var reserva = await _context.Reservas.FindAsync(id);
+            if (reserva == null)
+            {
                 return NotFound();
+            }
 
-            if (result.UtilizadorId != User.FindFirst(ClaimTypes.NameIdentifier).Value && !User.IsInRole("Gestor"))
+            if (reserva.UtilizadorId != User.FindFirst(ClaimTypes.NameIdentifier).Value && !User.IsInRole("Gestor"))
+            {
                 return Forbid();
+            }
 
-            _context.Reservas.Remove(result);
-            _context.SaveChanges();
+            _context.Reservas.Remove(reserva);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

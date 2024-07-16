@@ -1,33 +1,31 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from "react-router-dom";
 import ReorderIcon from "@mui/icons-material/Reorder";
-import { useAuth } from '../AuthContext';
 
 function Navbar() {
   const [openLinks, setOpenLinks] = useState(false);
-  const { currentUser, logout } = useAuth();
   const history = useHistory();
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('userRole');
 
   const NavbarToggle = () => {
     setOpenLinks(!openLinks);
   };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
     history.push('/login');
   };
 
   return (
     <div className='navbar'>
       <div className='leftSide' id={openLinks ? "open" : "close"}>
-        {currentUser && (
-          <span className="user-role">{currentUser.role}</span>
-        )}
         <div className='hiddenLinks'>
-          {currentUser ? (
+          {token && role ? (
             <>
               <Link to="/home"> Home </Link>
-              {currentUser.role === 'Gestor' && <Link to="/Bancas"> Bancas </Link>}
+              {role === 'Gestor' && <Link to="/Bancas"> Bancas </Link>}
               <Link to="/Reservas"> Reservas </Link>
               <Link to='/' onClick={handleLogout}>Logout</Link>
             </>
@@ -40,10 +38,10 @@ function Navbar() {
         </div>
       </div>
       <div className='rightSide'>
-        {currentUser ? (
+        {token && role ? (
           <>
             <Link to="/home"> Home </Link>
-            {currentUser.role === 'Gestor' && <Link to="/Bancas"> Bancas </Link>}
+            {role === 'Gestor' && <Link to="/Bancas"> Bancas </Link>}
             <Link to="/Reservas"> Reservas </Link>
             <Link to='/' onClick={handleLogout}>Logout</Link>
           </>

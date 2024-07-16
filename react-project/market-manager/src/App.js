@@ -15,7 +15,7 @@ import ApagarBanca from "./Pages/ApagarBanca";
 import DetalhesBanca from "./Pages/DetalhesBanca";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from "./AuthContext";
-import './CSS_Styles/styles.css';  // Unified CSS file
+import './CSS_Styles/styles.css'; 
 
 function App() {
   return (
